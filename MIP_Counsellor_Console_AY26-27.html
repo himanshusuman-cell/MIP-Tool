@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIP Counsellor Console — AY 26-27</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+  :root{
+    /* Ink & paper */
+    --ink:#0F1B36;          /* PW navy, authority */
+    --ink-2:#28365c;
+    --paper:#F3F6FC;
+    --card:#ffffff;
+    --line:#E3E9F4;
+    --muted:#64748B;
+
+    /* Stream identity */
+    --jee:#4338CA;          /* indigo  = JEE */
+    --neet:#047857;         /* emerald = NEET */
+
+    /* Vertical identity */
+    --vp:#1E3A8A;           /* deep blue  = Vidyapeeth */
+    --ps:#0F766E;           /* teal       = Pathshala */
+
+    /* Plan ladder (Basic -> PRO -> Pro Max) */
+    --basic:#546484;
+    --pro:#1D4ED8;
+    --promax:#B45309;
+    --gold:#F0B429;
+
+    --ok:#047857;
+    --no:#C2410C;
+    --warn:#B45309;
+    --plan:var(--basic);    /* live accent: set by the selected plan */
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:
+      radial-gradient(900px 380px at 12% -8%, #E7EDFB 0%, transparent 60%),
+      radial-gradient(700px 320px at 95% 2%, #E4F5F1 0%, transparent 55%),
+      var(--paper);
+    color:#16223f;
+    font-family:'Inter',-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+    font-size:15px;line-height:1.55;padding-bottom:70px;
+  }
+  h1,h2,.tname,.price,.gt{font-family:'Sora','Inter',Arial,sans-serif;letter-spacing:-.015em;}
+
+  /* ---------- Masthead ---------- */
+  header{
+    background:linear-gradient(115deg,#0B1428 0%,#16295C 48%,#1E3A8A 100%);
+    color:#fff;padding:22px 28px;display:flex;align-items:center;justify-content:space-between;
+    flex-wrap:wrap;gap:12px;position:relative;overflow:hidden;
+    border-bottom:3px solid var(--gold);
+  }
+  header::after{
+    content:"";position:absolute;inset:0;pointer-events:none;opacity:.16;
+    background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px);
+    background-size:34px 34px;
+    -webkit-mask-image:linear-gradient(105deg,transparent 45%,#000 100%);
+            mask-image:linear-gradient(105deg,transparent 45%,#000 100%);
+  }
+  header>*{position:relative;z-index:1;}
+  header h1{font-size:23px;font-weight:800;}
+  header .sub{font-size:12.5px;color:#B9C7EA;margin-top:3px;letter-spacing:.01em;}
+  .badge{background:var(--gold);color:#221703;font-weight:700;font-size:11.5px;padding:7px 14px;border-radius:999px;box-shadow:0 3px 10px rgba(240,180,41,.35);}
+
+  .wrap{max-width:1200px;margin:0 auto;padding:26px 18px;}
+
+  /* ---------- Section headings (numbered: the flow is a real sequence) ---------- */
+  h2.sec{
+    font-size:15px;font-weight:700;color:var(--ink);text-transform:uppercase;letter-spacing:.09em;
+    margin:32px 0 12px;padding-left:13px;border-left:4px solid var(--plan);display:flex;align-items:center;gap:9px;
+  }
+  h2.sec:first-of-type{margin-top:6px;}
+
+  /* ---------- Choice chips ---------- */
+  .chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:11px;margin:0 0 18px;}
+  .chip{
+    --c:var(--ink-2);
+    background:var(--card);border:1.5px solid var(--line);border-left:5px solid var(--c);
+    border-radius:12px;padding:14px 13px;text-align:left;cursor:pointer;
+    font-family:'Sora','Inter',sans-serif;font-weight:700;font-size:15px;color:var(--ink);
+    transition:transform .14s ease, box-shadow .14s ease, background .14s ease;
+    box-shadow:0 1px 2px rgba(16,27,54,.05);user-select:none;
+  }
+  .chip small{display:block;font-family:'Inter',sans-serif;font-weight:500;color:var(--muted);font-size:11.5px;margin-top:3px;letter-spacing:.02em;}
+  .chip:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(16,27,54,.10);}
+  .chip:focus-visible{outline:3px solid var(--gold);outline-offset:2px;}
+  .chip.jee{--c:var(--jee);} .chip.neet{--c:var(--neet);}
+  .chip[data-v="VP"]{--c:var(--vp);} .chip[data-v="PS"]{--c:var(--ps);}
+  .chip.active{
+    background:var(--c);border-color:var(--c);color:#fff;
+    box-shadow:0 10px 24px color-mix(in srgb, var(--c) 38%, transparent);
+  }
+  .chip.active small{color:rgba(255,255,255,.82);}
+
+  .hidden{display:none;}
+
+  /* ---------- Plan cards ---------- */
+  .tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px;}
+  .tier{
+    --c:var(--basic);
+    background:var(--card);border-radius:16px;border:1.5px solid var(--line);overflow:hidden;
+    box-shadow:0 2px 8px rgba(16,27,54,.06);display:flex;flex-direction:column;
+    cursor:pointer;transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+  }
+  .tier.basic{--c:var(--basic);} .tier.pro{--c:var(--pro);} .tier.promax{--c:var(--promax);}
+  .tier:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(16,27,54,.12);}
+  .tier .head{padding:17px 15px 15px;text-align:center;color:#fff;position:relative;
+    background:linear-gradient(160deg, var(--c) 0%, color-mix(in srgb, var(--c) 72%, #000) 100%);}
+  .tier .head .tname{font-size:18px;font-weight:800;letter-spacing:.01em;}
+  .tier .head .price{font-size:29px;font-weight:800;margin-top:5px;}
+  .tier .head .price span{font-size:11px;font-weight:500;opacity:.85;font-family:'Inter',sans-serif;}
+  .hero-flag{background:var(--gold);color:#221703;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:999px;display:inline-block;margin-top:7px;letter-spacing:.04em;}
+  .tier.sel{border-color:var(--c);box-shadow:0 0 0 3px color-mix(in srgb, var(--c) 26%, transparent),0 14px 30px rgba(16,27,54,.14);transform:translateY(-3px);}
+  .tier .picktag{display:none;font-size:11px;font-weight:700;background:color-mix(in srgb, var(--c) 13%, #fff);color:var(--c);
+    padding:6px 10px;margin:11px 15px 0;border-radius:8px;text-align:center;letter-spacing:.03em;}
+  .tier.sel .picktag{display:block;}
+  .tier .tag{font-size:12.5px;text-align:center;padding:10px 14px;color:var(--muted);background:#FAFBFE;border-bottom:1px solid var(--line);font-style:italic;margin-top:11px;}
+  .tier ul{list-style:none;padding:12px 16px 6px;flex:1;}
+  .tier li{font-size:13.5px;padding:6px 0 6px 24px;position:relative;border-bottom:1px dashed #EDF1F8;line-height:1.5;}
+  .tier li:last-child{border-bottom:none;}
+  .tier li.y::before{content:"\2713";position:absolute;left:2px;top:6px;color:var(--ok);font-weight:800;}
+  .tier li.n{color:#AFB8C9;text-decoration:line-through;}
+  .tier li.n::before{content:"\2715";position:absolute;left:2px;top:6px;color:#D5DBE6;}
+  .tier li.hd{
+    font-family:'Sora',sans-serif;font-weight:700;color:var(--c);padding:12px 0 5px;font-size:11px;
+    text-transform:uppercase;letter-spacing:.1em;border-bottom:none;
+  }
+  .tier li.hd::before{content:"";}
+  .copybtn{
+    margin:10px 15px 15px;padding:11px;border:none;border-radius:10px;background:var(--c);color:#fff;
+    font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.02em;
+    transition:filter .14s ease;
+  }
+  .copybtn:hover{filter:brightness(1.08);}
+  .copybtn:active{transform:translateY(1px);}
+  .copybtn:focus-visible{outline:3px solid var(--gold);outline-offset:2px;}
+
+  /* ---------- Tables ---------- */
+  table{width:100%;border-collapse:separate;border-spacing:0;background:var(--card);
+    border-radius:13px;overflow:hidden;box-shadow:0 2px 8px rgba(16,27,54,.06);border:1px solid var(--line);}
+  th,td{padding:11px 13px;font-size:13.5px;text-align:center;border-bottom:1px solid #EEF2F8;}
+  th{background:var(--plan);color:#fff;font-family:'Sora',sans-serif;font-size:11.5px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.07em;border-bottom:none;}
+  tr:last-child td{border-bottom:none;}
+  tbody tr:nth-child(even) td,table tr:nth-child(even) td{background:#FBFCFE;}
+  td:first-child,th:first-child{text-align:left;font-weight:600;}
+  tr.total td{background:color-mix(in srgb, var(--plan) 11%, #fff)!important;font-weight:800;color:var(--plan);border-top:2px solid color-mix(in srgb, var(--plan) 35%, #fff);}
+  .note{font-size:12.5px;color:var(--muted);margin-top:9px;line-height:1.6;}
+  .ok{color:var(--ok);font-weight:700;} .no{color:var(--no);font-weight:600;}
+
+  /* ---------- Controls ---------- */
+  .centre-controls{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+  select,input[type=text]{
+    padding:10px 13px;border:1.5px solid var(--line);border-radius:10px;font-size:13.5px;
+    background:var(--card);color:var(--ink);font-family:'Inter',sans-serif;transition:border-color .14s ease,box-shadow .14s ease;
+  }
+  select:focus,input[type=text]:focus{outline:none;border-color:var(--plan);box-shadow:0 0 0 3px color-mix(in srgb, var(--plan) 18%, transparent);}
+
+  .pending{background:#FFF8E8;border:1.5px dashed var(--gold);border-radius:12px;padding:16px;text-align:center;font-size:13.5px;color:#7A5A0B;}
+
+  /* ---------- Glossary ---------- */
+  .gwrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px;}
+  .gcard{border-radius:14px;padding:17px 19px;box-shadow:0 2px 8px rgba(16,27,54,.06);border:1px solid rgba(0,0,0,.06);
+    transition:transform .14s ease, box-shadow .14s ease;}
+  .gcard:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(16,27,54,.11);}
+  .gcard .gt{font-weight:800;font-size:17px;margin-bottom:7px;line-height:1.3;}
+  .gcard .gd{font-size:15px;line-height:1.6;color:#233052;}
+  .gcard .gmeta{display:inline-block;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;padding:5px 12px;
+    border-radius:999px;margin-bottom:9px;color:#fff;letter-spacing:.03em;}
+  .gcard ul.gb{margin:10px 0 0 19px;padding:0;}
+  .gcard ul.gb li{font-size:14.5px;line-height:1.65;color:#233052;margin-bottom:2px;}
+  .gcard.wide{grid-column:1/-1;}
+
+  footer{text-align:center;font-size:11.5px;color:var(--muted);margin-top:40px;padding:0 18px;line-height:1.7;}
+
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(8px);
+    background:var(--ink);color:#fff;padding:12px 22px;border-radius:999px;font-size:13.5px;font-weight:600;
+    opacity:0;transition:.25s ease;pointer-events:none;box-shadow:0 10px 30px rgba(15,27,54,.35);}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  @media (max-width:640px){
+    header{padding:18px 16px;} header h1{font-size:19px;}
+    .wrap{padding:20px 13px;} .tier .head .price{font-size:25px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important;animation:none!important;}
+    .chip:hover,.tier:hover,.gcard:hover{transform:none;}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>MIP with RTS — Counsellor Console</h1>
+    <div class="sub">Marks Improvement Program · Offline Test Series · AY 2026-27 · PW Vidyapeeth</div>
+  </div>
+  <span class="badge">Starting @ ₹3,999* · Prices incl. GST · Same for VP &amp; PS</span>
+</header>
+
+<div class="wrap">
+  <h2 class="sec">Step 1 — Select Vertical</h2>
+  <div class="chips" style="grid-template-columns:repeat(2,1fr);max-width:520px">
+    <div class="chip vchip active" data-v="VP" tabindex="0" onclick="selectVertical('VP')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectVertical('VP')}">Vidyapeeth (VP)<small>Offline Centres</small></div>
+    <div class="chip vchip" data-v="PS" tabindex="0" onclick="selectVertical('PS')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectVertical('PS')}">Pathshala (PS)<small>Pathshala Centres</small></div>
+  </div>
+
+  <div id="psFlow" class="hidden">
+    <h2 class="sec">Step 2 — Select Cohort (one click, everything loads)</h2>
+    <div class="chips" id="psChips"></div>
+    <div class="note" style="margin:2px 0 6px"><b>Class &rarr; Online Batch Name</b> &middot; AY 2027 online batches mapped to each class</div>
+    <div class="batchholder" style="overflow-x:auto;margin-bottom:6px"></div>
+    <div id="psResult" class="hidden">
+      <h2 class="sec">Step 3 — PS Offerings: <span id="psCohortLabel" style="color:var(--red)"></span></h2>
+      <div class="note" style="margin:-4px 0 12px">Duration: August 2026 – June 2027 · Validity: Till the Exam · Batches: PS MIP (Basic) - Offline Test · PS MIP (Pro) - Offline Test + Real Test · PS MIP (Pro+DT) - Offline Test + Real Test</div>
+      <div class="note" style="margin:-4px 0 8px">&#8505;&#65039; Click any plan card to see its exact test breakdown in the table below.</div>
+      <div class="tiers" id="psTiers"></div>
+
+      <h2 class="sec">No. of Tests — <span id="psCountLabel"></span></h2>
+      <div style="overflow-x:auto"><table id="psCountTable"></table></div>
+      <div class="note" id="psCountNote"></div>
+    </div>
+    <div id="psIntro">
+      <h2 class="sec">Test Types &amp; Terms — Explained in Plain Language</h2>
+      <div class="note" style="margin:-4px 0 10px">Select a cohort above to see offerings and centre availability. Source: MIP Counsellor Handbook AY 2026-27.</div>
+      <div class="gholder"></div>
+    </div>
+
+    <div id="psCentreSec" class="hidden">
+      <h2 class="sec">PS Centre Availability — Pathshala Centres (AY 26-27)</h2>
+      <div id="psCentreBox"></div>
+    </div>
+  </div>
+
+  <div id="vpFlow">
+  <h2 class="sec">Step 2 — Select Cohort (one click, everything loads)</h2>
+  <div class="chips" id="chips"></div>
+  <div class="note" style="margin:2px 0 6px"><b>Class &rarr; Online Batch Name</b> &middot; AY 2027 online batches mapped to each class</div>
+  <div class="batchholder" style="overflow-x:auto;margin-bottom:6px"></div>
+
+  <div id="result" class="hidden">
+    <h2 class="sec">Step 3 — Offerings &amp; Pricing: <span id="cohortLabel" style="color:var(--red)"></span></h2>
+    <div class="note" style="margin:-4px 0 8px">&#8505;&#65039; Click any plan card to see its exact test breakdown in the table below.</div>
+    <div class="tiers" id="tiers"></div>
+
+    <h2 class="sec">No. of Tests — <span id="countLabel"></span></h2>
+    <div style="overflow-x:auto"><table id="countTable"></table></div>
+    <div class="note" id="countNote"></div>
+  </div>
+
+  <div id="vpIntro">
+    <h2 class="sec">Test Types &amp; Terms — Explained in Plain Language</h2>
+    <div class="note" style="margin:-4px 0 10px">Select a cohort above to see pricing, test counts and centre availability. Source: MIP Counsellor Handbook AY 2026-27.</div>
+    <div class="gholder"></div>
+  </div>
+
+  <div id="vpCentreSec" class="hidden">
+    <h2 class="sec">VP Centre Availability — MIP Live Centres (AY 26-27)</h2>
+    <div id="centreBox"></div>
+  </div>
+  </div>
+</div>
+
+<footer>Internal counselling aid · Sources: MIP AY 26-27 Final Counselling Deck · MIP Counsellor Handbook AY 26-27 · PS MIP Batch Listing AY 26-27 · MIP Targets AY26-27 (Final centers) · Verify with latest circular before commitment.</footer>
+<div class="toast" id="toast">Copied!</div>
+
+<script>
+/* =====================================================================
+   DATA — sourced only from "MIP_AY_26-27_Final_Counselling_Deck_.pptx"
+   ===================================================================== */
+
+const PRICING = {
+  "11": { basic: 3999, pro: 5999, promax: 9499 },
+  "12": { basic: 5499, pro: 8499, promax: 13999 },
+  "dr": { basic: 5499, pro: 8499, promax: 13999 }
+};
+
+const TAGLINES = {
+  basic:  "Entry tier — offline test exposure at the best price.",
+  pro:    "The hero tier — right for most students.",
+  promax: "Full support for droppers & serious aspirants."
+};
+
+/* Feature matrix per cohort. t = [Basic, PRO, ProMax] (true/false) */
+const COHORTS = {
+  "11-JEE": {
+    label: "11th JEE",
+    tests: [
+      ["Batch Test", [1,1,1]],
+      ["AITS", [1,1,1]],
+      ["Ranker Test", [1,1,1]],
+      ["RTS (Real Test — up to 4)", [0,1,1]]
+    ],
+    support: [
+      ["Doubt Support", [0,0,1]],
+      ["Last 45 Days Supervised Learning at VP", [0,0,0]]
+    ],
+    online: [
+      ["Detailed test analysis & video solutions", [1,1,1]],
+      ["Report with AIR ranking + improvement areas", [1,1,1]],
+      ["Personalised Academic guidance at VP (by counsellor)", [1,1,1]],
+      ["AITS M2M Sheet (PDF)", [0,1,1]],
+      ["Formulae Book", [0,1,1]],
+      ["Chapterwise short notes", [0,0,1]],
+      ["PCM Premium practice material", [0,0,1]]
+    ],
+    onlineCount: [3,5,7]
+  },
+  "11-NEET": {
+    label: "11th NEET",
+    tests: [
+      ["Batch Test", [1,1,1]],
+      ["AITS", [1,1,1]],
+      ["Ranker Test", [1,1,1]],
+      ["RTS (Real Test — up to 4)", [0,1,1]]
+    ],
+    support: [
+      ["Doubt Support", [0,0,1]],
+      ["Last 45 Days Supervised Learning at VP", [0,0,0]]
+    ],
+    online: [
+      ["Detailed test analysis & video solutions", [1,1,1]],
+      ["Report with AIR ranking + improvement areas", [1,1,1]],
+      ["Personalised Academic guidance at VP (by counsellor)", [1,1,1]],
+      ["AITS M2M Sheet (PDF)", [0,1,1]],
+      ["Achiever Handbook", [0,1,1]],
+      ["NCERT Assertion reason + statement sheets (chapterwise)", [0,0,1]],
+      ["Physics Premium practice material", [0,0,1]]
+    ],
+    onlineCount: [3,5,7]
+  },
+  "12-JEE": {
+    label: "12th JEE",
+    tests: [
+      ["Batch Test", [1,1,1]],
+      ["AITS + 2 Maha JEE", [1,1,1]],
+      ["Ranker Test", [1,1,1]],
+      ["RTS (Real Test — up to 4)", [0,1,1]],
+      ["VP Mastery Test Series", [0,0,1]]
+    ],
+    support: [
+      ["Doubt Support", [0,0,1]],
+      ["Supervised Study", [0,0,1]]
+    ],
+    online: [
+      ["Detailed test analysis & video solutions", [1,1,1]],
+      ["Report with AIR ranking + improvement areas", [1,1,1]],
+      ["Personalised Academic guidance at VP (by counsellor)", [1,1,1]],
+      ["AITS M2M Sheet (PDF)", [0,1,1]],
+      ["Formula Book", [0,1,1]],
+      ["Pre-AITS paper as CBT simulation on app", [0,0,1]],
+      ["Chapterwise short notes", [0,0,1]],
+      ["PCM Premium practice material", [0,0,1]]
+    ],
+    onlineCount: [3,5,8]
+  },
+  "12-NEET": {
+    label: "12th NEET",
+    tests: [
+      ["Batch Test", [1,1,1]],
+      ["AITS + 2 MAHA NEET", [1,1,1]],
+      ["Ranker Test", [1,1,1]],
+      ["RTS (Real Test — up to 4)", [0,1,1]],
+      ["VP Mastery Test Series", [0,0,1]]
+    ],
+    support: [
+      ["Doubt Support", [0,0,1]],
+      ["Last 45 Days Supervised Learning at VP", [0,0,1]]
+    ],
+    online: [
+      ["Detailed test analysis & video solutions", [1,1,1]],
+      ["Test Report with AIR ranking + improvement areas", [1,1,1]],
+      ["Personalised career guidance at VP (by counsellor)", [1,1,1]],
+      ["AITS M2M Sheet (PDF)", [0,1,1]],
+      ["Achiever Handbook", [0,1,1]],
+      ["Pre-AITS 100Qs CBT simulation — for 12th: NEET-CBSE Board Kit (Phy, Chem & Bio)", [0,0,1]],
+      ["NCERT Assertion reason + statement sheets (chapterwise)", [0,0,1]],
+      ["Physics Premium practice material", [0,0,1]]
+    ],
+    onlineCount: [3,5,8]
+  },
+  "dr-JEE": {
+    label: "Dropper JEE",
+    tests: [
+      ["Batch Test", [1,1,1]],
+      ["AITS + 2 Maha JEE", [1,1,1]],
+      ["Ranker Test", [1,1,1]],
+      ["RTS (Real Test — up to 4)", [0,1,1]],
+      ["VP Mastery Test Series", [0,0,1]]
+    ],
+    support: [
+      ["Doubt Support", [0,0,1]],
+      ["Supervised Study", [0,0,1]]
+    ],
+    online: [
+      ["Detailed test analysis & video solutions", [1,1,1]],
+      ["Report with AIR ranking + improvement areas", [1,1,1]],
+      ["Personalised Academic guidance at VP (by counsellor)", [1,1,1]],
+      ["AITS M2M Sheet (PDF)", [0,1,1]],
+      ["Formula Book", [0,1,1]],
+      ["Pre-AITS paper as CBT simulation on app", [0,0,1]],
+      ["Chapterwise short notes", [0,0,1]],
+      ["PCM Premium practice material", [0,0,1]]
+    ],
+    onlineCount: [3,5,8]
+  },
+  "dr-NEET": {
+    label: "Dropper NEET",
+    tests: [
+      ["Batch Test", [1,1,1]],
+      ["AITS + 2 MAHA NEET", [1,1,1]],
+      ["Ranker Test", [1,1,1]],
+      ["RTS (Real Test — up to 4)", [0,1,1]],
+      ["VP Mastery Test Series", [0,0,1]]
+    ],
+    support: [
+      ["Doubt Support", [0,0,1]],
+      ["Last 45 Days Supervised Learning at VP", [0,0,1]]
+    ],
+    online: [
+      ["Detailed test analysis & video solutions", [1,1,1]],
+      ["Test Report with AIR ranking + improvement areas", [1,1,1]],
+      ["Personalised career guidance at VP (by counsellor)", [1,1,1]],
+      ["AITS M2M Sheet (PDF)", [0,1,1]],
+      ["Achiever Handbook", [0,1,1]],
+      ["Pre-AITS 100Qs paper as CBT simulation on app (Dropper only)", [0,0,1]],
+      ["NCERT Assertion reason + statement sheets (chapterwise)", [0,0,1]],
+      ["Physics Premium practice material", [0,0,1]]
+    ],
+    onlineCount: [3,5,8]
+  }
+};
+
+/* =====================================================================
+   PLAN-WISE TEST BREAKDOWN
+   Part/Full splits: MIP AY 26-27 deck (cohort-wise test count slides).
+   Plan composition: "MIP TEST count _training" tables.
+   [part, full, total]; null = split not given in source.
+   ===================================================================== */
+const TEST_SPLITS = {
+  "11-JEE":  {Batch:[6,0,6],   AITS:[8,1,9],   Ranker:[null,null,2], RTS:[2,2,4], Maha:[0,2,2],  Mastery:[null,null,0]},
+  "12-JEE":  {Batch:[8,1,9],   AITS:[5,12,17], Ranker:[null,null,4], RTS:[0,4,4], Maha:[0,2,2],  Mastery:[null,null,6]},
+  "dr-JEE":  {Batch:[6,1,7],   AITS:[6,9,15],  Ranker:[null,null,4], RTS:[0,4,4], Maha:[0,2,2],  Mastery:[null,null,6]},
+  "11-NEET": {Batch:[3,1,4],   AITS:[5,1,6],   Ranker:[2,1,3],       RTS:[2,2,4], Maha:[0,2,2],  Mastery:[0,0,0]},
+  "12-NEET": {Batch:[4,0,4],   AITS:[6,6,12],  Ranker:[2,0,2],       RTS:[1,3,4], Maha:[0,2,2],  Mastery:[3,3,6]},
+  "dr-NEET": {Batch:[7,2,9],   AITS:[7,4,11],  Ranker:[4,0,4],       RTS:[1,3,4], Maha:[0,2,2],  Mastery:[3,3,6]}
+};
+
+/* Which test types each plan includes (index 0=Basic, 1=PRO, 2=Pro Max) */
+const PLAN_TYPES = {
+  "11-JEE":  [["Batch","AITS"],["Batch","AITS","Ranker"],["Batch","AITS","Ranker"]],
+  "12-JEE":  [["Batch","AITS"],["RTS","Batch","AITS","Maha","Ranker"],["RTS","Batch","AITS","Maha","Ranker","Mastery"]],
+  "dr-JEE":  [["Batch","AITS"],["RTS","Batch","AITS","Maha","Ranker"],["RTS","Batch","AITS","Maha","Ranker","Mastery"]],
+  "11-NEET": [["Batch","AITS","Ranker"],["RTS","Batch","AITS","Ranker"],["RTS","Batch","AITS","Ranker"]],
+  "12-NEET": [["Batch","AITS","Maha"],["RTS","Batch","AITS","Maha","Ranker"],["RTS","Batch","AITS","Maha","Ranker","Mastery"]],
+  "dr-NEET": [["Batch","AITS","Ranker"],["RTS","Batch","AITS","Ranker","Maha"],["RTS","Batch","AITS","Ranker","Maha","Mastery"]]
+};
+
+const TYPE_LABEL = {Batch:"Batch Test", AITS:"AITS", Ranker:"Ranker / Rank Booster Test", RTS:"RTS \u2014 Real Test", Maha:"Maha Test (full-scale mega mock)", Mastery:"VP Mastery Test"};
+
+/* Renders the plan-filtered test-count table into the given elements */
+function renderPlanCounts(key, ti, tableId, labelId, noteId){
+  const sp=TEST_SPLITS[key], types=PLAN_TYPES[key][ti], vt=VP_TIER_TOTALS[key];
+  const planName=["MIP Basic","MIP PRO","MIP Pro Max"][ti];
+  const label=(key.startsWith("11")?"11th ":key.startsWith("12")?"12th ":"Dropper ")+(key.endsWith("JEE")?"JEE":"NEET");
+  const cell=v=>v===null?'<td style="color:#9ca3af">\u2014</td>':'<td>'+v+'</td>';
+  let derived=0, hasNull=false;
+  let html='<tr><th style="text-align:left">Test Type</th><th>Part Test</th><th>Full Syllabus Test</th><th>Total</th></tr>';
+  types.forEach(t=>{
+    const [pt,ft,tot]=sp[t];
+    if(tot===0) return;
+    derived+=tot; if(pt===null) hasNull=true;
+    html+='<tr><td style="text-align:left">'+TYPE_LABEL[t]+'</td>'+cell(pt)+cell(ft)+'<td style="font-weight:bold">'+tot+'</td></tr>';
+  });
+  html+='<tr class="total"><td style="text-align:left">Total tests in '+planName+'</td><td colspan="2" style="color:#6b7280">'+
+        (hasNull?'part/full split not given for all types':'')+'</td><td>'+vt.totals[ti]+'</td></tr>';
+  document.getElementById(tableId).innerHTML=html;
+  document.getElementById(labelId).textContent=label+" \u00B7 "+planName;
+  document.getElementById(noteId).innerHTML=
+    'Showing only the tests included in <b>'+planName+'</b>. Click another plan card above to switch. Part/Full split as per MIP AY 26-27 deck; plan totals as per MIP test-count sheet.'+
+    (derived!==vt.totals[ti]?' <span style="color:#b45309"><b>Note:</b> the listed test types add up to '+derived+', while the source states '+vt.totals[ti]+' \u2014 pending confirmation.</span>':'');
+}
+
+/* VP tier-wise test totals \u2014 Source: "MIP TEST count _training.docx"
+   JEE and NEET cohorts, all three plans. Totals reproduced exactly as printed in source. */
+const VP_TIER_TOTALS = {
+  "11-JEE": {
+    totals: [15,17,17],
+    breakdown: [
+      "Batch Tests 6 + AITS 9",
+      "Batch Tests 6 + AITS 9 + Ranker Tests 2",
+      "Batch Tests 6 + AITS 9 + Ranker Tests 2"
+    ]
+  },
+  "12-JEE": {
+    totals: [25,38,38],
+    breakdown: [
+      "Batch Tests 9 + AITS 17*",
+      "RTS 4 + Batch Tests 9 + AITS 17 + Maha JEE 2 + Ranker Tests 4",
+      "RTS 4 + Batch Tests 9 + AITS 17 + Maha JEE 2 + Ranker Tests 4 + VP Mastery 6"
+    ]
+  },
+  "dr-JEE": {
+    totals: [22,32,38],
+    breakdown: [
+      "Batch Tests 7 + AITS 15",
+      "RTS 4 + Batch Tests 7 + AITS 15 + Maha JEE 2 + Ranker Tests 4",
+      "RTS 4 + Batch Tests 7 + AITS 15 + Maha JEE 2 + Ranker Tests 4 + Mastery Tests 6"
+    ]
+  },
+  "11-NEET": {
+    totals: [13,17,17],
+    breakdown: [
+      "Batch Tests 4 + AITS 6 + Ranker Tests 3",
+      "RTS 4 + Batch Tests 4 + AITS 6 + Ranker Tests 3",
+      "RTS 4 + Batch Tests 4 + AITS 6 + Ranker Tests 3*"
+    ]
+  },
+  "12-NEET": {
+    totals: [22,24,30],
+    breakdown: [
+      "Batch Tests 4 + AITS 12 + Maha NEET 2",
+      "RTS 4 + Batch Tests 4 + AITS 12 + Maha NEET 2 + Ranker Tests 2",
+      "RTS 4 + Batch Tests 4 + AITS 12 + Maha NEET 2 + Ranker Tests 2 + VP Mastery Tests 6"
+    ]
+  },
+  "dr-NEET": {
+    totals: [22,30,38],
+    breakdown: [
+      "Batch Tests 9 + AITS 11 + Ranker Tests 4",
+      "RTS 4 + Batch Tests 9 + AITS 11 + Ranker Tests 4 + Maha NEET 2",
+      "RTS 4 + Batch Tests 9 + AITS 11 + Ranker Tests 4 + Maha NEET 2 + Mastery Tests 6"
+    ]
+  }
+};
+
+/* Test counts — exactly as printed in the deck */
+const JEE_COUNTS = {
+  headers: ["Class","AITS Part","AITS Full","RTS Part","RTS Full","VP Mastery","Batch Part","Batch Full","Total Tests"],
+  rows: {
+    "11": ["11th", 8, 1, 2, 2, 0, 6, 0, 19],
+    "12": ["12th", 5, 12, 0, 4, 6, 8, 1, 35],
+    "dr": ["Dropper", 6, 9, 0, 4, 6, 6, 1, 30]
+  }
+};
+const NEET_COUNTS = {
+  headers: ["Test Planner","Batch Part","Batch Full","Rank Booster Part","Rank Booster Full","AITS Part","AITS Full","Real Part","Real Full","VP Mastery Part","VP Mastery Full","Total Tests"],
+  rows: {
+    "11": [["11th NEET MIP-English", 3,1,2,1,5,1,2,2,0,0,17]],
+    "12": [["12th NEET MIP-English", 4,0,2,0,6,6,1,3,3,3,28]],
+    "dr": [["Yakeen 2.0 / Dropper MIP-English", 7,2,4,0,7,4,1,3,3,3,34],
+           ["Yakeen Hindi 2.0", 8,2,4,0,8,3,1,3,3,3,35]]
+  }
+};
+
+/* =====================================================================
+   VP CENTRE DATA — Source: "MIP Targets AY26-27" sheet, tab "Final centers"
+   BASIC_PRO_CENTERS  = Column C (MIP Basic & MIP PRO live)
+   PRO_MAX_CENTERS    = Column D (MIP Pro Max live), [name, remark]
+   PS centre/offering data — pending (will be added when PS doc arrives).
+   ===================================================================== */
+const BASIC_PRO_CENTERS = [
+"Ahmedabad - Chandkheda Vidyapeeth","Surat - Katargram Vidyapeeth","Vadodara - Sama Savli Vidyapeeth","Coimbatore Vidyapeeth","Mysore Vidyapeeth","Ahmedabad - Nikol Vidyapeeth","Gandhinagar Vidyapeeth","Ahmedabad - Satellite Vidyapeeth","Bharuch Vidyapeeth","Surat - Adajan Vidyapeeth","Pune - NalStop Vidyapeeth","Indore - Vijay Nagar Vidyapeeth","Mumbai - Panvel Vidyapeeth","Mumbai - Nerul Vidyapeeth","Panchkula Vidyapeeth","Delhi - Yamuna Vihar Vidyapeeth","Mumbai - Ghatkopar Vidyapeeth","Mumbai - Kharghar Vidyapeeth","Ahmedabad - Maninagar Vidyapeeth","Delhi - Punjabibagh Vidyapeeth","Vadodara - Alkapuri Vidyapeeth","Surat - Vesu Vidyapeeth","Dehradun - Ballupur Vidyapeeth","Pune - Viman Nagar Vidyapeeth","Greater Noida Vidyapeeth","Gurugram - Sector 47 Vidyapeeth","Haridwar - Ranipur Vidyapeeth","Moradabad Vidyapeeth","Noida Vidyapeeth (Residential Program)","Kanpur - SomBizness Vidyapeeth","Pune - Hadapsar Vidyapeeth","Mumbai - Chembur Vidyapeeth","Pune - FC Road Vidyapeeth","Pune - Pimpri Vidyapeeth","Goa - Madgaon Vidyapeeth","Goa - Panjim Vidyapeeth","Mumbai - Virar Vidyapeeth","Nagpur Vidyapeeth (Residential Program)","Mumbai - Borivali Vidyapeeth","Lucknow - Vrindavan Vidyapeeth","Delhi - Dwarka Vidyapeeth","Nashik Vidyapeeth","Dehradun - Rajpur Rd Vidyapeeth","Hisar Vidyapeeth","Nanded Vidyapeeth","Bhubaneswar - Chandrasekharpur Vidyapeeth","Latur Vidyapeeth","Mumbai - Kalyan Vidyapeeth","Kanpur - Kidwai Nagar Vidyapeeth","Varanasi - Pahariya Aashapur Vidyapeeth","Rohtak Vidyapeeth","Akola Vidyapeeth","Prayagraj - Naini Vidyapeeth","Ranchi - Harmu Vidyapeeth","Ghaziabad Vidyapeeth","Mumbai - Thane Vidyapeeth","Raipur Vidyapeeth","Anantnag Vidyapeeth","Ludhiana Vidyapeeth","Mumbai - Andheri Vidyapeeth","Jabalpur Vidyapeeth","Jammu - Akhnoor Road Vidyapeeth","Faridabad Vidyapeeth","Bokaro Vidyapeeth","Chhatrapati Sambhajinagar Vidyapeeth","Delhi - Jasola Vidyapeeth","Jamshedpur Vidyapeeth","Panipat Vidyapeeth","Gurugram Vidyapeeth","Dhanbad Vidyapeeth","Kharagpur Vidyapeeth","Chandigarh Vidyapeeth","Alipurduar - Samuktala Road Vidyapeeth","Indore - MG Road Vidyapeeth","Muzaffarpur Vidyapeeth","Meerut Vidyapeeth","Indore - Bhawarkuan Vidyapeeth","Bhopal Vidyapeeth","Imphal - Babupara Vidyapeeth","Itanagar - F Sector Vidyapeeth","Kolkata - Baruipur Vidyapeeth","Kolkata - Behala Vidyapeeth","Noida - Block C Vidyapeeth","Delhi - Kalusarai Vidyapeeth","Bilaspur Vidyapeeth","Bhagalpur Vidyapeeth","Bhilai Vidyapeeth","Patna - Boring Road Vidyapeeth","Gwalior Vidyapeeth","Agra Vidyapeeth","Aligarh Vidyapeeth","Gorakhpur - Medical Road Vidyapeeth","Varanasi - Indira Tower Vidyapeeth","Lucknow - Alambagh Vidyapeeth","Guwahati Vidyapeeth","Siliguri Vidyapeeth","Varanasi - Bhojuveer Vidyapeeth","Ambala Vidyapeeth","Jalandhar Vidyapeeth","Lucknow - Gomtinagar Vidyapeeth","Nagpur Vidyapeeth","Srinagar - Rajbagh Vidyapeeth","Durgapur Vidyapeeth","Bareilly Vidyapeeth","Patna - Ashiana Digha Vidyapeeth","Delhi - NSP Vidyapeeth","Kolkata - Barrackpore Vidyapeeth","Ranchi - Lalpur Vidyapeeth","Delhi - Preet Vihar Vidyapeeth","Lucknow - Kapoorthala Vidyapeeth","Lucknow - HazratGanj Vidyapeeth","Kanpur - JSTower Vidyapeeth","Bhubaneswar Vidyapeeth","Kolkata - NewTown Vidyapeeth","Jammu - Pacific Tower Vidyapeeth","Delhi - Janakpuri Vidyapeeth","Patna - Exhibition Rd Vidyapeeth","Kolkata - Gariahat Vidyapeeth","Malda Vidyapeeth","Agartala Vidyapeeth","Bardhaman Vidyapeeth","Howrah Vidyapeeth","Gorakhpur Vidyapeeth","Varanasi - BHU Vidyapeeth","Srinagar - Baghat Vidyapeeth","Prayagraj - Civil Lines Vidyapeeth","Patna - Iskcon Vidyapeeth","Pulwama Tuition Center","Rajouri - Kheora Tuition Center","Bengaluru - Banaswadi Vidyapeeth","Bengaluru - HSR layout Vidyapeeth","Bengaluru - RR Nagar Vidyapeeth","Bengaluru - JP Nagar Vidyapeeth","Bengaluru - RajajiNagar Vidyapeeth","Bengaluru - Whitefield Vidyapeeth","Bengaluru - Yelahanka Vidyapeeth","Chennai - Adyar Gandhi Nagar Vidyapeeth","Chennai - Annanagar Vidyapeeth","Chennai - Ashok Nagar Vidyapeeth","Chennai - Medavakkam Vidyapeeth","Alwar Vidyapeeth","Jaipur Vidyapeeth","Jodhpur Vidyapeeth","Kota Vidyapeeth","Sikar Vidyapeeth","Udaipur Vidyapeeth","Sriganganagar - Meera Marg Vidyapeeth","Ajmer - Civil Lines Vidyapeeth"
+];
+
+const PRO_MAX_CENTERS = [
+["Vizag Vidyapeeth",""],["Vijayawada Vidyapeeth",""],["Patna - Exhibition Rd Vidyapeeth",""],["Ranchi - Harmu Vidyapeeth",""],["Patna - Iskcon Vidyapeeth",""],["Ranchi - Lalpur Vidyapeeth",""],["Bhagalpur Vidyapeeth",""],["Dhanbad Vidyapeeth",""],["Patna - Ashiana Digha Vidyapeeth",""],["Muzaffarpur Vidyapeeth",""],["Jamshedpur Vidyapeeth",""],["Patna - Boring Road Vidyapeeth",""],
+["Delhi - Janakpuri Vidyapeeth","JEE & NEET for both"],["Delhi - Kalusarai Vidyapeeth","Only NEET not in JEE (at Saket)"],["Delhi - NSP Vidyapeeth","Only NEET"],["Rohtak Vidyapeeth",""],["Hisar Vidyapeeth",""],["Delhi - Preet Vihar Vidyapeeth","Only in Gagan Vihar Campus"],["Delhi - Jasola Vidyapeeth","JEE & NEET"],["Delhi - Punjabibagh Vidyapeeth","JEE & NEET for both"],["Panipat Vidyapeeth",""],["Delhi - Yamuna Vihar Vidyapeeth","JEE & NEET for both"],
+["Kolkata - NewTown Vidyapeeth",""],["Siliguri Vidyapeeth",""],["Malda Vidyapeeth",""],["Bhubaneswar Vidyapeeth",""],["Guwahati Vidyapeeth",""],["Kolkata - Gariahat Vidyapeeth",""],["Durgapur Vidyapeeth",""],["Kolkata - Baruipur Vidyapeeth",""],["Kolkata - Barrackpore Vidyapeeth",""],["Bhubaneswar - Chandrasekharpur Vidyapeeth",""],["Kharagpur Vidyapeeth",""],["Howrah Vidyapeeth",""],["Agartala Vidyapeeth",""],["Bardhaman Vidyapeeth",""],["Kolkata - Behala Vidyapeeth",""],["Alipurduar - Samuktala Road Vidyapeeth",""],["Itanagar - F Sector Vidyapeeth",""],["Imphal - Babupara Vidyapeeth",""],
+["Nanded Vidyapeeth",""],["Chhatrapati Sambhajinagar Vidyapeeth",""],["Pune - Hadapsar Vidyapeeth",""],["Nashik Vidyapeeth",""],["Nagpur Vidyapeeth",""],["Mumbai - Andheri Vidyapeeth","Only 50 students can be accommodated"],["Mumbai - Thane Vidyapeeth","Only 50 students can be accommodated"],["Mumbai - Kalyan Vidyapeeth","Only 50 students can be accommodated"],["Pune - Pimpri Vidyapeeth",""],["Pune - NalStop Vidyapeeth","Only 50 students can be accommodated"],["Pune - Viman Nagar Vidyapeeth",""],["Mumbai - Panvel Vidyapeeth","Only 30 students can be accommodated"],["Akola Vidyapeeth",""],["Latur Vidyapeeth",""],["Goa - Madgaon Vidyapeeth",""],["Mumbai - Kharghar Vidyapeeth",""],["Goa - Panjim Vidyapeeth",""],
+["Indore - Bhawarkuan Vidyapeeth",""],["Indore - MG Road Vidyapeeth",""],["Bhilai Vidyapeeth",""],["Bilaspur Vidyapeeth",""],["Indore - Vijay Nagar Vidyapeeth",""],["Jabalpur Vidyapeeth","Only 50 students can be accommodated"],["Raipur Vidyapeeth",""],
+["Dehradun - Rajpur Rd Vidyapeeth",""],["Meerut Vidyapeeth",""],["Dehradun - Ballupur Vidyapeeth",""],["Chandigarh Vidyapeeth",""],["Srinagar - Baghat Vidyapeeth",""],["Panchkula Vidyapeeth",""],["Jammu - Pacific Tower Vidyapeeth",""],["Ludhiana Vidyapeeth",""],["Jammu - Akhnoor Road Vidyapeeth",""],["Srinagar - Rajbagh Vidyapeeth",""],["Ambala Vidyapeeth",""],["Jalandhar Vidyapeeth",""],["Anantnag Vidyapeeth",""],["Pulwama Tuition Center","Only NEET"],["Rajouri - Kheora Tuition Center","Only NEET"],
+["Bengaluru - HSR layout Vidyapeeth",""],["Bengaluru - Banaswadi Vidyapeeth",""],["Bengaluru - Yelahanka Vidyapeeth",""],["Chennai - Ashok Nagar Vidyapeeth",""],["Chennai - Annanagar Vidyapeeth",""],["Chennai - Medavakkam Vidyapeeth",""],["Coimbatore Vidyapeeth",""],["Mysore Vidyapeeth",""],["Chennai - Adyar Gandhi Nagar Vidyapeeth",""],["Bengaluru - RR Nagar Vidyapeeth",""],
+["Lucknow - HazratGanj Vidyapeeth",""],["Gorakhpur Vidyapeeth",""],["Kanpur - JSTower Vidyapeeth",""],["Varanasi - BHU Vidyapeeth",""],["Prayagraj - Civil Lines Vidyapeeth",""],["Lucknow - Gomtinagar Vidyapeeth",""],["Lucknow - Kapoorthala Vidyapeeth",""],["Varanasi - Bhojuveer Vidyapeeth",""],["Lucknow - Alambagh Vidyapeeth",""],["Bareilly Vidyapeeth",""],["Lucknow - Vrindavan Vidyapeeth",""],["Kanpur - SomBizness Vidyapeeth",""],["Prayagraj - Naini Vidyapeeth",""],["Kanpur - Kidwai Nagar Vidyapeeth",""],["Agra Vidyapeeth","Only Test is possible as Faculties bandwidth is not available for the doubts"],["Gorakhpur - Medical Road Vidyapeeth",""],["Varanasi - Pahariya Aashapur Vidyapeeth",""],["Varanasi - Indira Tower Vidyapeeth",""],
+["Jaipur - RS Circle Vidyapeeth",""],["Jodhpur - Sardarpura Vidyapeeth",""],["Udaipur Vidyapeeth",""]
+];
+
+/* ===================== RENDER LOGIC (no edits needed below) ===================== */
+const CHIP_ORDER = [["11-JEE","11th JEE"],["11-NEET","11th NEET"],["12-JEE","12th JEE"],["12-NEET","12th NEET"],["dr-JEE","Dropper JEE"],["dr-NEET","Dropper NEET"]];
+const TIER_META = [["basic","MIP Basic","basic"],["pro","MIP PRO","pro"],["promax","MIP Pro Max","promax"]];
+const fmt = n => "\u20B9" + n.toLocaleString("en-IN");
+
+const chipsEl = document.getElementById("chips");
+CHIP_ORDER.forEach(([key,label])=>{
+  const d=document.createElement("div");
+  d.className="chip "+(key.endsWith("JEE")?"jee":"neet"); d.dataset.key=key;
+  d.innerHTML=label+"<small>"+(key.endsWith("JEE")?"IIT-JEE":"NEET")+" cohort</small>";
+  d.tabIndex=0;d.onclick=()=>select(key);d.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();select(key);}};
+  chipsEl.appendChild(d);
+});
+
+function select(key){
+  document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("active",c.dataset.key===key));
+  const c = COHORTS[key];
+  const cls = key.split("-")[0];
+  const stream = key.split("-")[1];
+  document.getElementById("vpIntro").classList.add("hidden");
+  document.getElementById("result").classList.remove("hidden");
+  document.getElementById("vpCentreSec").classList.remove("hidden");
+  document.getElementById("cohortLabel").textContent = c.label;
+
+  /* Tier cards */
+  const tiersEl=document.getElementById("tiers");
+  tiersEl.innerHTML="";
+  TIER_META.forEach(([tk,tname,tcls],ti)=>{
+    const price=PRICING[cls][tk];
+    let lis="";
+    const tt=VP_TIER_TOTALS[key];
+    if(tt){
+      lis+='<li class="hd">Total Tests in this plan \u2014 '+tt.totals[ti]+'</li>';
+      lis+='<li class="y">'+tt.breakdown[ti]+'</li>';
+    }
+    lis+='<li class="hd">Tests</li>';
+    c.tests.forEach(([f,v])=>{lis+='<li class="'+(v[ti]?'y':'n')+'">'+f+'</li>';});
+    lis+='<li class="hd">Doubt & Supervised Study</li>';
+    c.support.forEach(([f,v])=>{lis+='<li class="'+(v[ti]?'y':'n')+'">'+f+'</li>';});
+    lis+='<li class="hd">Online Features ('+c.onlineCount[ti]+')</li>';
+    c.online.forEach(([f,v])=>{lis+='<li class="'+(v[ti]?'y':'n')+'">'+f+'</li>';});
+    const hero = tk==="pro" ? '<span class="hero-flag">\u2B50 HERO TIER</span>' : "";
+    const card=document.createElement("div");
+    card.className="tier "+tcls+(ti===0?" sel":"");
+    card.dataset.ti=ti;
+    card.onclick=e=>{ if(e.target.tagName!=="BUTTON") selectPlan(key,ti); };
+    card.innerHTML=
+      '<div class="head"><div class="tname">'+tname+'</div><div class="price">'+fmt(price)+' <span>incl. GST</span></div>'+
+        (tt?'<div style="font-size:12px;margin-top:5px;opacity:.95">\uD83E\uDDEA '+tt.totals[ti]+' Tests in this plan</div>':'')+hero+'</div>'+
+      '<div class="picktag">\u2B07 Test breakdown shown below</div>'+
+      '<div class="tag">'+TAGLINES[tk]+'</div>'+
+      '<ul>'+lis+'</ul>'+
+      '<button class="copybtn" onclick="copyPitch(\''+key+'\',\''+tk+'\','+ti+')">\uD83D\uDCCB Copy Pitch (WhatsApp)</button>';
+    tiersEl.appendChild(card);
+  });
+
+  selectPlan(key,0);
+  document.getElementById("result").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+/* Click a plan card -> counts table below shows only that plan's tests */
+const PLAN_ACCENT=["var(--basic)","var(--pro)","var(--promax)"];
+function selectPlan(key,ti){
+  document.querySelectorAll("#tiers .tier").forEach(el=>el.classList.toggle("sel", +el.dataset.ti===ti));
+  document.body.style.setProperty("--plan",PLAN_ACCENT[ti]);
+  renderPlanCounts(key,ti,"countTable","countLabel","countNote");
+}
+
+/* =====================================================================
+   PS (PATHSHALA) CENTRE DATA — Source: PS centres list (AY 26-27)
+   [Centre, Region] — offerings/pricing pending (PS doc awaited).
+   ===================================================================== */
+const PS_CENTERS = [
+["Narnaul - City Vidyapeeth (Pathshala Centre)","Region 4 (North)"],
+["Haldwani Vidyapeeth (Pathshala Centre)","Region 4 (North)"],
+["Sagar Vidyapeeth (Pathshala Centre)","Region 5 (UP South & MP)"],
+["Solapur Vidyapeeth (Pathshala Centre)","Region 8 (South Maharashtra & Karnataka)"],
+["Rewa Vidyapeeth (Pathshala Centre)","Region 5 (UP South & MP)"],
+["Deoria Vidyapeeth (Pathshala Centre)","Region 1 (Patna)"],
+["Mathura Vidyapeeth (Pathshala Centre)","Region 4 (North)"],
+["Chhindwara Vidyapeeth (Pathshala Centre)","Region 5 (UP South & MP)"],
+["Jorhat Vidyapeeth (Pathshala Centre)","Region 9 (Assam)"],
+["Ghazipur Vidyapeeth (Pathshala Centre)","Region 1 (Patna)"],
+["Bidar Vidyapeeth (Pathshala Centre)","Region 8 (South Maharashtra & Karnataka)"],
+["Chandrapur Vidyapeeth (Pathshala Centre)","Region 6 (North East Maharashtra)"],
+["Amrawati - Gadge Nagar Vidyapeeth (Pathshala Centre)","Region 6 (North East Maharashtra)"],
+["Beed Vidyapeeth (Pathshala Centre)","Region 7 (North Maharashtra)"],
+["Yavatmal Vidyapeeth (Pathshala Centre)","Region 6 (North East Maharashtra)"],
+["Gondia Vidyapeeth (Pathshala Centre)","Region 6 (North East Maharashtra)"],
+["Ayodhya Vidyapeeth (Pathshala Centre)","Region 5 (UP South & MP)"],
+["Patna Vidyapeeth (Pathshala Centre)","Region 1 (Patna)"],
+["Hingoli Vidyapeeth (Pathshala Centre)","Region 6 (North East Maharashtra)"],
+["Jalna Vidyapeeth (Pathshala Centre)","Region 7 (North Maharashtra)"],
+["Raigarh Vidyapeeth (Pathshala Centre)","Region 3 (Orissa/Chhattisgarh)"],
+["Satna Vidyapeeth (Pathshala Centre)","Region 5 (UP South & MP)"],
+["Jaunpur Vidyapeeth (Pathshala Centre)","Region 5 (UP South & MP)"],
+["Bijnor Vidyapeeth (Pathshala Centre)","Region 4 (North)"],
+["Korba - City Center Vidyapeeth (Pathshala Centre)","Region 3 (Orissa/Chhattisgarh)"],
+["Jhansi Vidyapeeth (Pathshala Centre)","Region 4 (North)"],
+["Chhatarpur Vidyapeeth (Pathshala Centre)","Region 5 (UP South & MP)"],
+["Gaya Vidyapeeth (Pathshala Centre)","Region 2 (Jharkhand)"],
+["Rae Bareli Vidyapeeth (Pathshala Centre)","Region 5 (UP South & MP)"],
+["Darbhanga - Kathalbari Vidyapeeth (Pathshala Centre)","Region 1 (Patna)"],
+["Bihar Sharif-Nalanda Vidyapeeth (Pathshala Centre)","Region 1 (Patna)"],
+["Ballia Vidyapeeth (Pathshala Centre)","Region 1 (Patna)"],
+["Deoghar Vidyapeeth (Pathshala Centre)","Region 2 (Jharkhand)"],
+["Samastipur Vidyapeeth (Pathshala Centre)","Region 1 (Patna)"],
+["Ahmednagar Vidyapeeth (Pathshala Centre)","Region 7 (North Maharashtra)"],
+["Barpeta Vidyapeeth (Pathshala Centre)","Region 9 (Assam)"],
+["Kolhapur Vidyapeeth (Pathshala Centre)","Region 8 (South Maharashtra & Karnataka)"],
+["Dhule Vidyapeeth (Pathshala Centre)","Region 7 (North Maharashtra)"],
+["Tezpur Vidyapeeth (Pathshala Centre)","Region 9 (Assam)"],
+["Nagaon Vidyapeeth (Pathshala Centre)","Region 9 (Assam)"],
+["Dibrugarh Vidyapeeth (Pathshala Centre)","Region 9 (Assam)"],
+["Buldhana Vidyapeeth (Pathshala Centre)","Region 7 (North Maharashtra)"],
+["Giridih Vidyapeeth (Pathshala Centre)","Region 2 (Jharkhand)"],
+["Jalgaon Vidyapeeth (Pathshala Centre)","Region 7 (North Maharashtra)"],
+["Nadia Vidyapeeth (Pathshala Centre)","Region 2 (Jharkhand)"],
+["Sonipat Vidyapeeth (Pathshala Centre)","Region 4 (North)"],
+["Sangli Vidyapeeth (Pathshala Centre)","Region 8 (South Maharashtra & Karnataka)"],
+["Satara Vidyapeeth (Pathshala Centre)","Region 8 (South Maharashtra & Karnataka)"],
+["Hubli Vidyapeeth (Pathshala Centre)","Region 8 (South Maharashtra & Karnataka)"],
+["Kalaburagi Vidyapeeth (Pathshala Centre)","Region 8 (South Maharashtra & Karnataka)"],
+["Baramati Vidyapeeth (Pathshala Centre)","Region 7 (North Maharashtra)"],
+["Purnea Vidyapeeth (Pathshala Centre)","Region 1 (Patna)"],
+["Hazaribagh Vidyapeeth (Pathshala Centre)","Region 2 (Jharkhand)"],
+["Murshidabad (West Bengal) Vidyapeeth (Pathshala Centre)","Region 2 (Jharkhand)"],
+["Amrawati - Rajapeth Vidyapeeth (Pathshala Centre)","Region 6 (North East Maharashtra)"],
+["Cuttack Vidyapeeth (Pathshala Centre)","Region 3 (Orissa/Chhattisgarh)"],
+["Sambalpur Vidyapeeth (Pathshala Centre)","Region 3 (Orissa/Chhattisgarh)"],
+["Berhampur (Odisha) Vidyapeeth (Pathshala Centre)","Region 3 (Orissa/Chhattisgarh)"],
+["Balasore Vidyapeeth (Pathshala Centre)","Region 3 (Orissa/Chhattisgarh)"],
+["Rourkela Vidyapeeth (Pathshala Centre)","Region 3 (Orissa/Chhattisgarh)"],
+["Saharsa Vidyapeeth (Pathshala Centre)","Region 1 (Patna)"],
+["Sitamarhi Vidyapeeth (Pathshala Centre)","Region 1 (Patna)"],
+["Sasaram Vidyapeeth (Pathshala Centre)","Region 2 (Jharkhand)"],
+["Aurangabad Vidyapeeth (Pathshala Centre)","Region 2 (Jharkhand)"],
+["Lakhimpur Kheri Vidyapeeth (Pathshala Centre)","Region 4 (North)"],
+["Shahjahanpur Vidyapeeth (Pathshala Centre)","Region 4 (North)"],
+["Parbhani Vidyapeeth (Pathshala Centre)","Region 6 (North East Maharashtra)"],
+["Wardha Vidyapeeth (Pathshala Centre)","Region 6 (North East Maharashtra)"],
+["Belagavi Vidyapeeth (Pathshala Centre)","Region 8 (South Maharashtra & Karnataka)"],
+["Vijayapura Vidyapeeth (Pathshala Centre)","Region 8 (South Maharashtra & Karnataka)"]
+];
+
+/* =====================================================================
+   PS (PATHSHALA) OFFERINGS — Source: "PS MIP Batch Listing Details - AY 26-27.xlsx"
+   Pricing not in source doc — shown as TBD until shared.
+   totals/breakdowns reproduced exactly as printed in the workbook.
+   ===================================================================== */
+const PS_COHORTS = {
+  "11-JEE": {
+    label: "11th JEE (PS)",
+    totals: [15,17,17],
+    breakdown: ["Batch 6 \u00B7 AITS 9","Batch 6 \u00B7 AITS 9 \u00B7 Ranker 2","Batch 6 \u00B7 AITS 9 \u00B7 Ranker 2"],
+    tests: [
+      ["Batch Test", [1,1,1]],
+      ["AITS", [1,1,1]],
+      ["Ranker Test", [0,1,1]]
+    ],
+    support: [["Doubt Support \u2014 8 Hrs weekly offline, personalised", [0,0,1]]],
+    online: [
+      ["Detailed test analysis & video solutions", [1,1,1]],
+      ["Test report with AIR ranking + improvement areas", [1,1,1]],
+      ["Personalised career guidance at Pathshala Centers (by counsellor)", [1,1,1]],
+      ["AITS Mistakes to Mastery (M2M)", [0,1,1]],
+      ["Formula Book", [0,1,1]],
+      ["Pre-AITS paper as CBT simulation on app", [0,0,1]],
+      ["Chapterwise short notes", [0,0,1]],
+      ["PCM premium practice material", [0,0,1]]
+    ],
+    onlineCount: [3,5,8]
+  },
+  "11-NEET": {
+    label: "11th NEET (PS)",
+    totals: [13,17,17],
+    breakdown: ["Batch 4 \u00B7 AITS 6 \u00B7 Ranker 3","RTS 4 \u00B7 Batch 4 \u00B7 AITS 6 \u00B7 Ranker 3","RTS 4 \u00B7 Batch 4 \u00B7 AITS 6 \u00B7 Ranker 3"],
+    tests: [
+      ["Batch Test", [1,1,1]],
+      ["AITS", [1,1,1]],
+      ["Ranker Test", [1,1,1]],
+      ["RTS \u2014 Real Test Series (CBT mode)", [0,1,1]]
+    ],
+    support: [["Doubt Support \u2014 8 Hrs weekly offline, personalised", [0,0,1]]],
+    online: [
+      ["Detailed test analysis & video solutions", [1,1,1]],
+      ["Test report with AIR ranking + improvement areas", [1,1,1]],
+      ["Personalised career guidance at Pathshala Centers (by counsellor)", [1,1,1]],
+      ["AITS Mistakes to Mastery (M2M)", [0,1,1]],
+      ["Achiever Handbook", [0,1,1]],
+      ["NCERT Assertion\u2013Reason + Statement Sheets (chapterwise)", [0,0,1]],
+      ["Physics Premium Practice Material (600+ questions)", [0,0,1]]
+    ],
+    onlineCount: [3,5,7]
+  },
+  "12-JEE": {
+    label: "12th JEE (PS)",
+    totals: [25,38,38],
+    breakdown: ["Batch 9 \u00B7 AITS 17","RTS 4 \u00B7 Batch 9 \u00B7 AITS 17 \u00B7 Maha JEE 2 \u00B7 Ranker 4","RTS 4 \u00B7 Batch 9 \u00B7 AITS 17 \u00B7 Maha JEE 2 \u00B7 Ranker 4 \u00B7 PS Mastery 6"],
+    tests: [
+      ["Batch Test", [1,1,1]],
+      ["AITS + 2 Maha JEE", [1,1,1]],
+      ["Ranker Test", [1,1,1]],
+      ["RTS \u2014 Real Test Series (CBT mode)", [0,1,1]],
+      ["Mastery Test Series (6 exclusive Pathshala tests, April)", [0,0,1]]
+    ],
+    support: [["Doubt Support \u2014 8 Hrs weekly offline, personalised", [0,0,1]]],
+    online: [
+      ["Detailed test analysis & video solutions", [1,1,1]],
+      ["Test report with AIR ranking + improvement areas", [1,1,1]],
+      ["Personalised career guidance at Pathshala Centers (by counsellor)", [1,1,1]],
+      ["AITS Mistakes to Mastery (M2M)", [0,1,1]],
+      ["Formula Book", [0,1,1]],
+      ["Pre-AITS paper as CBT simulation on app", [0,0,1]],
+      ["Chapterwise short notes", [0,0,1]],
+      ["PCM premium practice material", [0,0,1]]
+    ],
+    onlineCount: [3,5,8]
+  },
+  "12-NEET": {
+    label: "12th NEET (PS)",
+    totals: [22,24,30],
+    breakdown: ["Batch 4 \u00B7 AITS 12 \u00B7 Maha NEET 2","RTS 4 \u00B7 Batch 4 \u00B7 AITS 12 \u00B7 Maha NEET 2 \u00B7 Ranker 2","RTS 4 \u00B7 Batch 4 \u00B7 AITS 12 \u00B7 Maha NEET 2 \u00B7 Ranker 2 \u00B7 Mastery 6"],
+    tests: [
+      ["Batch Test", [1,1,1]],
+      ["AITS + 2 Maha NEET", [1,1,1]],
+      ["Ranker Test", [0,1,1]],
+      ["RTS \u2014 Real Test Series (CBT mode)", [0,1,1]],
+      ["Mastery Test Series (6 exclusive Pathshala tests, April)", [0,0,1]]
+    ],
+    support: [["Doubt Support \u2014 8 Hrs weekly offline, personalised", [0,0,1]]],
+    online: [
+      ["Detailed test analysis & video solutions", [1,1,1]],
+      ["Test report with AIR ranking + improvement areas", [1,1,1]],
+      ["Personalised career guidance at Pathshala Centers (by counsellor)", [1,1,1]],
+      ["AITS Mistakes to Mastery (M2M)", [0,1,1]],
+      ["Achiever Handbook", [0,1,1]],
+      ["Pre-AITS 100Qs CBT simulation \u2014 for 12th: NEET-CBSE Board Kit (Phy, Chem & Bio)", [0,0,1]],
+      ["NCERT Assertion\u2013Reason + Statement Sheets (chapterwise)", [0,0,1]],
+      ["Physics Premium Practice Material (600+ questions)", [0,0,1]]
+    ],
+    onlineCount: [3,5,8]
+  },
+  "dr-JEE": {
+    label: "Dropper JEE (PS)",
+    totals: [22,32,38],
+    breakdown: ["Batch 7 \u00B7 AITS 15","RTS 4 \u00B7 Batch 7 \u00B7 AITS 15 \u00B7 Maha JEE 2 \u00B7 Ranker 4","RTS 4 \u00B7 Batch 7 \u00B7 AITS 15 \u00B7 Maha JEE 2 \u00B7 Ranker 4 \u00B7 Mastery 6"],
+    tests: [
+      ["Batch Test", [1,1,1]],
+      ["AITS + 2 Maha JEE", [1,1,1]],
+      ["Ranker Test", [0,1,1]],
+      ["RTS \u2014 Real Test Series (CBT mode)", [0,1,1]],
+      ["Mastery Test Series (6 exclusive Pathshala tests, April)", [0,0,1]]
+    ],
+    support: [["Doubt Support \u2014 8 Hrs weekly offline, personalised", [0,0,1]]],
+    online: [
+      ["Detailed test analysis & video solutions", [1,1,1]],
+      ["Test report with AIR ranking + improvement areas", [1,1,1]],
+      ["Personalised career guidance at Pathshala Centers (by counsellor)", [1,1,1]],
+      ["AITS Mistakes to Mastery (M2M)", [0,1,1]],
+      ["Formula Book", [0,1,1]],
+      ["Pre-AITS paper as CBT simulation on app", [0,0,1]],
+      ["Chapterwise short notes", [0,0,1]],
+      ["PCM premium practice material", [0,0,1]]
+    ],
+    onlineCount: [3,5,8]
+  },
+  "dr-NEET": {
+    label: "Dropper NEET (PS)",
+    totals: [22,30,38],
+    breakdown: ["Batch 9 \u00B7 AITS 11 \u00B7 Ranker 4","RTS 4 \u00B7 Batch 9 \u00B7 AITS 11 \u00B7 Ranker 4 \u00B7 Maha NEET 2","RTS 4 \u00B7 Batch 9 \u00B7 AITS 11 \u00B7 Ranker 4 \u00B7 Maha NEET 2 \u00B7 Mastery 6"],
+    tests: [
+      ["Batch Test", [1,1,1]],
+      ["AITS + 2 Maha NEET", [1,1,1]],
+      ["Ranker Test", [1,1,1]],
+      ["RTS \u2014 Real Test Series (CBT mode)", [0,1,1]],
+      ["Mastery Test Series (6 exclusive Pathshala tests, April)", [0,0,1]]
+    ],
+    support: [["Doubt Support \u2014 8 Hrs weekly offline, personalised", [0,0,1]]],
+    online: [
+      ["Achiever Handbook", [1,1,1]],
+      ["Detailed test analysis & video solutions", [1,1,1]],
+      ["Test report with AIR ranking + improvement areas", [1,1,1]],
+      ["Personalised career guidance at Pathshala Centers (by counsellor)", [1,1,1]],
+      ["AITS Mistakes to Mastery (M2M)", [0,1,1]],
+      ["Pre-AITS 100Qs paper as CBT simulation on app (Dropper only)", [0,0,1]],
+      ["NCERT Assertion\u2013Reason + Statement Sheets (chapterwise)", [0,0,1]],
+      ["Physics Premium Practice Material (600+ questions)", [0,0,1]]
+    ],
+    onlineCount: [4,5,8]
+  }
+};
+
+const PS_TIER_NAMES = {basic:"MIP Basic",pro:"MIP PRO",promax:"MIP Pro Max"};
+const PS_BATCH_NAMES = {basic:"PS MIP (Basic) - Offline Test",pro:"PS MIP (Pro) - Offline Test + Real Test",promax:"PS MIP (Pro+DT) - Offline Test + Real Test"};
+
+function buildPSChips(){
+  const psChipsEl = document.getElementById("psChips");
+  CHIP_ORDER.forEach(([key,label])=>{
+    const d=document.createElement("div");
+    d.className="chip "+(key.endsWith("JEE")?"jee":"neet"); d.dataset.pskey=key;
+    d.innerHTML=label+"<small>"+(key.endsWith("JEE")?"IIT-JEE":"NEET")+" \u00B7 Pathshala</small>";
+    d.tabIndex=0;d.onclick=()=>selectPS(key);d.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();selectPS(key);}};
+    psChipsEl.appendChild(d);
+  });
+}
+
+function selectPS(key){
+  document.querySelectorAll("#psChips .chip").forEach(c=>c.classList.toggle("active",c.dataset.pskey===key));
+  const c=PS_COHORTS[key];
+  const cls=key.split("-")[0];
+  const vt=VP_TIER_TOTALS[key];
+  const vtests=COHORTS[key].tests;
+  document.getElementById("psIntro").classList.add("hidden");
+  document.getElementById("psResult").classList.remove("hidden");
+  document.getElementById("psCentreSec").classList.remove("hidden");
+  document.getElementById("psCohortLabel").textContent=c.label;
+  const tiersEl=document.getElementById("psTiers");
+  tiersEl.innerHTML="";
+  TIER_META.forEach(([tk,tname,tcls],ti)=>{
+    let lis="";
+    lis+='<li class="hd">Total Tests in this plan \u2014 '+vt.totals[ti]+'</li>';
+    lis+='<li class="y">'+vt.breakdown[ti]+'</li>';
+    lis+='<li class="hd">Tests</li>';
+    vtests.forEach(([f,v])=>{lis+='<li class="'+(v[ti]?'y':'n')+'">'+f+'</li>';});
+    lis+='<li class="hd">Doubt Support</li>';
+    c.support.forEach(([f,v])=>{lis+='<li class="'+(v[ti]?'y':'n')+'">'+f+'</li>';});
+    lis+='<li class="hd">Online & Offline Benefits ('+c.onlineCount[ti]+')</li>';
+    c.online.forEach(([f,v])=>{lis+='<li class="'+(v[ti]?'y':'n')+'">'+f+'</li>';});
+    const hero = tk==="pro" ? '<span class="hero-flag">\u2B50 HERO TIER</span>' : "";
+    const card=document.createElement("div");
+    card.className="tier "+tcls+(ti===0?" sel":"");
+    card.dataset.ti=ti;
+    card.onclick=e=>{ if(e.target.tagName!=="BUTTON") selectPlanPS(key,ti); };
+    card.innerHTML=
+      '<div class="head"><div class="tname">'+tname+'</div><div class="price">'+fmt(PRICING[cls][tk])+' <span>incl. GST</span></div>'+
+        '<div style="font-size:12px;margin-top:5px;opacity:.95">\uD83E\uDDEA '+vt.totals[ti]+' Tests in this plan</div>'+hero+'</div>'+
+      '<div class="picktag">\u2B07 Test breakdown shown below</div>'+
+      '<div class="tag">'+PS_BATCH_NAMES[tk]+'</div>'+
+      '<ul>'+lis+'</ul>'+
+      '<button class="copybtn" onclick="copyPitchPS(\''+key+'\',\''+tk+'\','+ti+')">\uD83D\uDCCB Copy Pitch (WhatsApp)</button>';
+    tiersEl.appendChild(card);
+  });
+  selectPlanPS(key,0);
+  document.getElementById("psResult").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function selectPlanPS(key,ti){
+  document.querySelectorAll("#psTiers .tier").forEach(el=>el.classList.toggle("sel", +el.dataset.ti===ti));
+  document.body.style.setProperty("--plan",PLAN_ACCENT[ti]);
+  renderPlanCounts(key,ti,"psCountTable","psCountLabel","psCountNote");
+}
+
+function copyPitchPS(key,tk,ti){
+  const c=PS_COHORTS[key];
+  const cls=key.split("-")[0];
+  const vt=VP_TIER_TOTALS[key];
+  const inc=[
+    ...COHORTS[key].tests.filter(([f,v])=>v[ti]).map(([f])=>f),
+    ...c.support.filter(([f,v])=>v[ti]).map(([f])=>f)
+  ];
+  const online=c.online.filter(([f,v])=>v[ti]).map(([f])=>f);
+  const txt=
+"*PW Pathshala \u2014 "+PS_TIER_NAMES[tk]+" ("+c.label+") | AY 2026-27*\n"+
+"\uD83D\uDCDD Batch: "+PS_BATCH_NAMES[tk]+"\n"+
+"\uD83D\uDCB0 Price: "+fmt(PRICING[cls][tk])+" (incl. GST)\n"+
+"\uD83D\uDCC5 Duration: August 2026 \u2013 June 2027 | Validity: Till the Exam\n"+
+"\uD83E\uDDEA Total Tests: "+vt.totals[ti]+" ("+vt.breakdown[ti]+")\n\n"+
+"\u2705 *Included:*\n"+inc.map(f=>"\u2022 "+f).join("\n")+"\n\n"+
+"\uD83D\uDCF1 *Online & Offline Benefits ("+c.onlineCount[ti]+"):*\n"+online.map(f=>"\u2022 "+f).join("\n")+"\n\n"+
+"Enrol now for AY 2026-27! \uD83C\uDFAF";
+  navigator.clipboard.writeText(txt).then(()=>{
+    const t=document.getElementById("toast");
+    t.classList.add("show");
+    setTimeout(()=>t.classList.remove("show"),1500);
+  });
+}
+
+/* =====================================================================
+   GLOSSARY — Source: "MIP Handbook.docx" (MIP Counsellor Handbook AY 2026-27, Sec. 3)
+   Pre-AITS entry added per Training & Quality input.
+   [title, description, accentColor, bgColor, bullets?, metaChip?]
+   ===================================================================== */
+const GLOSSARY = [
+  ["Batch Test","A short test taken inside the student's own PW Vidyapeeth batch, right after a few chapters are finished in class. It checks how well the student understood what was recently taught.","#1d4ed8","#eef4ff"],
+  ["AITS (All India Test Series)","A large test taken by students across all PW centres in India on the same paper. Results are compared nationally, so the student gets a real All India Rank (AIR) \u2014 a true sense of where they stand.","#b45309","#fff7e6"],
+  ["Rank Booster / Ranker Test","A tougher test aimed at students chasing a top rank. It goes beyond the basics to sharpen speed and accuracy for high scorers.","#7c3aed","#f5f0ff"],
+  ["RTS / Real Test","A test built to copy the real JEE/NEET exam exactly \u2014 same pattern, same difficulty, same time limit \u2014 so the student is comfortable with real exam pressure before the actual day.","#be123c","#fff0f3"],
+  ["VP Mastery Test","An exclusive, high-level test series only for Vidyapeeth students, used in the final stretch before the exam. Available only for Class 12 and Droppers.","#0f766e","#eefbf8"],
+  ["Part Test vs. Full Syllabus Test","A Part Test covers a few chapters at a time. A Full Syllabus Test covers everything taught so far \u2014 a full rehearsal for the real exam.","#0369a1","#eef8ff"],
+  ["Doubt Support","Dedicated time where a student can get any doubt \u2014 from class or from a test \u2014 cleared by a teacher.","#15803d","#f0fbf2"],
+  ["Last 45 Days Supervised Learning at VP","In the final 45 days before the exam, the student studies at the Vidyapeeth centre itself under teacher supervision, instead of studying alone at home. Offered in Pro Max for Class 12 & Droppers only.","#c2410c","#fff4ec"],
+  ["\"+2 Maha\"","2 additional mega (full-scale) mock tests bundled into the AITS series for Class 12 & Droppers.","#4d7c0f","#f6fbea"],
+  ["Pre-AITS","A 100-question rehearsal test conducted on the App, one day before every AITS. It is a CBT (Computer-Based Test, but on the App) \u2014 the same format as the actual exam. A focused rehearsal that gets the student ready before the real AITS.","#5b21b6","#f4f0ff",
+    ["Warm up before AITS","Revise high-yield concepts","Build test temperament","Practise CBT navigation","Identify last-minute gaps"],
+    "100 Questions \u00B7 CBT on App \u00B7 1 Day Before AITS"]
+];
+
+function renderGlossary(){
+  const gHtml='<div class="gwrap">'+GLOSSARY.map(g=>{
+    const [t,desc,accent,bg,bullets,meta]=g;
+    let h='<div class="gcard'+(bullets?' wide':'')+'" style="background:'+bg+';border-color:'+accent+'33">';
+    if(meta) h+='<div class="gmeta" style="background:'+accent+'">'+meta+'</div>';
+    h+='<div class="gt" style="color:'+accent+'">'+t+'</div><div class="gd">'+desc+'</div>';
+    if(bullets) h+='<ul class="gb">'+bullets.map(b=>'<li>'+b+'</li>').join('')+'</ul>';
+    return h+'</div>';
+  }).join('')+'</div>';
+  document.querySelectorAll(".gholder").forEach(e=>e.innerHTML=gHtml);
+}
+
+/* =====================================================================
+   CLASS -> ONLINE BATCH NAME — Source: Class/Online Batch Name mapping table
+   Reproduced exactly as provided.
+   ===================================================================== */
+const ONLINE_BATCHES = [
+  ["11th NEET","Arjuna NEET 2.0 2027"],
+  ["11th JEE","Arjuna JEE 2.0 2027"],
+  ["12th JEE","Lakshya JEE 2.0 2027"],
+  ["11th NEET","Lakshya NEET 2.0 2027"],
+  ["Dropper JEE","Prayas JEE 2.0 2027"],
+  ["NEET Dropper","Yakeen NEET 2.0 2027"],
+  ["NEET Dropper (HINDI)","Yakeen NEET 2.0 2027 (Hindi)"]
+];
+
+function renderBatchTable(){
+  const html='<table><tr><th style="text-align:left">Class</th><th style="text-align:left">Online Batch Name</th></tr>'+
+    ONLINE_BATCHES.map(([c,b])=>'<tr><td style="text-align:left">'+c+'</td><td style="text-align:left">'+b+'</td></tr>').join('')+
+    '</table>';
+  document.querySelectorAll(".batchholder").forEach(e=>e.innerHTML=html);
+}
+
+/* Vertical toggle (VP / PS) */
+function selectVertical(v){
+  document.querySelectorAll(".vchip").forEach(c=>c.classList.toggle("active",c.dataset.v===v));
+  document.getElementById("vpFlow").classList.toggle("hidden", v!=="VP");
+  document.getElementById("psFlow").classList.toggle("hidden", v!=="PS");
+  resetCohort();
+}
+
+/* No cohort chosen yet: show only Test Types & Terms; hide pricing/tests/centres */
+function resetCohort(){
+  const v=document.querySelector(".vchip.active");
+  document.body.style.setProperty("--plan", v && v.dataset.v==="PS" ? "var(--ps)" : "var(--vp)");
+  document.querySelectorAll("#chips .chip, #psChips .chip").forEach(c=>c.classList.remove("active"));
+  ["result","vpCentreSec","psResult","psCentreSec"].forEach(id=>document.getElementById(id).classList.add("hidden"));
+  ["vpIntro","psIntro"].forEach(id=>document.getElementById(id).classList.remove("hidden"));
+}
+
+/* PS centre table: search + region filter */
+function renderPSCentres(){
+  const box=document.getElementById("psCentreBox");
+  const regions=[...new Set(PS_CENTERS.map(c=>c[1]))].sort();
+  box.innerHTML=
+    '<div class="centre-controls">'+
+    '<input type="text" id="psSearch" placeholder="Type PS centre / city name... (e.g. Patna, Jhansi, Kolhapur)" style="flex:1;min-width:240px" oninput="drawPSTable()">'+
+    '<select id="psRegion" onchange="drawPSTable()"><option value="">All Regions ('+PS_CENTERS.length+' centres)</option>'+
+    regions.map(r=>'<option>'+r+'</option>').join('')+'</select></div>'+
+    '<div style="overflow-x:auto"><table id="psTable"></table></div>'+
+    '<div class="note">Source: PS centres list (AY 26-27). Offering/pricing availability per centre will be mapped once the PS offerings doc is shared.</div>';
+  drawPSTable();
+}
+function drawPSTable(){
+  const q=document.getElementById("psSearch").value.toLowerCase().trim();
+  const rg=document.getElementById("psRegion").value;
+  const list=PS_CENTERS.filter(([n,r])=>(!rg||r===rg)&&(!q||n.toLowerCase().includes(q)));
+  let html="<tr><th style='text-align:left'>Centre</th><th>Region</th><th>PS Status</th></tr>";
+  list.forEach(([n,r])=>{
+    html+="<tr><td style='text-align:left'>"+n+"</td><td>"+r+"</td><td class='ok'>\u2713 Live</td></tr>";
+  });
+  if(!list.length) html+='<tr><td colspan="3" style="text-align:center;color:var(--grey)">No centres match your search.</td></tr>';
+  document.getElementById("psTable").innerHTML=html;
+}
+renderPSCentres();
+
+/* Merged centre lookup: union of both lists, per-tier availability + remarks */
+const CENTRE_MERGED = (() => {
+  const pmMap = new Map(PRO_MAX_CENTERS.map(([n,r])=>[n,r]));
+  const names = [...new Set([...BASIC_PRO_CENTERS, ...PRO_MAX_CENTERS.map(([n])=>n)])].sort((a,b)=>a.localeCompare(b));
+  return names.map(n=>({
+    name: n,
+    basicPro: BASIC_PRO_CENTERS.includes(n),
+    proMax: pmMap.has(n),
+    remark: pmMap.get(n) || ""
+  }));
+})();
+
+function renderCentres(){
+  const box=document.getElementById("centreBox");
+  box.innerHTML=
+    '<div class="centre-controls">'+
+    '<input type="text" id="centreSearch" placeholder="Type centre / city name... (e.g. Kota, Jaipur, Patna)" style="flex:1;min-width:240px" oninput="drawCentreTable()">'+
+    '<select id="tierFilter" onchange="drawCentreTable()">'+
+      '<option value="">All Centres ('+CENTRE_MERGED.length+')</option>'+
+      '<option value="bp">Basic / PRO Live</option>'+
+      '<option value="pm">Pro Max Live</option>'+
+      '<option value="pmOnly">Pro Max NOT Live</option>'+
+    '</select></div>'+
+    '<div style="overflow-x:auto"><table id="centreTable"></table></div>'+
+    '<div class="note">Source: MIP Targets AY26-27 — "Final centers" tab. Basic/PRO and Pro Max are separate live lists; a centre may be live in one and not the other. Remarks (capacity / JEE-NEET / campus) apply to Pro Max availability.</div>';
+  drawCentreTable();
+}
+function drawCentreTable(){
+  const q=document.getElementById("centreSearch").value.toLowerCase().trim();
+  const tf=document.getElementById("tierFilter").value;
+  let list=CENTRE_MERGED.filter(c=>!q||c.name.toLowerCase().includes(q));
+  if(tf==="bp") list=list.filter(c=>c.basicPro);
+  if(tf==="pm") list=list.filter(c=>c.proMax);
+  if(tf==="pmOnly") list=list.filter(c=>!c.proMax);
+  const cell=v=>'<td class="'+(v?'ok':'no')+'">'+(v?'\u2713 Live':'\u2715 Not Live')+'</td>';
+  let html="<tr><th>Centre</th><th>MIP Basic</th><th>MIP PRO</th><th>MIP Pro Max</th><th style='text-align:left'>Remarks</th></tr>";
+  list.forEach(c=>{
+    html+="<tr><td>"+c.name+"</td>"+cell(c.basicPro)+cell(c.basicPro)+cell(c.proMax)+
+      '<td style="text-align:left;font-size:12px;color:'+(c.remark?'#8a6d1a':'var(--grey)')+'">'+(c.remark||"—")+"</td></tr>";
+  });
+  if(!list.length) html+='<tr><td colspan="5" style="text-align:center;color:var(--grey)">No centres match your search.</td></tr>';
+  document.getElementById("centreTable").innerHTML=html;
+}
+renderCentres();
+buildPSChips();
+renderGlossary();
+renderBatchTable();
+document.body.style.setProperty("--plan","var(--vp)");
+
+function copyPitch(key,tk,ti){
+  const c=COHORTS[key], cls=key.split("-")[0];
+  const tname={basic:"MIP Basic",pro:"MIP PRO",promax:"MIP Pro Max"}[tk];
+  const inc=[
+    ...c.tests.filter(([f,v])=>v[ti]).map(([f])=>f),
+    ...c.support.filter(([f,v])=>v[ti]).map(([f])=>f)
+  ];
+  const online=c.online.filter(([f,v])=>v[ti]).map(([f])=>f);
+  const txt=
+"*PW Vidyapeeth \u2014 "+tname+" ("+c.label+") | AY 2026-27*\n"+
+"\uD83D\uDCB0 Price: "+fmt(PRICING[cls][tk])+" (incl. GST)\n"+
+(VP_TIER_TOTALS[key]?"\uD83E\uDDEA Total Tests: "+VP_TIER_TOTALS[key].totals[ti]+" ("+VP_TIER_TOTALS[key].breakdown[ti]+")\n":"")+"\n"+
+"\u2705 *Included:*\n"+inc.map(f=>"\u2022 "+f).join("\n")+"\n\n"+
+"\uD83D\uDCF1 *Online Features ("+c.onlineCount[ti]+"):*\n"+online.map(f=>"\u2022 "+f).join("\n")+"\n\n"+
+"_"+TAGLINES[tk]+"_\n"+
+"Enrol now for AY 2026-27! \uD83C\uDFAF";
+  navigator.clipboard.writeText(txt).then(()=>{
+    const t=document.getElementById("toast");
+    t.classList.add("show");
+    setTimeout(()=>t.classList.remove("show"),1500);
+  });
+}
+</script>
+</body>
+</html>
