@@ -177,6 +177,32 @@
   .gcard ul.gb li{font-size:14.5px;line-height:1.65;color:#233052;margin-bottom:2px;}
   .gcard.wide{grid-column:1/-1;}
 
+  .sheetlink{background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.35);color:#fff;text-decoration:none;
+    font-size:12px;font-weight:700;padding:7px 14px;border-radius:999px;transition:.15s;}
+  .sheetlink:hover{background:rgba(255,255,255,.26);}
+  .vtabs{display:flex;gap:8px;margin:4px 0 18px;flex-wrap:wrap;}
+  .vtab{font-family:'Sora',sans-serif;font-size:13.5px;font-weight:700;padding:11px 20px;border-radius:999px;
+    border:1.5px solid var(--line);background:var(--card);color:var(--ink-2);cursor:pointer;transition:.15s;letter-spacing:.02em;}
+  .vtab:hover{border-color:var(--vp);}
+  .vtab.on{background:var(--ink);border-color:var(--ink);color:#fff;box-shadow:0 6px 16px rgba(15,27,54,.24);}
+  .vtab:focus-visible{outline:3px solid var(--gold);outline-offset:2px;}
+  .spot{background:linear-gradient(135deg,var(--sc) 0%,color-mix(in srgb,var(--sc) 66%,#000) 100%);color:#fff;
+    border-radius:14px;padding:16px 19px;margin:14px 0;box-shadow:0 8px 22px color-mix(in srgb,var(--sc) 30%,transparent);
+    display:flex;flex-direction:column;gap:3px;position:relative;}
+  .spot-tag{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.86;font-weight:700;}
+  .spot-name{font-family:'Sora',sans-serif;font-size:21px;font-weight:800;margin-top:3px;}
+  .spot-meta{font-size:13.5px;opacity:.95;}
+  .spot-days{display:inline-block;align-self:flex-start;background:rgba(255,255,255,.2);padding:5px 13px;
+    border-radius:999px;font-size:12.5px;font-weight:700;margin-top:8px;}
+  .spot-link{align-self:flex-start;margin-top:10px;background:#fff;color:var(--sc);border:none;border-radius:9px;
+    padding:8px 15px;font-family:'Sora',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer;}
+  .spot-link:hover{filter:brightness(.96);}
+  .catchip{background:color-mix(in srgb,var(--sc) 13%,#fff);color:var(--sc);font-weight:700;font-size:11.5px;
+    padding:4px 10px;border-radius:999px;white-space:nowrap;}
+  .sylbtn{background:var(--plan);color:#fff;border:none;border-radius:8px;padding:6px 13px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;}
+  .sylbtn:hover{filter:brightness(1.1);}
+  .sylgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;font-size:13px;line-height:1.6;padding:6px 0;}
+  .sylrow td{border-top:2px solid var(--line);}
   footer{text-align:center;font-size:11.5px;color:var(--muted);margin-top:40px;padding:0 18px;line-height:1.7;}
 
   .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(8px);
@@ -200,10 +226,16 @@
     <h1>MIP with RTS — Counsellor Console</h1>
     <div class="sub">Marks Improvement Program · Offline Test Series · AY 2026-27 · PW Vidyapeeth</div>
   </div>
-  <span class="badge">Starting @ ₹3,999* · Prices incl. GST · Same for VP &amp; PS</span>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="badge">Starting @ ₹3,999* · Prices incl. GST · Same for VP &amp; PS</span><a class="sheetlink" href="https://docs.google.com/spreadsheets/d/1JDC-VWvDG6aPZgjkBjiPx-TiMDzJQuXAO0RSfE1-2dU/edit?gid=234264653#gid=234264653" target="_blank" rel="noopener">Open live planner sheet ↗</a></div>
 </header>
 
 <div class="wrap">
+  <div class="vtabs">
+    <button class="vtab on" data-view="offer" onclick="showView('offer')">Offerings &amp; Pricing</button>
+    <button class="vtab" data-view="planner" onclick="showView('planner')">Test Planner</button>
+  </div>
+
+  <div id="offerView">
   <h2 class="sec">Step 1 — Select Vertical</h2>
   <div class="chips" style="grid-template-columns:repeat(2,1fr);max-width:520px">
     <div class="chip vchip active" data-v="VP" tabindex="0" onclick="selectVertical('VP')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectVertical('VP')}">Vidyapeeth (VP)<small>Offline Centres</small></div>
@@ -220,12 +252,19 @@
       <div class="note" style="margin:-4px 0 12px">Duration: August 2026 – June 2027 · Validity: Till the Exam · Batches: PS MIP (Basic) - Offline Test · PS MIP (Pro) - Offline Test + Real Test · PS MIP (Pro+DT) - Offline Test + Real Test</div>
       <div class="note" style="margin:-4px 0 8px">&#8505;&#65039; Click any plan card to see its exact test breakdown in the table below.</div>
       <div class="tiers" id="psTiers"></div>
+      <div id="psNextStrip"></div>
 
       <h2 class="sec">No. of Tests — <span id="psCountLabel"></span></h2>
       <div style="overflow-x:auto"><table id="psCountTable"></table></div>
       <div class="note" id="psCountNote"></div>
+
+
     </div>
     <div id="psIntro">
+      <h2 class="sec">Number of Tests — Cohort-Wise (all three plans)</h2>
+      <div class="note" style="margin:-4px 0 10px">Final counts from the academic team, MIP Counsellor Handbook AY 26-27 &mdash; Section 4. Test counts are the same for Vidyapeeth and Pathshala.</div>
+      <div class="matrixholder"></div>
+
       <h2 class="sec">Test Types &amp; Terms — Explained in Plain Language</h2>
       <div class="note" style="margin:-4px 0 10px">Select a cohort above to see offerings and centre availability. Source: MIP Counsellor Handbook AY 2026-27.</div>
       <div class="gholder"></div>
@@ -247,13 +286,20 @@
     <h2 class="sec">Step 3 — Offerings &amp; Pricing: <span id="cohortLabel" style="color:var(--red)"></span></h2>
     <div class="note" style="margin:-4px 0 8px">&#8505;&#65039; Click any plan card to see its exact test breakdown in the table below.</div>
     <div class="tiers" id="tiers"></div>
+    <div id="vpNextStrip"></div>
 
     <h2 class="sec">No. of Tests — <span id="countLabel"></span></h2>
     <div style="overflow-x:auto"><table id="countTable"></table></div>
     <div class="note" id="countNote"></div>
+
+
   </div>
 
   <div id="vpIntro">
+    <h2 class="sec">Number of Tests — Cohort-Wise (all three plans)</h2>
+    <div class="note" style="margin:-4px 0 10px">Final counts from the academic team, MIP Counsellor Handbook AY 26-27 &mdash; Section 4. Pick a cohort above for the plan-wise breakdown.</div>
+    <div class="matrixholder"></div>
+
     <h2 class="sec">Test Types &amp; Terms — Explained in Plain Language</h2>
     <div class="note" style="margin:-4px 0 10px">Select a cohort above to see pricing, test counts and centre availability. Source: MIP Counsellor Handbook AY 2026-27.</div>
     <div class="gholder"></div>
@@ -264,9 +310,30 @@
     <div id="centreBox"></div>
   </div>
   </div>
+  </div>
+
+  <div id="plannerView" class="hidden">
+    <h2 class="sec">Test Planner — pick the class</h2>
+    <div class="note" style="margin:-4px 0 10px">The planner is the same for Vidyapeeth and Pathshala. Dates and syllabus come from the academic team's live sheet &mdash;
+      <a href="https://docs.google.com/spreadsheets/d/1JDC-VWvDG6aPZgjkBjiPx-TiMDzJQuXAO0RSfE1-2dU/edit?gid=234264653#gid=234264653" target="_blank" rel="noopener" style="color:var(--pro);font-weight:600">open the live sheet &#8599;</a>
+      to confirm before you commit a date to a parent.</div>
+    <div class="chips" id="plChips"></div>
+    <div id="plSpot"></div>
+    <div class="centre-controls">
+      <select onchange="setPlannerFilter(this.value)">
+        <option value="upcoming">Upcoming tests only</option>
+        <option value="30">Next 30 days</option>
+        <option value="all">Full year plan</option>
+      </select>
+      <input type="text" id="plSearch" placeholder="Search test, batch or chapter... (e.g. AITS-4, rotational motion)" style="flex:1;min-width:240px" oninput="drawPlanner()">
+    </div>
+    <div id="plBody"></div>
+  </div>
 </div>
 
-<footer>Internal counselling aid · Sources: MIP AY 26-27 Final Counselling Deck · MIP Counsellor Handbook AY 26-27 · PS MIP Batch Listing AY 26-27 · MIP Targets AY26-27 (Final centers) · Verify with latest circular before commitment.</footer>
+<footer>Internal counselling aid &middot; Sources: MIP AY 26-27 Final Counselling Deck &middot; MIP Counsellor Handbook AY 26-27 (test counts &amp; features) &middot; PS MIP Batch Listing AY 26-27 &middot; MIP Targets AY26-27 (Final centers) &middot; MIP Planner 2026-2027<br>
+Planner data is a snapshot taken 18 Aug 2026. The academic team may add tests or move dates &mdash;
+<a href="https://docs.google.com/spreadsheets/d/1JDC-VWvDG6aPZgjkBjiPx-TiMDzJQuXAO0RSfE1-2dU/edit?gid=234264653#gid=234264653" target="_blank" rel="noopener" style="color:var(--pro);font-weight:600">check the live planner sheet</a> before committing a date to a parent.</footer>
 <div class="toast" id="toast">Copied!</div>
 
 <script>
@@ -281,156 +348,104 @@ const PRICING = {
 };
 
 const TAGLINES = {
-  basic:  "Entry tier — offline test exposure at the best price.",
-  pro:    "The hero tier — right for most students.",
-  promax: "Full support for droppers & serious aspirants."
+  basic:  "MIP Basic \u2014 without RTS. Extra offline test exposure at the most affordable price.",
+  pro:    "MIP PRO \u2014 with RTS. Everything in Basic + Real Test Series (CBT mode) + more online support.",
+  promax: "MIP Pro Max \u2014 with RTS, doubt support + supervised learning. Everything in PRO + VP Mastery tests."
 };
 
 /* Feature matrix per cohort. t = [Basic, PRO, ProMax] (true/false) */
 const COHORTS = {
   "11-JEE": {
     label: "11th JEE",
-    tests: [
-      ["Batch Test", [1,1,1]],
-      ["AITS", [1,1,1]],
-      ["Ranker Test", [1,1,1]],
-      ["RTS (Real Test — up to 4)", [0,1,1]]
-    ],
-    support: [
-      ["Doubt Support", [0,0,1]],
-      ["Last 45 Days Supervised Learning at VP", [0,0,0]]
-    ],
+    tests: [["Batch Test",[1,1,1]],["AITS",[1,1,1]],["RTS \u2014 Real Test Series (CBT mode)",[0,1,1]]],
+    support: [["Doubt support",[0,0,1]],["Last 45 Days Supervised Learning at VP",[0,0,0]]],
     online: [
-      ["Detailed test analysis & video solutions", [1,1,1]],
-      ["Report with AIR ranking + improvement areas", [1,1,1]],
-      ["Personalised Academic guidance at VP (by counsellor)", [1,1,1]],
-      ["AITS M2M Sheet (PDF)", [0,1,1]],
-      ["Formulae Book", [0,1,1]],
-      ["Chapterwise short notes", [0,0,1]],
-      ["PCM Premium practice material", [0,0,1]]
+      ["Detailed test analysis & video solutions",[1,1,1]],
+      ["Report with AIR ranking + improvement areas",[1,1,1]],
+      ["Personalised academic guidance at VP (by counsellor)",[1,1,1]],
+      ["AITS M2M Sheet (PDF)",[0,1,1]],
+      ["Formula book",[0,1,1]],
+      ["Chapterwise short notes",[0,0,1]],
+      ["PCM premium practice material",[0,0,1]]
     ],
     onlineCount: [3,5,7]
   },
   "11-NEET": {
     label: "11th NEET",
-    tests: [
-      ["Batch Test", [1,1,1]],
-      ["AITS", [1,1,1]],
-      ["Ranker Test", [1,1,1]],
-      ["RTS (Real Test — up to 4)", [0,1,1]]
-    ],
-    support: [
-      ["Doubt Support", [0,0,1]],
-      ["Last 45 Days Supervised Learning at VP", [0,0,0]]
-    ],
+    tests: [["Batch Test",[1,1,1]],["AITS",[1,1,1]],["RTS \u2014 Real Test Series (CBT mode)",[0,1,1]]],
+    support: [["Doubt support",[0,0,1]],["Last 45 Days Supervised Learning at VP",[0,0,0]]],
     online: [
-      ["Detailed test analysis & video solutions", [1,1,1]],
-      ["Report with AIR ranking + improvement areas", [1,1,1]],
-      ["Personalised Academic guidance at VP (by counsellor)", [1,1,1]],
-      ["AITS M2M Sheet (PDF)", [0,1,1]],
-      ["Achiever Handbook", [0,1,1]],
-      ["NCERT Assertion reason + statement sheets (chapterwise)", [0,0,1]],
-      ["Physics Premium practice material", [0,0,1]]
+      ["Detailed test analysis & video solutions",[1,1,1]],
+      ["Test report with AIR ranking + improvement areas",[1,1,1]],
+      ["Personalised academic guidance at VP (by counsellor)",[1,1,1]],
+      ["AITS M2M Sheet (PDF)",[0,1,1]],
+      ["Achiever Handbook",[0,1,1]],
+      ["NCERT assertion-reason sheets, chapterwise",[0,0,1]],
+      ["Physics premium practice material",[0,0,1]]
     ],
     onlineCount: [3,5,7]
   },
   "12-JEE": {
     label: "12th JEE",
-    tests: [
-      ["Batch Test", [1,1,1]],
-      ["AITS + 2 Maha JEE", [1,1,1]],
-      ["Ranker Test", [1,1,1]],
-      ["RTS (Real Test — up to 4)", [0,1,1]],
-      ["VP Mastery Test Series", [0,0,1]]
-    ],
-    support: [
-      ["Doubt Support", [0,0,1]],
-      ["Supervised Study", [0,0,1]]
-    ],
+    tests: [["Batch Test",[1,1,1]],["AITS (+ 2 Maha JEE)",[1,1,1]],["RTS \u2014 Real Test Series (CBT mode)",[0,1,1]],["VP Mastery Test series",[0,0,1]]],
+    support: [["Doubt support",[0,0,1]],["Supervised study",[0,0,1]]],
     online: [
-      ["Detailed test analysis & video solutions", [1,1,1]],
-      ["Report with AIR ranking + improvement areas", [1,1,1]],
-      ["Personalised Academic guidance at VP (by counsellor)", [1,1,1]],
-      ["AITS M2M Sheet (PDF)", [0,1,1]],
-      ["Formula Book", [0,1,1]],
-      ["Pre-AITS paper as CBT simulation on app", [0,0,1]],
-      ["Chapterwise short notes", [0,0,1]],
-      ["PCM Premium practice material", [0,0,1]]
+      ["Detailed test analysis & video solutions",[1,1,1]],
+      ["Report with AIR ranking + improvement areas",[1,1,1]],
+      ["Personalised academic guidance at VP (by counsellor)",[1,1,1]],
+      ["AITS M2M Sheet (PDF)",[0,1,1]],
+      ["Formula Book",[0,1,1]],
+      ["Pre-AITS paper as CBT simulation on app",[0,0,1]],
+      ["Chapterwise short notes",[0,0,1]],
+      ["PCM premium practice material",[0,0,1]]
     ],
     onlineCount: [3,5,8]
   },
   "12-NEET": {
     label: "12th NEET",
-    tests: [
-      ["Batch Test", [1,1,1]],
-      ["AITS + 2 MAHA NEET", [1,1,1]],
-      ["Ranker Test", [1,1,1]],
-      ["RTS (Real Test — up to 4)", [0,1,1]],
-      ["VP Mastery Test Series", [0,0,1]]
-    ],
-    support: [
-      ["Doubt Support", [0,0,1]],
-      ["Last 45 Days Supervised Learning at VP", [0,0,1]]
-    ],
+    tests: [["Batch Test",[1,1,1]],["AITS (+ 2 Maha NEET)",[1,1,1]],["RTS \u2014 Real Test Series (CBT mode)",[0,1,1]],["VP Mastery Test series",[0,0,1]]],
+    support: [["Doubt support",[0,0,1]],["Last 45 Days Supervised Learning at VP",[0,0,1]]],
     online: [
-      ["Detailed test analysis & video solutions", [1,1,1]],
-      ["Test Report with AIR ranking + improvement areas", [1,1,1]],
-      ["Personalised career guidance at VP (by counsellor)", [1,1,1]],
-      ["AITS M2M Sheet (PDF)", [0,1,1]],
-      ["Achiever Handbook", [0,1,1]],
-      ["Pre-AITS 100Qs CBT simulation — for 12th: NEET-CBSE Board Kit (Phy, Chem & Bio)", [0,0,1]],
-      ["NCERT Assertion reason + statement sheets (chapterwise)", [0,0,1]],
-      ["Physics Premium practice material", [0,0,1]]
+      ["Detailed test analysis & video solutions",[1,1,1]],
+      ["Test report with AIR ranking + improvement areas",[1,1,1]],
+      ["Personalised career guidance at VP (by counsellor)",[1,1,1]],
+      ["AITS M2M Sheet (PDF)",[0,1,1]],
+      ["Achiever Handbook",[0,1,1]],
+      ["CBSE Board Kit \u2014 Physics, Chemistry, Biology",[0,0,1]],
+      ["NCERT assertion-reason sheets, chapterwise",[0,0,1]],
+      ["Physics premium practice material",[0,0,1]]
     ],
     onlineCount: [3,5,8]
   },
   "dr-JEE": {
     label: "Dropper JEE",
-    tests: [
-      ["Batch Test", [1,1,1]],
-      ["AITS + 2 Maha JEE", [1,1,1]],
-      ["Ranker Test", [1,1,1]],
-      ["RTS (Real Test — up to 4)", [0,1,1]],
-      ["VP Mastery Test Series", [0,0,1]]
-    ],
-    support: [
-      ["Doubt Support", [0,0,1]],
-      ["Supervised Study", [0,0,1]]
-    ],
+    tests: [["Batch Test",[1,1,1]],["AITS (+ 2 Maha JEE)",[1,1,1]],["RTS \u2014 Real Test Series (CBT mode)",[0,1,1]],["VP Mastery Test series",[0,0,1]]],
+    support: [["Doubt support",[0,0,1]],["Supervised study",[0,0,1]]],
     online: [
-      ["Detailed test analysis & video solutions", [1,1,1]],
-      ["Report with AIR ranking + improvement areas", [1,1,1]],
-      ["Personalised Academic guidance at VP (by counsellor)", [1,1,1]],
-      ["AITS M2M Sheet (PDF)", [0,1,1]],
-      ["Formula Book", [0,1,1]],
-      ["Pre-AITS paper as CBT simulation on app", [0,0,1]],
-      ["Chapterwise short notes", [0,0,1]],
-      ["PCM Premium practice material", [0,0,1]]
+      ["Detailed test analysis & video solutions",[1,1,1]],
+      ["Report with AIR ranking + improvement areas",[1,1,1]],
+      ["Personalised academic guidance at VP (by counsellor)",[1,1,1]],
+      ["AITS M2M Sheet (PDF)",[0,1,1]],
+      ["Formula Book",[0,1,1]],
+      ["Pre-AITS paper as CBT simulation on app",[0,0,1]],
+      ["Chapterwise short notes",[0,0,1]],
+      ["PCM premium practice material",[0,0,1]]
     ],
     onlineCount: [3,5,8]
   },
   "dr-NEET": {
     label: "Dropper NEET",
-    tests: [
-      ["Batch Test", [1,1,1]],
-      ["AITS + 2 MAHA NEET", [1,1,1]],
-      ["Ranker Test", [1,1,1]],
-      ["RTS (Real Test — up to 4)", [0,1,1]],
-      ["VP Mastery Test Series", [0,0,1]]
-    ],
-    support: [
-      ["Doubt Support", [0,0,1]],
-      ["Last 45 Days Supervised Learning at VP", [0,0,1]]
-    ],
+    tests: [["Batch Test",[1,1,1]],["AITS (+ 2 Maha NEET)",[1,1,1]],["RTS \u2014 Real Test Series (CBT mode)",[0,1,1]],["VP Mastery Test series",[0,0,1]]],
+    support: [["Doubt support",[0,0,1]],["Last 45 Days Supervised Learning at VP",[0,0,1]]],
     online: [
-      ["Detailed test analysis & video solutions", [1,1,1]],
-      ["Test Report with AIR ranking + improvement areas", [1,1,1]],
-      ["Personalised career guidance at VP (by counsellor)", [1,1,1]],
-      ["AITS M2M Sheet (PDF)", [0,1,1]],
-      ["Achiever Handbook", [0,1,1]],
-      ["Pre-AITS 100Qs paper as CBT simulation on app (Dropper only)", [0,0,1]],
-      ["NCERT Assertion reason + statement sheets (chapterwise)", [0,0,1]],
-      ["Physics Premium practice material", [0,0,1]]
+      ["Detailed test analysis & video solutions",[1,1,1]],
+      ["Test report with AIR ranking + improvement areas",[1,1,1]],
+      ["Personalised career guidance at VP (by counsellor)",[1,1,1]],
+      ["AITS M2M Sheet (PDF)",[0,1,1]],
+      ["Achiever Handbook",[0,1,1]],
+      ["Pre-AITS 100Q CBT mock on app",[0,0,1]],
+      ["NCERT assertion-reason sheets, chapterwise",[0,0,1]],
+      ["Physics premium practice material",[0,0,1]]
     ],
     onlineCount: [3,5,8]
   }
@@ -438,32 +453,30 @@ const COHORTS = {
 
 /* =====================================================================
    PLAN-WISE TEST BREAKDOWN
-   Part/Full splits: MIP AY 26-27 deck (cohort-wise test count slides).
-   Plan composition: "MIP TEST count _training" tables.
-   [part, full, total]; null = split not given in source.
+   Type totals: MIP Counsellor Handbook AY 26-27 (Section 4).
+   Part/Full split: MIP planner. Every split below sums to the handbook total.
+   [part, full, total]; null = split not stated in source.
    ===================================================================== */
 const TEST_SPLITS = {
-  "11-JEE":  {Batch:[6,0,6],   AITS:[8,1,9],   Ranker:[null,null,2], RTS:[2,2,4], Maha:[0,2,2],  Mastery:[null,null,0]},
-  "12-JEE":  {Batch:[8,1,9],   AITS:[5,12,17], Ranker:[null,null,4], RTS:[0,4,4], Maha:[0,2,2],  Mastery:[null,null,6]},
-  "dr-JEE":  {Batch:[6,1,7],   AITS:[6,9,15],  Ranker:[null,null,4], RTS:[0,4,4], Maha:[0,2,2],  Mastery:[null,null,6]},
-  "11-NEET": {Batch:[3,1,4],   AITS:[5,1,6],   Ranker:[2,1,3],       RTS:[2,2,4], Maha:[0,2,2],  Mastery:[0,0,0]},
-  "12-NEET": {Batch:[4,0,4],   AITS:[6,6,12],  Ranker:[2,0,2],       RTS:[1,3,4], Maha:[0,2,2],  Mastery:[3,3,6]},
-  "dr-NEET": {Batch:[7,2,9],   AITS:[7,4,11],  Ranker:[4,0,4],       RTS:[1,3,4], Maha:[0,2,2],  Mastery:[3,3,6]}
+  "11-JEE":  {Batch:[6,0,6],   AITS:[8,1,9],   RTS:[2,2,4], Mastery:[null,null,0]},
+  "12-JEE":  {Batch:[8,1,9],   AITS:[5,12,17], RTS:[0,4,4], Mastery:[null,null,6]},
+  "dr-JEE":  {Batch:[6,1,7],   AITS:[6,9,15],  RTS:[0,4,4], Mastery:[null,null,6]},
+  "11-NEET": {Batch:[3,1,4],   AITS:[5,1,6],   Ranker:[2,1,3], RTS:[2,2,4], Mastery:[0,0,0]},
+  "12-NEET": {Batch:[4,0,4],   AITS:[6,6,12],  Ranker:[2,0,2], RTS:[1,3,4], Mastery:[3,3,6]},
+  "dr-NEET": {Batch:[7,2,9],   AITS:[7,4,11],  Ranker:[4,0,4], RTS:[1,3,4], Mastery:[3,3,6]}
 };
 
-/* Which test types each plan includes (index 0=Basic, 1=PRO, 2=Pro Max) */
 const PLAN_TYPES = {
-  "11-JEE":  [["Batch","AITS"],["Batch","AITS","Ranker"],["Batch","AITS","Ranker"]],
-  "12-JEE":  [["Batch","AITS"],["RTS","Batch","AITS","Maha","Ranker"],["RTS","Batch","AITS","Maha","Ranker","Mastery"]],
-  "dr-JEE":  [["Batch","AITS"],["RTS","Batch","AITS","Maha","Ranker"],["RTS","Batch","AITS","Maha","Ranker","Mastery"]],
-  "11-NEET": [["Batch","AITS","Ranker"],["RTS","Batch","AITS","Ranker"],["RTS","Batch","AITS","Ranker"]],
-  "12-NEET": [["Batch","AITS","Maha"],["RTS","Batch","AITS","Maha","Ranker"],["RTS","Batch","AITS","Maha","Ranker","Mastery"]],
-  "dr-NEET": [["Batch","AITS","Ranker"],["RTS","Batch","AITS","Ranker","Maha"],["RTS","Batch","AITS","Ranker","Maha","Mastery"]]
+  "11-JEE":  [["Batch","AITS"],["Batch","AITS","RTS"],["Batch","AITS","RTS"]],
+  "12-JEE":  [["Batch","AITS"],["Batch","AITS","RTS"],["Batch","AITS","RTS","Mastery"]],
+  "dr-JEE":  [["Batch","AITS"],["Batch","AITS","RTS"],["Batch","AITS","RTS","Mastery"]],
+  "11-NEET": [["Batch","Ranker","AITS"],["Batch","Ranker","AITS","RTS"],["Batch","Ranker","AITS","RTS"]],
+  "12-NEET": [["Batch","Ranker","AITS"],["Batch","Ranker","AITS","RTS"],["Batch","Ranker","AITS","RTS","Mastery"]],
+  "dr-NEET": [["Batch","Ranker","AITS"],["Batch","Ranker","AITS","RTS"],["Batch","Ranker","AITS","RTS","Mastery"]]
 };
 
-const TYPE_LABEL = {Batch:"Batch Test", AITS:"AITS", Ranker:"Ranker / Rank Booster Test", RTS:"RTS \u2014 Real Test", Maha:"Maha Test (full-scale mega mock)", Mastery:"VP Mastery Test"};
+const TYPE_LABEL = {Batch:"Batch Test", AITS:"AITS (incl. 2 Maha for 12th & Dropper)", Ranker:"Rank Booster / Ranker Test", RTS:"RTS \u2014 Real Test (CBT mode)", Mastery:"VP Mastery Test"};
 
-/* Renders the plan-filtered test-count table into the given elements */
 function renderPlanCounts(key, ti, tableId, labelId, noteId){
   const sp=TEST_SPLITS[key], types=PLAN_TYPES[key][ti], vt=VP_TIER_TOTALS[key];
   const planName=["MIP Basic","MIP PRO","MIP Pro Max"][ti];
@@ -478,66 +491,27 @@ function renderPlanCounts(key, ti, tableId, labelId, noteId){
     html+='<tr><td style="text-align:left">'+TYPE_LABEL[t]+'</td>'+cell(pt)+cell(ft)+'<td style="font-weight:bold">'+tot+'</td></tr>';
   });
   html+='<tr class="total"><td style="text-align:left">Total tests in '+planName+'</td><td colspan="2" style="color:#6b7280">'+
-        (hasNull?'part/full split not given for all types':'')+'</td><td>'+vt.totals[ti]+'</td></tr>';
+        (hasNull?'part/full split not stated for all types':'')+'</td><td>'+vt.totals[ti]+'</td></tr>';
   document.getElementById(tableId).innerHTML=html;
   document.getElementById(labelId).textContent=label+" \u00B7 "+planName;
+  const hindi=(key==="dr-NEET")?' Yakeen Hindi 2.0 runs one extra Batch Test \u2014 '+HINDI_TOTALS.totals[ti]+' tests in this plan.':'';
   document.getElementById(noteId).innerHTML=
-    'Showing only the tests included in <b>'+planName+'</b>. Click another plan card above to switch. Part/Full split as per MIP AY 26-27 deck; plan totals as per MIP test-count sheet.'+
+    'Showing only the tests included in <b>'+planName+'</b>. Click another plan card above to switch. Totals as per MIP Counsellor Handbook AY 26-27; Part/Full split as per the MIP planner.'+hindi+
     (derived!==vt.totals[ti]?' <span style="color:#b45309"><b>Note:</b> the listed test types add up to '+derived+', while the source states '+vt.totals[ti]+' \u2014 pending confirmation.</span>':'');
 }
 
-/* VP tier-wise test totals \u2014 Source: "MIP TEST count _training.docx"
-   JEE and NEET cohorts, all three plans. Totals reproduced exactly as printed in source. */
+/* VP & PS tier-wise test totals \u2014 Source: "MIP Handbook - AY 26-27.docx", Section 4.
+   Every total below is verified to equal the sum of its own test-type breakdown. */
 const VP_TIER_TOTALS = {
-  "11-JEE": {
-    totals: [15,17,17],
-    breakdown: [
-      "Batch Tests 6 + AITS 9",
-      "Batch Tests 6 + AITS 9 + Ranker Tests 2",
-      "Batch Tests 6 + AITS 9 + Ranker Tests 2"
-    ]
-  },
-  "12-JEE": {
-    totals: [25,38,38],
-    breakdown: [
-      "Batch Tests 9 + AITS 17*",
-      "RTS 4 + Batch Tests 9 + AITS 17 + Maha JEE 2 + Ranker Tests 4",
-      "RTS 4 + Batch Tests 9 + AITS 17 + Maha JEE 2 + Ranker Tests 4 + VP Mastery 6"
-    ]
-  },
-  "dr-JEE": {
-    totals: [22,32,38],
-    breakdown: [
-      "Batch Tests 7 + AITS 15",
-      "RTS 4 + Batch Tests 7 + AITS 15 + Maha JEE 2 + Ranker Tests 4",
-      "RTS 4 + Batch Tests 7 + AITS 15 + Maha JEE 2 + Ranker Tests 4 + Mastery Tests 6"
-    ]
-  },
-  "11-NEET": {
-    totals: [13,17,17],
-    breakdown: [
-      "Batch Tests 4 + AITS 6 + Ranker Tests 3",
-      "RTS 4 + Batch Tests 4 + AITS 6 + Ranker Tests 3",
-      "RTS 4 + Batch Tests 4 + AITS 6 + Ranker Tests 3*"
-    ]
-  },
-  "12-NEET": {
-    totals: [22,24,30],
-    breakdown: [
-      "Batch Tests 4 + AITS 12 + Maha NEET 2",
-      "RTS 4 + Batch Tests 4 + AITS 12 + Maha NEET 2 + Ranker Tests 2",
-      "RTS 4 + Batch Tests 4 + AITS 12 + Maha NEET 2 + Ranker Tests 2 + VP Mastery Tests 6"
-    ]
-  },
-  "dr-NEET": {
-    totals: [22,30,38],
-    breakdown: [
-      "Batch Tests 9 + AITS 11 + Ranker Tests 4",
-      "RTS 4 + Batch Tests 9 + AITS 11 + Ranker Tests 4 + Maha NEET 2",
-      "RTS 4 + Batch Tests 9 + AITS 11 + Ranker Tests 4 + Maha NEET 2 + Mastery Tests 6"
-    ]
-  }
+  "11-JEE": {totals:[15,19,19], breakdown:["Batch Test 6 + AITS 9","Batch Test 6 + AITS 9 + RTS 4","Batch Test 6 + AITS 9 + RTS 4"]},
+  "12-JEE": {totals:[26,30,36], breakdown:["Batch Test 9 + AITS 17","Batch Test 9 + AITS 17 + RTS 4","Batch Test 9 + AITS 17 + RTS 4 + VP Mastery 6"]},
+  "dr-JEE": {totals:[22,26,32], breakdown:["Batch Test 7 + AITS 15","Batch Test 7 + AITS 15 + RTS 4","Batch Test 7 + AITS 15 + RTS 4 + VP Mastery 6"]},
+  "11-NEET": {totals:[13,17,17], breakdown:["Batch Test 4 + Rank Booster 3 + AITS 6","Batch Test 4 + Rank Booster 3 + AITS 6 + Real Test 4","Batch Test 4 + Rank Booster 3 + AITS 6 + Real Test 4"]},
+  "12-NEET": {totals:[18,22,28], breakdown:["Batch Test 4 + Rank Booster 2 + AITS 12","Batch Test 4 + Rank Booster 2 + AITS 12 + Real Test 4","Batch Test 4 + Rank Booster 2 + AITS 12 + Real Test 4 + VP Mastery 6"]},
+  "dr-NEET": {totals:[24,28,34], breakdown:["Batch Test 9 + Rank Booster 4 + AITS 11","Batch Test 9 + Rank Booster 4 + AITS 11 + Real Test 4","Batch Test 9 + Rank Booster 4 + AITS 11 + Real Test 4 + VP Mastery 6"]}
 };
+/* Yakeen Hindi 2.0 (NEET Dropper Hindi) runs one extra Batch Test */
+const HINDI_TOTALS={totals:[25,29,35]};
 
 /* Test counts — exactly as printed in the deck */
 const JEE_COUNTS = {
@@ -637,6 +611,7 @@ function select(key){
   });
 
   selectPlan(key,0);
+  renderNextStrip(key,"vpNextStrip");
   document.getElementById("result").scrollIntoView({behavior:"smooth",block:"start"});
 }
 
@@ -924,6 +899,7 @@ function selectPS(key){
     tiersEl.appendChild(card);
   });
   selectPlanPS(key,0);
+  renderNextStrip(key,"psNextStrip");
   document.getElementById("psResult").scrollIntoView({behavior:"smooth",block:"start"});
 }
 
@@ -964,15 +940,17 @@ function copyPitchPS(key,tk,ti){
    [title, description, accentColor, bgColor, bullets?, metaChip?]
    ===================================================================== */
 const GLOSSARY = [
-  ["Batch Test","A short test taken inside the student's own PW Vidyapeeth batch, right after a few chapters are finished in class. It checks how well the student understood what was recently taught.","#1d4ed8","#eef4ff"],
-  ["AITS (All India Test Series)","A large test taken by students across all PW centres in India on the same paper. Results are compared nationally, so the student gets a real All India Rank (AIR) \u2014 a true sense of where they stand.","#b45309","#fff7e6"],
-  ["Rank Booster / Ranker Test","A tougher test aimed at students chasing a top rank. It goes beyond the basics to sharpen speed and accuracy for high scorers.","#7c3aed","#f5f0ff"],
-  ["RTS / Real Test","A test built to copy the real JEE/NEET exam exactly \u2014 same pattern, same difficulty, same time limit \u2014 so the student is comfortable with real exam pressure before the actual day.","#be123c","#fff0f3"],
+  ["Batch Test","The same test the student's online batch takes \u2014 written at the Vidyapeeth centre in offline mode. It checks how well the student understood what was recently taught.","#1d4ed8","#eef4ff"],
+  ["AITS (All India Test Series)","The online batch's All India Test Series, written offline at the centre. Results are compared nationally, so the student gets a real All India Rank (AIR) \u2014 a true sense of where they stand.","#b45309","#fff7e6"],
+  ["Rank Booster / Ranker Test","A tougher test for students chasing a top rank. It is cumulative \u2014 for example, Rank Booster Test = Batch Test 1 + 2 + 3 combined into a single paper \u2014 so it sharpens speed and accuracy across chapters.","#7c3aed","#f5f0ff"],
+  ["RTS / Real Test","A test built to copy the real JEE/NEET exam exactly \u2014 same pattern, same difficulty, same time limit \u2014 taken in CBT mode, so the student is comfortable with real exam pressure before the actual day.","#be123c","#fff0f3"],
   ["VP Mastery Test","An exclusive, high-level test series only for Vidyapeeth students, used in the final stretch before the exam. Available only for Class 12 and Droppers.","#0f766e","#eefbf8"],
   ["Part Test vs. Full Syllabus Test","A Part Test covers a few chapters at a time. A Full Syllabus Test covers everything taught so far \u2014 a full rehearsal for the real exam.","#0369a1","#eef8ff"],
-  ["Doubt Support","Dedicated time where a student can get any doubt \u2014 from class or from a test \u2014 cleared by a teacher.","#15803d","#f0fbf2"],
+  ["Doubt Support","Dedicated time where a student can get any doubt \u2014 from class or from a test \u2014 cleared by a teacher. Included in Pro Max.","#15803d","#f0fbf2"],
   ["Last 45 Days Supervised Learning at VP","In the final 45 days before the exam, the student studies at the Vidyapeeth centre itself under teacher supervision, instead of studying alone at home. Offered in Pro Max for Class 12 & Droppers only.","#c2410c","#fff4ec"],
-  ["\"+2 Maha\"","2 additional mega (full-scale) mock tests bundled into the AITS series for Class 12 & Droppers.","#4d7c0f","#f6fbea"],
+  ["Test mode \u2014 CBT vs OMR","RTS / Real Tests are taken in CBT (computer-based) mode. All other MIP tests are written offline in OMR mode at the centre. Worth saying out loud: the student practises both formats.","#0e7490","#ecfbfd"],
+  ["\"+2 Maha\"","2 additional mega (full-scale) mock tests bundled into the AITS series for Class 12 & Droppers \u2014 already counted inside the AITS total.","#4d7c0f","#f6fbea"],
+  ["Planner naming \u2014 the 2.0 batches","MIP follows the 2.0 planners: Arjuna 2.0 for Class 11, Lakshya 2.0 for Class 12, Prayas 2.0 for JEE Droppers and Yakeen 2.0 for NEET Droppers. Whatever the cohort, the test plan comes from that batch's 2.0 planner.","#475569","#f1f5f9"],
   ["Pre-AITS","A 100-question rehearsal test conducted on the App, one day before every AITS. It is a CBT (Computer-Based Test, but on the App) \u2014 the same format as the actual exam. A focused rehearsal that gets the student ready before the real AITS.","#5b21b6","#f4f0ff",
     ["Warm up before AITS","Revise high-yield concepts","Build test temperament","Practise CBT navigation","Identify last-minute gaps"],
     "100 Questions \u00B7 CBT on App \u00B7 1 Day Before AITS"]
@@ -1009,6 +987,336 @@ function renderBatchTable(){
     ONLINE_BATCHES.map(([c,b])=>'<tr><td style="text-align:left">'+c+'</td><td style="text-align:left">'+b+'</td></tr>').join('')+
     '</table>';
   document.querySelectorAll(".batchholder").forEach(e=>e.innerHTML=html);
+}
+
+/* =====================================================================
+   TEST PLANNER — Source: MIP Planner 2026-2027 (live Google Sheet)
+   Snapshot taken 18 Aug 2026. Batch datasets keyed by online batch name.
+   ===================================================================== */
+const CC=" (Complete Chapter)";
+const D=[
+{name:"Arjuna JEE 2.0 2027",subs:["Physics","Chemistry","Maths"],note:"",tests:[
+{d:"2026-08-23",n:"AITS-1",b:"Arjuna JEE 2.0 2027",tt:"Part Test",p:"Main",m:"OMR",s:["Mathematical Tools","Structure of Atom","Basic Maths"]},
+{d:"2026-08-30",n:"AITS-2",b:"Arjuna JEE 2.0 2027",tt:"Part Test",p:"Advanced",m:"CBT",s:["Mathematical Tools","Structure of Atom","Basic Maths"]},
+{d:"2026-09-13",n:"JEE Main-3",b:"Arjuna JEE 2.0 2027",tt:"Part Test",p:"JEE Main",m:"",s:["Motion in a Straight Line"+CC+" · Scalars and Vectors"+CC,"Structure of Atom"+CC+" · Classification of Elements and Periodicity in Properties"+CC,"Quadratic Equations"+CC+" · Trigonometric Functions"+CC]},
+{d:"2026-09-27",n:"JEE Main-4",b:"Arjuna JEE 2.0 2027",tt:"Part Test",p:"JEE Main",m:"",s:["Motion in a Plane"+CC,"Classification of Elements and Periodicity in Properties"+CC,"Trigonometric Equation"+CC]},
+{d:"2026-10-04",n:"AITS-3",b:"Arjuna JEE 2.0 2027",tt:"Part Test",p:"Main",m:"CBT",s:["Units and Measurements · Motion in a Straight Line · + 30% Questions from cumulative syllabus of previously conducted all JEE Main AITS tests","Some Basic Concepts of Chemistry · Classification of Elements and Periodicity in Properties · + 30% cumulative (JEE Main AITS)","Sets · Quadratic Equations · + 30% cumulative (JEE Main AITS)"]},
+{d:"2026-10-11",n:"AITS-4",b:"Arjuna JEE 2.0 2027",tt:"Part Test",p:"Advanced",m:"OMR",s:["Units and Measurements · Motion in a Straight Line · + 30% cumulative (JEE Advanced AITS)","Some Basic Concepts of Chemistry · Classification of Elements and Periodicity in Properties · + 30% cumulative (JEE Advanced AITS)","Sets · Quadratic Equations · + 30% cumulative (JEE Advanced AITS)"]},
+{d:"2026-10-25",n:"JEE Main-5",b:"Arjuna JEE 2.0 2027",tt:"Part Test",p:"JEE Main",m:"",s:["Laws of Motion + Friction"+CC+" · Circular Motion"+CC,"Chemical Bonding and Molecular Structure"+CC+" · State of Matter"+CC,"Sequence and Series"+CC+" · Complex Number-I"+CC]},
+{d:"2026-11-22",n:"Test 9",b:"Class 11 JRTS 09 - 2027",tt:"Major Part Test",p:"JEE Main",m:"Offline",s:["Units and Measurements · Mathematical Tools · Motion in a Straight Line · Scalars and Vectors · Motion in a Plane · Laws of Motion + Friction · Circular Motion · Work, Energy and Power (all Complete Chapters)","Some Basic Concepts of Chemistry · Structure of Atom · Classification of Elements and Periodicity in Properties · Chemical Bonding and Molecular Structure · State of Matter · Thermodynamics (all Complete Chapters)","Basic Mathematics · Sets · Quadratic Equations · Trigonometric Functions · Sequence and Series · Permutations and Combinations (all Complete Chapters)"]},
+{d:"2026-11-29",n:"AITS-5",b:"Arjuna JEE 2.0 2027",tt:"Part Test",p:"Main",m:"OMR",s:["Motion in a Plane · Laws of Motion · Work, Energy and Power · + 30% cumulative (JEE Main AITS)","Chemical Bonding and Molecular Structure · States of Matter · Thermodynamics & Thermochemistry · + 30% cumulative (JEE Main AITS)","Trigonometric Functions · Sequence and Series · Binomial Theorem · Permutations and Combinations · + 30% cumulative (JEE Main AITS)"]},
+{d:"2026-12-06",n:"AITS-6",b:"Arjuna JEE 2.0 2027",tt:"Part Test",p:"Advanced",m:"CBT",s:["Motion in a Plane · Laws of Motion · Work, Energy and Power · + 30% cumulative (JEE Advanced AITS)","Chemical Bonding and Molecular Structure · States of Matter · Thermodynamics & Thermochemistry · + 30% cumulative (JEE Advanced AITS)","Trigonometric Functions · Sequence and Series · Binomial Theorem · Permutations and Combinations · + 30% cumulative (JEE Advanced AITS)"]},
+{d:"2026-12-20",n:"Board Pattern Test-2",b:"Arjuna JEE 2.0 2027",tt:"Part Test",p:"Board Pattern Test-2",m:"",s:["Complete Syllabus Till Date","Complete Syllabus Till Date","Complete Syllabus Till Date"]},
+{d:"2026-12-27",n:"Test 12",b:"Class 11 JRTS 12 - 2027",tt:"Part Test",p:"JEE Main",m:"Offline",s:["Centre of Mass & System of Particles"+CC+" · Rotational Motion"+CC,"Ionic Equilibrium"+CC+" · Some Basic Principles and Techniques (IUPAC Naming)"+CC,"Straight Lines"+CC+" · Circles: Introduction, General equation, Diameter form, Parametric form, Intercept made on axis, Position of point w.r.t circle"]},
+{d:"2027-01-03",n:"JEE Main-6",b:"Arjuna JEE 2.0 2027",tt:"Part Test",p:"JEE Main",m:"",s:["Work, Energy and Power · Centre of Mass & System of Particles · Rotational Motion · Mechanical Properties of Solids (all Complete Chapters)","Thermodynamics · Redox Reaction · Chemical Equilibrium · Ionic Equilibrium · Some Basic Principles and Techniques (IUPAC Naming) (all Complete Chapters)","Permutations and Combinations · Binomial Theorem · Relation Function · Straight Lines (all Complete Chapters)"]},
+{d:"2027-01-10",n:"Test 13",b:"Class 11 JRTS 13 - 2027",tt:"Full - 11th",p:"JEE Main",m:"Offline",s:["To be decided","To be decided","To be decided"]},
+{d:"2027-01-17",n:"AITS-8",b:"Arjuna JEE 2027",tt:"Part Test",p:"Advanced",m:"OMR",s:["Centre of Mass & System of Particles · Rotational Motion · Gravitation · Mechanical Properties of Solids · + 30% cumulative (JEE Advanced AITS)","Equilibrium · Redox Reactions · Organic Chemistry - IUPAC Nomenclature · + 30% cumulative (JEE Advanced AITS)","Straight Lines · Circles · + 30% cumulative (JEE Advanced AITS)"]},
+{d:"2027-02-07",n:"AITS-9",b:"Arjuna JEE 2.0 2027",tt:"Part Test",p:"Main",m:"OMR",s:["Mathematical Tools · Units and Measurements · Motion in a Straight Line · Motion in a Plane · Laws of Motion · Work, Energy and Power · Centre of Mass & System of Particles · Rotational Motion · Gravitation · Mechanical Properties of Solids · Mechanical Properties of Fluids · Thermal Properties of Matter · Kinetic Theory","Structure of Atom · Some Basic Concepts of Chemistry · Classification of Elements and Periodicity in Properties · Chemical Bonding and Molecular Structure · States of Matter · Thermodynamics & Thermochemistry · Equilibrium · Redox Reactions · Organic Chemistry - IUPAC Nomenclature · Isomerism · General Organic Chemistry","Basic Maths · Sets · Quadratic Equations · Trigonometric Functions · Sequence and Series · Binomial Theorem · Permutations and Combinations · Probability · Straight Lines · Circles · Limits and Derivatives · Conic Sections - Parabola · Ellipse · Hyperbola"]},
+{d:"2027-02-21",n:"JEE Main-7",b:"Arjuna JEE 2.0 2027",tt:"Part Test",p:"JEE Main",m:"",s:["Thermal Properties of Matter · Kinetic Theory & Thermodynamics · Gravitation · Mechanical Properties of Fluids · Simple Harmonic Motion · Waves (all Complete Chapters)","Some Basic Principles and Techniques (GOC) · (Isomerism) · Hydrocarbon · Purification and Analysis of Organic Compound · Environmental Chemistry · P-block Elements (Group 13 and 14) (all Complete Chapters)","Circles · Conic Sections: Parabola · Ellipse · Hyperbola · Complex Number-II · Limits and Derivatives · Statistics · Probability (all Complete Chapters)"]},
+{d:"2027-03-14",n:"Test 18",b:"Class 11 JRTS 18 - 2027",tt:"Full - 11th",p:"JEE Advanced",m:"Offline",s:["Full Syllabus","Full Syllabus","Full Syllabus"]},
+{d:"2027-03-21",n:"AITS-11",b:"Arjuna JEE 2.0 2027",tt:"Full Test",p:"Advanced",m:"OMR",s:["11th Full Syllabus","11th Full Syllabus","11th Full Syllabus"]}
+]},
+{name:"Arjuna NEET 2.0 2027",subs:["Physics","Chemistry","Botany","Zoology"],note:"VP NEET Mastery Test Series — 6 exclusive Vidyapeeth tests · April month · weekdays (dates to be announced).",tests:[
+{d:"2026-08-30",n:"NEET-3",b:"Arjuna NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Units and Measurements"+CC+" · Motion in a Straight Line"+CC,"Structure of Atom"+CC,"Cell Cycle and Cell Division"+CC,"Structural Organization in Animals — Tissues: Animal Tissues, Epithelium Tissue, Cell Junctions, Connective Tissue"]},
+{d:"2026-09-06",n:"Test 3",b:"Class 11 NRTS 03 - 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Units and Measurements"+CC+" · Motion in a Straight Line"+CC,"Structure of Atom"+CC+" · Classification of Elements and Periodicity in Properties"+CC,"Cell Cycle and Cell Division"+CC+" · The Living World"+CC,"Structural Organization in Animals — Tissues: Animal Tissues, Epithelium Tissue, Cell Junctions, Connective Tissue, Muscular Tissue, Nervous Tissue"]},
+{d:"2026-09-20",n:"AITS-1",b:"Arjuna NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Units and Measurements · Mathematical Tools · Motion in a Straight Line","Structure of Atom · Some Basic Concepts of Chemistry","Cell - The Unit of Life · Cell Cycle and Cell Division","Structural Organisation in Animals — up to Tissue"]},
+{d:"2026-09-27",n:"NEET-4",b:"Arjuna NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Motion in a Plane"+CC,"Classification of Elements and Periodicity in Properties"+CC,"The Living World"+CC+" · Biological Classification"+CC,"Structural Organization in Animals"]},
+{d:"2026-10-11",n:"Rank Booster Test-2",b:"Arjuna NEET 2.0 2027",tt:"Part Test",p:"Rank Booster Test",m:"Offline",s:["Basic Maths & Calculus (Mathematical Tools) · Units and Measurements · Motion in a Straight Line · Motion in a Plane (all Complete Chapters)","Some Basic Concepts of Chemistry · Structure of Atom · Classification of Elements and Periodicity in Properties (all Complete Chapters)","Cell - The Unit of Life · Cell Cycle and Cell Division · The Living World · Biological Classification (all Complete Chapters)","Animal Kingdom · Structural Organization in Animals (all Complete Chapters)"]},
+{d:"2026-11-22",n:"Test 8",b:"Class 11 NRTS 08 - 2027",tt:"Major Part Test",p:"NEET",m:"Offline",s:["Basic Maths & Calculus (Mathematical Tools) · Units and Measurements · Motion in a Straight Line · Motion in a Plane · Laws of Motion & Friction · Circular Motion (all Complete Chapters)","Some Basic Concepts of Chemistry · Structure of Atom · Chemical Bonding and Molecular Structure · Thermodynamics · Redox Reaction (all Complete Chapters)","Cell - The Unit of Life · Cell Cycle and Cell Division · The Living World · Biological Classification · Plant Kingdom (all Complete Chapters)","Animal Kingdom · Structural Organization in Animals · Biomolecules (all Complete Chapters)"]},
+{d:"2026-11-29",n:"AITS-3",b:"Arjuna NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Work, Energy and Power","Thermodynamics · Redox Reactions","Plant Kingdom","Breathing and Exchange of Gases"]},
+{d:"2026-12-27",n:"NEET-6",b:"Arjuna NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Centre of Mass and System of Particles"+CC,"Chemical Equilibrium"+CC+" · Ionic Equilibrium"+CC+" · Some Basic Principles and Techniques (IUPAC Naming)"+CC,"Anatomy of Flowering Plants"+CC,"Body Fluids and Circulation"+CC]},
+{d:"2027-01-10",n:"AITS-4",b:"Arjuna NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Centre of Mass & System of Particles · Rotational Motion · Gravitation","Equilibrium","Morphology of Flowering Plants","Body Fluids and Circulation · Excretory Products and their Elimination"]},
+{d:"2027-01-24",n:"Rank Booster Test-3",b:"Arjuna NEET 2.0 2027",tt:"Part Test",p:"Rank Booster Test",m:"Offline",s:["Basic Maths & Calculus (Mathematical Tools) · Units and Measurements · Motion in a Straight Line · Motion in a Plane · Laws of Motion & Friction · Circular Motion · Work, Energy and Power · Centre of Mass and System of Particles (all Complete Chapters)","Some Basic Concepts of Chemistry · Structure of Atom · Classification of Elements and Periodicity in Properties · Chemical Bonding and Molecular Structure · Thermodynamics · Redox Reaction · Chemical Equilibrium · Ionic Equilibrium · Some Basic Principles and Techniques (IUPAC Naming) (all Complete Chapters)","Cell - The Unit of Life · Cell Cycle and Cell Division · The Living World · Biological Classification · Plant Kingdom · Morphology of Flowering Plants · Anatomy of Flowering Plants (all Complete Chapters)","Animal Kingdom · Structural Organization in Animals · Biomolecules · Breathing and Exchange of Gases · Body Fluids and Circulation (all Complete Chapters)"]},
+{d:"2027-02-07",n:"AITS-5",b:"Arjuna NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Mechanical Properties of Solids · Mechanical Properties of Fluids · Thermal Properties of Matter","P-block Elements - Group 13 and 14 · Organic Chemistry - IUPAC Nomenclature · Isomerism · General Organic Chemistry","Anatomy of Flowering Plants · Respiration in Plants","Locomotion and Movement · Neural Control and Coordination"]},
+{d:"2027-02-14",n:"Test 14",b:"Class 11 NRTS 14 - 2027",tt:"Full - 11th",p:"NEET",m:"Offline",s:["Full Syllabus","Full Syllabus","Full Syllabus","Full Syllabus"]},
+{d:"2027-02-21",n:"NEET-8",b:"Arjuna NEET 2.0 2027",tt:"Full - 11th",p:"NEET",m:"",s:["Full Syllabus","Full Syllabus","Full Syllabus","Full Syllabus"]},
+{d:"2027-02-28",n:"Rank Booster Test-4",b:"Arjuna NEET 2.0 2027",tt:"Full - 11th",p:"Rank Booster Test",m:"Offline",s:["Full Syllabus","Full Syllabus","Full Syllabus","Full Syllabus"]},
+{d:"2027-03-07",n:"AITS-6",b:"Arjuna NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Kinetic Theory · Thermodynamics · Waves · Oscillations","Hydrocarbons · Purification and Analysis of Organic Compound","Photosynthesis in Higher Plants · Plant Growth and Development","Chemical Coordination and Integration · Animal Kingdom · Animal Morphology - including Cockroach & Frog"]},
+{d:"2027-03-14",n:"Test 17",b:"Class 11 NRTS 17 - 2027",tt:"Full Test",p:"NEET",m:"Offline",s:["Full Syllabus 11th","Full Syllabus 11th","Full Syllabus 11th","Full Syllabus 11th"]},
+{d:"2027-03-21",n:"AITS-8",b:"Arjuna NEET 2.0 2027",tt:"Full Test",p:"NEET",m:"Offline",s:["11th Full Syllabus * As per NTA","11th Full Syllabus * As per NTA","11th Full Syllabus * As per NTA","11th Full Syllabus * As per NTA"]}
+]},
+{name:"Lakshya NEET 2.0 2027",subs:["Physics","Chemistry","Botany","Zoology"],note:"VP NEET Mastery Test Series — 6 exclusive Vidyapeeth tests · April month · weekdays (dates to be announced).",tests:[
+{d:"2026-08-23",n:"Rank Booster Test-1",b:"Lakshya NEET 2.0 2027",tt:"Part Test",p:"Rank Booster Test",m:"Offline",s:["Electric Charges and Fields"+CC,"Solution"+CC,"Sexual Reproduction in Flowering Plants"+CC,"Human Reproduction"+CC]},
+{d:"2026-09-20",n:"NEET-3",b:"Lakshya NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Electrostatic Potential and Capacitance"+CC+" · Current Electricity"+CC,"Electrochemistry"+CC+" · Chemical Kinetics"+CC,"Principle of Inheritance and Variation: Introduction, Genetic Terminology, Mendel's Experiments on Pea Plant, Inheritance of One Gene, Mendel's Laws of Inheritance, Exceptions to Mendelian Principles, Inheritance of Two Genes, Polygenic Inheritance and Pleiotropy, Post-Mendelism, Sex Determination, Mutation, Genetic Disorders","Reproductive Health"+CC]},
+{d:"2026-10-11",n:"NEET-4",b:"Lakshya NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Moving Charges and Magnetism"+CC+" · Magnetism and Matter"+CC,"Optical Isomerism"+CC,"Principle of Inheritance and Variation"+CC,"Human Health and Diseases"+CC]},
+{d:"2026-10-25",n:"Rank Booster Test-2",b:"Lakshya NEET 2.0 2027",tt:"Part Test",p:"Rank Booster Test",m:"Offline",s:["Electric Charges and Fields · Electrostatic Potential and Capacitance · Current Electricity · Moving Charges and Magnetism · Magnetism and Matter (all Complete Chapters)","Solution · Electrochemistry · Chemical Kinetics · Optical Isomerism (all Complete Chapters)","Sexual Reproduction in Flowering Plants · Principle of Inheritance and Variation (all Complete Chapters)","Human Reproduction · Reproductive Health · Human Health and Diseases (all Complete Chapters)"]},
+{d:"2026-11-01",n:"AITS-3",b:"Lakshya NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Magnetism and Matter · Electromagnetic Induction · Alternating Current","Haloalkanes and Haloarenes · Alcohols, Phenols and Ethers · Aldehydes, Ketones and Carboxylic Acids","Principles of Inheritance and Variation","Human Health and Disease"]},
+{d:"2026-11-29",n:"NEET-5",b:"Lakshya NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Electromagnetic Induction"+CC+" · Alternating Current"+CC+" · Electromagnetic Waves"+CC,"Haloalkanes and Haloarenes · Alcohols, Phenols and Ethers · Aldehydes, Ketones and Carboxylic Acids · Amines · Biomolecules · Purification and Analysis of Organic Compound (all Complete Chapters)","Molecular Basis of Inheritance"+CC,"Biotechnology and its Applications"+CC]},
+{d:"2026-12-13",n:"NEET-6",b:"Lakshya NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Ray Optics and Optical Instruments"+CC+" · Wave Optics"+CC+" · Dual Nature of Radiation and Matter"+CC,"Coordination Compound"+CC+" · The d and f-Block Elements"+CC,"Microbes in Human Welfare"+CC+" · Organisms and Population"+CC+" · Ecosystem"+CC,"Evolution"+CC]},
+{d:"2026-12-20",n:"AITS-5",b:"Lakshya NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Dual Nature of Radiation and Matter · Atoms · Nuclei · Semiconductor Electronics - Materials, Devices and Simple Circuits","The p-Block Elements · The d- and f-Block Elements · Salt Analysis","Organisms and Population · Ecosystem · Biodiversity and Conservation","Biotechnology - Principles and Processes · Biotechnology and its Applications"]},
+{d:"2026-12-27",n:"Test 11",b:"Class 12 NRTS 11 - 2027",tt:"Major Part Test",p:"NEET",m:"Offline",s:["Electric Charges and Fields · Electrostatic Potential and Capacitance · Current Electricity · Moving Charges and Magnetism · Magnetism and Matter · Electromagnetic Induction · Alternating Current · Electromagnetic Waves · Ray Optics and Optical Instruments · Wave Optics · Dual Nature of Radiation and Matter · Atoms · Nuclei · Semiconductor Electronics (all Complete Chapters)","Solution · Electrochemistry · Chemical Kinetics · Optical Isomerism · Haloalkanes and Haloarenes · Alcohols, Phenols and Ethers · Aldehydes, Ketones and Carboxylic Acids · Amines · Biomolecules · Purification and Analysis of Organic Compound · Coordination Compound · The d and f-Block Elements · The p-Block Elements · Salt Analysis · Surface Chemistry (Colloids) (all Complete Chapters)","Sexual Reproduction in Flowering Plants · Principle of Inheritance and Variation · Molecular Basis of Inheritance · Microbes in Human Welfare · Organisms and Population · Ecosystem · Biodiversity and Conservation (all Complete Chapters)","Human Reproduction · Reproductive Health · Human Health and Diseases · Biotechnology: Principles & Processes · Biotechnology and its Applications · Evolution (all Complete Chapters)"]},
+{d:"2027-01-03",n:"AITS-6",b:"Lakshya NEET 2.0 2027",tt:"12th Full",p:"NEET",m:"Offline",s:["12th Full Syllabus * As per NTA","12th Full Syllabus * As per NTA","12th Full Syllabus * As per NTA","12th Full Syllabus * As per NTA"]},
+{d:"2027-01-10",n:"AITS-7",b:"Lakshya NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Units and Measurements · Mathematical Tools · Motion in a Straight Line · Motion in a Plane · Laws of Motion · Work, Energy and Power · Centre of Mass & System of Particles · Rotational Motion","Structure of Atom · Some Basic Concepts of Chemistry · Classification of Elements and Periodicity in Properties · Chemical Bonding and Molecular Structure · Thermodynamics & Thermochemistry · Equilibrium · Redox Reactions","Cell - The Unit of Life · Cell Cycle and Cell Division · The Living World · Biological Classification · Plant Kingdom","Structural Organization in Animals - Tissue only · Biomolecules · Breathing and Exchange of Gases · Body Fluids and Circulation · Excretory Products and their Elimination"]},
+{d:"2027-01-17",n:"AITS-8",b:"Lakshya NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Gravitation · Mechanical Properties of Solids · Mechanical Properties of Fluids · Thermal Properties of Matter · Kinetic Theory · Thermodynamics · Oscillations · Waves","P-block Elements - Group 13 and 14 · Organic Chemistry - IUPAC Nomenclature · Isomerism · General Organic Chemistry · Hydrocarbon · Purification and Analysis of Organic Compound","Morphology of Flowering Plants · Anatomy of Flowering Plants · Respiration in Plants · Photosynthesis in Higher Plants · Plant Growth and Development","Locomotion and Movement · Neural Control and Coordination · Chemical Coordination and Integration · Animal Kingdom · Animal Morphology - including Cockroach & Frog"]},
+{d:"2027-01-24",n:"AITS-9",b:"Lakshya NEET 2.0 2027",tt:"11th Full Test",p:"NEET",m:"Offline",s:["11th Full Syllabus * As per NTA","11th Full Syllabus * As per NTA","11th Full Syllabus * As per NTA","11th Full Syllabus * As per NTA"]},
+{d:"2027-01-31",n:"AITS-10",b:"Lakshya NEET 2.0 2027",tt:"Full Test",p:"NEET",m:"Offline",s:["Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA"]},
+{d:"2027-02-14",n:"Test 14",b:"Class 12 NRTS 14 - 2027",tt:"Full Test",p:"NEET",m:"Offline",s:["Full Syllabus (11th + 12th)","Full Syllabus (11th + 12th)","Full Syllabus (11th + 12th)","Full Syllabus (11th + 12th)"]},
+{d:"2027-03-28",n:"AITS-11",b:"Lakshya NEET 2.0 2027",tt:"Full Test",p:"NEET",m:"Offline",s:["Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA"]},
+{d:"2027-04-04",n:"Test 20",b:"Class 12 NRTS 20 - 2027",tt:"Full Test",p:"NEET",m:"Offline",s:["Full Syllabus (11th + 12th)","Full Syllabus (11th + 12th)","Full Syllabus (11th + 12th)","Full Syllabus (11th + 12th)"]},
+{d:"2027-04-11",n:"Test 21",b:"Class 12 NRTS 21 - 2027",tt:"Full Test",p:"NEET",m:"Offline",s:["Full Syllabus (11th + 12th)","Full Syllabus (11th + 12th)","Full Syllabus (11th + 12th)","Full Syllabus (11th + 12th)"]},
+{d:"2027-04-18",n:"AITS-14",b:"Lakshya NEET 2.0 2027",tt:"Full Test",p:"NEET",m:"Offline",s:["Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA"]},
+{d:"2027-04-21",n:"AITS-15",b:"Lakshya NEET 2.0 2027",tt:"Full Test",p:"NEET",m:"Offline",s:["Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA"]},
+{d:"2027-04-25",n:"AITS-16",b:"Lakshya NEET 2.0 2027",tt:"Full Test",p:"NEET",m:"Offline",s:["Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA"]},
+{d:"2027-04-28",n:"AITS-17",b:"Lakshya NEET 2.0 2027",tt:"Full Test",p:"NEET",m:"Offline",s:["Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA"]}
+]},
+{name:"Yakeen NEET 2.0 2027",subs:["Physics","Chemistry","Botany","Zoology"],note:"VP NEET Mastery Test Series — 6 exclusive Vidyapeeth tests · April month · weekdays (dates to be announced). VP AIR Pre-AITS tests are NEET English only, on the PW App (CBT).",tests:[
+{d:"2026-08-30",n:"NEET-3",b:"Yakeen NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Units and Measurements"+CC+" · Motion in a Straight Line"+CC,"Redox Reaction"+CC+" · Solutions"+CC+" · Thermodynamics & Thermochemistry"+CC,"Cell Cycle and Cell Division"+CC+" · The Living World"+CC,"Breathing and Exchange of Gases"+CC]},
+{d:"2026-09-13",n:"NEET-4",b:"Yakeen NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Motion in a Plane"+CC,"Chemical Equilibrium"+CC+" · Ionic Equilibrium"+CC,"Biological Classification"+CC,"Body Fluids and Circulation"+CC]},
+{d:"2026-09-27",n:"Rank Booster Test-2",b:"Yakeen NEET 2.0 2027",tt:"Part Test",p:"Rank Booster Test",m:"Offline",s:["Basic Maths & Calculus (Mathematical Tools) · Vectors · Units and Measurements · Motion in a Straight Line · Motion in a Plane (all Complete Chapters)","Some Basic Concepts of Chemistry · Redox Reaction · Solutions · Thermodynamics & Thermochemistry · Chemical Equilibrium · Ionic Equilibrium (all Complete Chapters)","Cell - The Unit of Life · Cell Cycle and Cell Division · The Living World · Biological Classification (all Complete Chapters)","Structural Organization in Animals · Breathing and Exchange of Gases · Body Fluids and Circulation (all Complete Chapters)"]},
+{d:"2026-10-03",n:"VP AIR Pre-AITS-1",b:"VP AIR Pre-AITS",tt:"Part Test",p:"NEET-100Q",m:"PW App (CBT)",s:["Mathematical Tools · Motion in a Straight Line · Motion in a Plane","Some Basic Concepts of Chemistry · Redox Reaction","Cell - The Unit of Life","Structural Organization in Animals (including Frog & Cockroach)"]},
+{d:"2026-10-04",n:"AITS-1",b:"Yakeen NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Mathematical Tools · Motion in a Straight Line · Motion in a Plane","Some Basic Concepts of Chemistry · Redox Reactions","Cell - The Unit of Life","Structural Organization in Animals (including Frog & Cockroach)"]},
+{d:"2026-10-18",n:"NEET-5",b:"Yakeen NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Laws of Motion"+CC+" · Work, Energy and Power"+CC+" · Centre of Mass and System of Particles"+CC,"Electrochemistry"+CC+" · Chemical Kinetics"+CC+" · Structure of Atom"+CC,"Plant Kingdom"+CC+" · Morphology of Flowering Plants"+CC,"Excretory Products & their Elimination"+CC+" · Locomotion & Movement"+CC]},
+{d:"2026-10-31",n:"VP AIR Pre-AITS-2",b:"VP AIR Pre-AITS",tt:"Part Test",p:"NEET-100Q",m:"PW App (CBT)",s:["Units and Measurements · Newton's Laws of Motion · Work, Energy & Power · Centre of Mass & System of Particles","Structure of Atom · Thermodynamics & Thermochemistry","Cell Cycle & Cell Division","Breathing and Exchange of Gases · Body Fluids and Circulation"]},
+{d:"2026-11-01",n:"AITS-2",b:"Yakeen NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Units and Measurements · Laws of Motion · Work, Energy and Power · Centre of Mass & System of Particles","Structure of Atom · Thermodynamics & Thermochemistry","Cell Cycle and Cell Division","Breathing and Exchange of Gases · Body Fluids and Circulation"]},
+{d:"2026-11-22",n:"Test 8",b:"Dropper NRTS 08 - 2027",tt:"Major Part Test",p:"NEET",m:"Offline",s:["Basic Maths & Calculus (Mathematical Tools) · Vectors · Units and Measurements · Motion in a Straight Line · Motion in a Plane · Laws of Motion · Work, Energy and Power · Centre of Mass and System of Particles · Rotational Motion · Gravitation · Mechanical Properties of Solids (all Complete Chapters)","Some Basic Concepts of Chemistry · Redox Reaction · Solutions · Thermodynamics & Thermochemistry · Chemical Equilibrium · Ionic Equilibrium · Electrochemistry · Chemical Kinetics · Structure of Atom · Classification of Elements and Periodicity in Properties · Chemical Bonding and Molecular Structure (all Complete Chapters)","Cell - The Unit of Life · Cell Cycle and Cell Division · The Living World · Biological Classification · Plant Kingdom · Morphology of Flowering Plants · Anatomy of Flowering Plants · Respiration in Plants (all Complete Chapters)","Structural Organization in Animals · Breathing and Exchange of Gases · Body Fluids and Circulation · Excretory Products & their Elimination · Locomotion & Movement · Neural Control & Coordination · Chemical Coordination & Integration (all Complete Chapters)"]},
+{d:"2026-12-06",n:"Rank Booster Test-3",b:"Yakeen NEET 2.0 2027",tt:"Part Test",p:"Rank Booster Test",m:"Offline",s:["Basic Maths & Calculus (Mathematical Tools) · Vectors · Units and Measurements · Motion in a Straight Line · Motion in a Plane · Laws of Motion · Work, Energy and Power · Centre of Mass and System of Particles · Rotational Motion · Gravitation · Mechanical Properties of Solids (all Complete Chapters)","Some Basic Concepts of Chemistry · Redox Reaction · Solutions · Thermodynamics & Thermochemistry · Chemical Equilibrium · Ionic Equilibrium · Electrochemistry · Chemical Kinetics · Structure of Atom · Classification of Elements and Periodicity in Properties · Chemical Bonding and Molecular Structure (all Complete Chapters)","Cell - The Unit of Life · Cell Cycle and Cell Division · The Living World · Biological Classification · Plant Kingdom · Morphology of Flowering Plants · Anatomy of Flowering Plants · Respiration in Plants (all Complete Chapters)","Structural Organization in Animals · Breathing and Exchange of Gases · Body Fluids and Circulation · Excretory Products & their Elimination · Locomotion & Movement · Neural Control & Coordination · Chemical Coordination & Integration (all Complete Chapters)"]},
+{d:"2026-12-12",n:"VP AIR Pre-AITS-3",b:"VP AIR Pre-AITS",tt:"Part Test",p:"NEET-100Q",m:"PW App (CBT)",s:["Rotational Motion · Mechanical Properties of Solids","Equilibrium","The Living World · Biological Classification","Excretory Products & their Elimination · Locomotion & Movement"]},
+{d:"2026-12-13",n:"AITS-3",b:"Yakeen NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Rotational Motion · Mechanical Properties of Solids","Equilibrium","The Living World · Biological Classification","Excretory Products and their Elimination · Locomotion and Movement"]},
+{d:"2026-12-27",n:"NEET-7",b:"Yakeen NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"",s:["Mechanical Properties of Fluids · Thermal Properties of Matter · Kinetic Theory · Thermodynamics · Oscillations · Waves (all Complete Chapters)","Organic Chemistry: Some Basic Principles and Techniques (IUPAC Naming) · (Isomerism) (all Complete Chapters)","Photosynthesis in Higher Plants · Plant Growth and Development (all Complete Chapters)","Animal Kingdom · Biomolecules (all Complete Chapters)"]},
+{d:"2027-01-10",n:"NEET-8",b:"Yakeen NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Electric Charges and Fields"+CC,"Organic Chemistry: Some Basic Principles and Techniques (GOC)"+CC+" · Hydrocarbon"+CC,"Sexual Reproduction in Flowering Plants"+CC,"Human Reproduction"+CC]},
+{d:"2027-01-16",n:"VP AIR Pre-AITS-4",b:"VP AIR Pre-AITS",tt:"Part Test",p:"NEET-100Q",m:"PW App (CBT)",s:["Gravitation · Mechanical Properties of Fluids · Thermal Properties of Matter · Kinetic Theory of Gases","Solutions · Electrochemistry","Plant Kingdom · Morphology of Flowering Plants","Neural Control & Coordination · Chemical Coordination & Integration"]},
+{d:"2027-01-17",n:"AITS-4",b:"Yakeen NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Gravitation · Mechanical Properties of Fluids · Thermal Properties of Matter · Kinetic Theory of Gases","Solutions · Electrochemistry","Plant Kingdom · Morphology of Flowering Plants","Neural Control and Coordination · Chemical Coordination and Integration"]},
+{d:"2027-01-31",n:"Rank Booster Test-4",b:"Yakeen NEET 2.0 2027",tt:"Part Test",p:"Rank Booster Test",m:"Offline",s:["Basic Maths & Calculus (Mathematical Tools) · Vectors · Units and Measurements · Motion in a Straight Line · Motion in a Plane · Laws of Motion · Work, Energy and Power · Centre of Mass and System of Particles · Rotational Motion · Gravitation · Mechanical Properties of Solids · Mechanical Properties of Fluids · Thermal Properties of Matter · Kinetic Theory · Thermodynamics · Oscillations · Waves · Electric Charges and Fields (all Complete Chapters)","Some Basic Concepts of Chemistry · Redox Reaction · Solutions · Thermodynamics & Thermochemistry · Chemical Equilibrium · Ionic Equilibrium · Electrochemistry · Chemical Kinetics · Structure of Atom · Classification of Elements and Periodicity in Properties · Chemical Bonding and Molecular Structure · Organic Chemistry: SBPT (IUPAC Naming) · (Isomerism) · (GOC) · Hydrocarbon (all Complete Chapters)","Cell - The Unit of Life · Cell Cycle and Cell Division · The Living World · Biological Classification · Plant Kingdom · Morphology of Flowering Plants · Anatomy of Flowering Plants · Respiration in Plants · Photosynthesis in Higher Plants · Plant Growth and Development · Sexual Reproduction in Flowering Plants (all Complete Chapters)","Structural Organization in Animals · Breathing and Exchange of Gases · Body Fluids and Circulation · Excretory Products & their Elimination · Locomotion & Movement · Neural Control & Coordination · Chemical Coordination & Integration · Animal Kingdom · Biomolecules · Human Reproduction (all Complete Chapters)"]},
+{d:"2027-02-14",n:"NEET-9",b:"Yakeen NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"",s:["Electrostatic Potential and Capacitance · Current Electricity · Moving Charges and Magnetism · Magnetism and Matter · Electromagnetic Induction (all Complete Chapters)","Haloalkanes and Haloarenes · Alcohols, Ethers and Phenols · Aldehydes, Ketones and Carboxylic Acids (all Complete Chapters)","Molecular Basis of Inheritance"+CC,"Reproductive Health"+CC+" · Human Health and Diseases"+CC]},
+{d:"2027-02-20",n:"VP AIR Pre-AITS-5",b:"VP AIR Pre-AITS",tt:"Part Test",p:"NEET-100Q",m:"PW App (CBT)",s:["Thermodynamics · Oscillations · Waves · Electric Charges and Fields","Organic Chemistry: IUPAC Nomenclature · Isomerism · Chemical Kinetics","Anatomy of Flowering Plants · Sexual Reproduction in Flowering Plants","Animal Kingdom · Human Reproduction"]},
+{d:"2027-02-21",n:"AITS-5",b:"Yakeen NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Thermodynamics · Oscillations · Waves · Electric Charges and Fields","Organic Chemistry - IUPAC Nomenclature · Isomerism · Chemical Kinetics","Anatomy of Flowering Plants · Sexual Reproduction in Flowering Plants","Animal Kingdom · Human Reproduction"]},
+{d:"2027-02-28",n:"NEET-10",b:"Yakeen NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Alternating Current"+CC+" · Electromagnetic Waves"+CC,"Amines"+CC+" · Biomolecules"+CC+" · Purification and Qualitative & Quantitative Analysis"+CC,"Principle of Inheritance and Variation"+CC+" · Microbes in Human Welfare"+CC,"Biotechnology: Principles & Processes"+CC]},
+{d:"2027-03-07",n:"Rank Booster Test-5",b:"Yakeen NEET 2.0 2027",tt:"Part Test",p:"Rank Booster Test",m:"Offline",s:["All mechanics, heat, SHM/waves + full electrodynamics: Basic Maths & Calculus (Mathematical Tools) · Vectors · Units and Measurements · Motion in a Straight Line · Motion in a Plane · Laws of Motion · Work, Energy and Power · Centre of Mass and System of Particles · Rotational Motion · Gravitation · Mechanical Properties of Solids · Mechanical Properties of Fluids · Thermal Properties of Matter · Kinetic Theory · Thermodynamics · Oscillations · Waves · Electric Charges and Fields · Electrostatic Potential and Capacitance · Current Electricity · Moving Charges and Magnetism · Magnetism and Matter · Electromagnetic Induction · Alternating Current · Electromagnetic Waves (all Complete Chapters)","Some Basic Concepts of Chemistry · Redox Reaction · Solutions · Thermodynamics & Thermochemistry · Chemical Equilibrium · Ionic Equilibrium · Electrochemistry · Chemical Kinetics · Structure of Atom · Classification of Elements and Periodicity in Properties · Chemical Bonding and Molecular Structure · Organic Chemistry: SBPT (IUPAC Naming) · (Isomerism) · (GOC) · Hydrocarbon · Haloalkanes and Haloarenes · Alcohols, Ethers and Phenols · Aldehydes, Ketones and Carboxylic Acids · Amines · Biomolecules · Purification and Qualitative & Quantitative Analysis (all Complete Chapters)","Cell - The Unit of Life · Cell Cycle and Cell Division · The Living World · Biological Classification · Plant Kingdom · Morphology of Flowering Plants · Anatomy of Flowering Plants · Respiration in Plants · Photosynthesis in Higher Plants · Plant Growth and Development · Sexual Reproduction in Flowering Plants · Molecular Basis of Inheritance · Principle of Inheritance and Variation · Microbes in Human Welfare (all Complete Chapters)","Structural Organization in Animals · Breathing and Exchange of Gases · Body Fluids and Circulation · Excretory Products & their Elimination · Locomotion & Movement · Neural Control & Coordination · Chemical Coordination & Integration · Animal Kingdom · Biomolecules · Human Reproduction · Reproductive Health · Human Health and Diseases · Biotechnology: Principles & Processes (all Complete Chapters)"]},
+{d:"2027-03-14",n:"Test 18",b:"Dropper NRTS 18 - 2027",tt:"Full Test",p:"NEET",m:"Offline",s:["Full Syllabus","Full Syllabus","Full Syllabus","Full Syllabus"]},
+{d:"2027-03-17",n:"NEET-10",b:"Yakeen NEET 2.0 2027",tt:"Full Test",p:"NEET",m:"Offline",s:["Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA"]},
+{d:"2027-03-21",n:"AITS-7",b:"Yakeen NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Moving Charges and Magnetism · Magnetism and Matter · Electromagnetic Induction","Alcohols, Phenols and Ethers · Aldehydes, Ketones and Carboxylic Acids · Amines · Bio-molecules","Principles of Inheritance and Variation","Human Health and Disease"]},
+{d:"2027-03-24",n:"NEET-11",b:"Yakeen NEET 2.0 2027",tt:"Full Test",p:"NEET",m:"Offline",s:["Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA"]},
+{d:"2027-03-28",n:"AITS-8",b:"Yakeen NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Alternating Current · Electromagnetic Waves · Ray Optics and Optical Instruments · Wave Optics","Purification and Analysis of Organic Compound · Classification of Elements and Periodicity in Properties · Chemical Bonding and Molecular Structure","Respiration in Plants · Photosynthesis in Higher Plants · Plant Growth and Development","Evolution"]},
+{d:"2027-04-04",n:"Test 20",b:"Dropper NRTS 20 - 2027",tt:"Full Test",p:"NEET",m:"Offline",s:["Full Syllabus","Full Syllabus","Full Syllabus","Full Syllabus"]},
+{d:"2027-04-11",n:"Test 21",b:"Dropper NRTS 21 - 2027",tt:"Full Test",p:"NEET",m:"Offline",s:["Full Syllabus","Full Syllabus","Full Syllabus","Full Syllabus"]},
+{d:"2027-04-18",n:"AITS-11",b:"Yakeen NEET 2.0 2027",tt:"Full Test",p:"NEET",m:"Offline",s:["Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA"]},
+{d:"2027-04-21",n:"AITS-12",b:"Yakeen NEET 2.0 2027",tt:"Full Test",p:"NEET",m:"Offline",s:["Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA"]},
+{d:"2027-04-25",n:"AITS-13",b:"Yakeen NEET 2.0 2027",tt:"Full Test",p:"NEET",m:"Offline",s:["Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA"]},
+{d:"2027-04-28",n:"AITS-14",b:"Yakeen NEET 2.0 2027",tt:"Full Test",p:"NEET",m:"Offline",s:["Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA"]}
+]},
+{name:"Yakeen NEET Hindi 2.0 2027",subs:["Physics","Chemistry","Botany","Zoology"],note:"Bilingual batch — chapter names shown in English + हिंदी as per the official schedule. Mode not specified in the source sheet for this batch.",tests:[
+{d:"2026-08-23",n:"Rank Booster Test-1",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"Rank Booster Test",m:"",s:["Mathematical Tools गणितीय उपकरण"+CC+" · Vectors सदिश"+CC,"Some Basic Concepts of Chemistry रसायन विज्ञान की कुछ मूल अवधारणाएँ"+CC+" · Solutions विलयन"+CC,"Cell: The Unit of Life कोशिका जीवन की इकाई"+CC,"Structural Organization in Animals प्राणियों में संरचनात्मक संगठन"+CC]},
+{d:"2026-09-06",n:"NEET-3",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"NEET",m:"",s:["Units and Measurements इकाई तथा मापन · Motion in a Straight Line सरल रेखा में गति · Motion in a Plane समतल में गति (all Complete Chapters)","Redox Reaction अपचयोपचय अभिक्रियाएँ · Thermodynamics ऊष्मागतिकी (all Complete Chapters)","Cell Cycle and Cell Division कोशिका चक्र और कोशिका विभाजन · The Living World जीव जगत (all Complete Chapters)","Breathing and Exchange of Gases श्वसन और गैसों का विनिमय · Body Fluids and Circulation शरीर द्रव तथा परिसंचरण (all Complete Chapters)"]},
+{d:"2026-09-20",n:"NEET-4",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"NEET",m:"",s:["Laws of Motion गति के नियम"+CC,"Equilibrium साम्यावस्था"+CC+" · Electrochemistry वैद्युत-रसायन"+CC,"Biological Classification जीव जगत का वर्गीकरण"+CC,"Excretory Products and their Elimination उत्सर्जी उत्पाद एवं उनका निष्कासन"+CC]},
+{d:"2026-10-04",n:"Rank Booster Test-2",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"Rank Booster Test",m:"",s:["Mathematical Tools गणितीय उपकरण · Vectors सदिश · Units and Measurements इकाई तथा मापन · Motion in a Straight Line सरल रेखा में गति · Motion in a Plane समतल में गति · Laws of Motion गति के नियम (all Complete Chapters)","Some Basic Concepts of Chemistry रसायन विज्ञान की कुछ मूल अवधारणाएँ · Solutions विलयन · Redox Reaction अपचयोपचय अभिक्रियाएँ · Thermodynamics ऊष्मागतिकी · Equilibrium साम्यावस्था · Electrochemistry वैद्युत-रसायन (all Complete Chapters)","Cell: The Unit of Life कोशिका जीवन की इकाई · Cell Cycle and Cell Division कोशिका चक्र और कोशिका विभाजन · The Living World जीव जगत · Biological Classification जीव जगत का वर्गीकरण (all Complete Chapters)","Structural Organization in Animals प्राणियों में संरचनात्मक संगठन · Breathing and Exchange of Gases श्वसन और गैसों का विनिमय · Body Fluids and Circulation शरीर द्रव तथा परिसंचरण · Excretory Products and their Elimination उत्सर्जी उत्पाद एवं उनका निष्कासन (all Complete Chapters)"]},
+{d:"2026-10-18",n:"NEET-5",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"NEET",m:"",s:["Work, Energy and Power कार्य, ऊर्जा तथा शक्ति · Centre of Mass & System of Particles द्रव्यमान केन्द्र एवं कणों का नियम · Rotational Motion घूर्णी गति · Gravitation गुरुत्वाकर्षण (all Complete Chapters)","Equilibrium साम्यावस्था · Electrochemistry वैद्युत-रसायन · Chemical Kinetics रासायनिक बलगतिकी · Structure of Atom परमाणु की संरचना (all Complete Chapters)","Plant Kingdom वनस्पति जगत"+CC,"Locomotion and Movement गमन एवं संचलन"+CC]},
+{d:"2026-11-01",n:"AITS-2",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"NEET",m:"",s:["Units and Measurements · Laws of Motion · Work, Energy and Power · Centre of Mass & System of Particles (मात्रक एवं मापन, गति के नियम, कार्य ऊर्जा और शक्ति, द्रव्यमान केंद्र और कणों के निकाय)","Structure of Atom · Thermodynamics & Thermochemistry (परमाणु संरचना, ऊष्मागतिकी एवं ऊष्मारसायन)","Cell Cycle and Cell Division (कोशिका चक्र और कोशिका विभाजन)","Breathing and Exchange of Gases · Body Fluids and Circulation (श्वसन और गैसों का विनिमय, शरीर द्रव तथा परिसंचरण)"]},
+{d:"2026-11-22",n:"Test 8",b:"Dropper NRTS 08 - 2027",tt:"Major Part Test",p:"NEET",m:"",s:["Basic Maths & Calculus (Mathematical Tools) · Vectors · Units and Measurements · Motion in a Straight Line · Motion in a Plane · Laws of Motion · Work, Energy and Power · Centre of Mass and System of Particles · Rotational Motion · Gravitation · Mechanical Properties of Solids (all Complete Chapters)","Some Basic Concepts of Chemistry · Redox Reaction · Solutions · Thermodynamics & Thermochemistry · Chemical Equilibrium · Ionic Equilibrium · Electrochemistry · Chemical Kinetics · Structure of Atom · Classification of Elements and Periodicity in Properties · Chemical Bonding and Molecular Structure (all Complete Chapters)","Cell - The Unit of Life · Cell Cycle and Cell Division · The Living World · Biological Classification · Plant Kingdom · Morphology of Flowering Plants · Anatomy of Flowering Plants · Respiration in Plants (all Complete Chapters)","Structural Organization in Animals · Breathing and Exchange of Gases · Body Fluids and Circulation · Excretory Products & their Elimination · Locomotion & Movement · Neural Control & Coordination · Chemical Coordination & Integration (all Complete Chapters)"]},
+{d:"2026-11-22",n:"NEET-6",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"NEET",m:"",s:["Mechanical Properties of Solids ठोसों के यांत्रिक गुणधर्म · Mechanical Properties of Fluids द्रवों की यांत्रिक गुणधर्म · Thermal Properties of Matter पदार्थ के ऊष्मीय गुण · Kinetic Theory गत्यात्मक सिद्धांत · Thermodynamics ऊष्मागतिकी (all Complete Chapters)","Classification of Elements and Periodicity in Properties तत्त्वों का वर्गीकरण एवं गुणधर्मों में आवर्तिता · Chemical Bonding and Molecular Structure रासायनिक आबंधन तथा आण्विक संरचना (all Complete Chapters)","Morphology of Flowering Plants पुष्पी पादपों की आकारिकी · Anatomy of Flowering Plants पुष्पी पादपों का शारीर (all Complete Chapters)","Neural Control and Coordination तंत्रिकीय नियंत्रण एवं समन्वय · Chemical Coordination & Integration रासायनिक समन्वय तथा एकीकरण (all Complete Chapters)"]},
+{d:"2026-12-13",n:"AITS-3",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"NEET",m:"",s:["Rotational Motion · Mechanical Properties of Solids (घूर्णी गति, ठोसों के यांत्रिक गुण)","Equilibrium (साम्यावस्था)","The Living World · Biological Classification (जीव जगत, जीव जगत का वर्गीकरण)","Excretory Products and their Elimination · Locomotion and Movement (उत्सर्जी उत्पाद एवं उनका निष्कासन, गमन एवं संचलन)"]},
+{d:"2026-12-27",n:"Rank Booster Test-3",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"Rank Booster Test",m:"",s:["Mathematical Tools गणितीय उपकरण · Vectors सदिश · Units and Measurements इकाई तथा मापन · Motion in a Straight Line सरल रेखा में गति · Motion in a Plane समतल में गति · Laws of Motion गति के नियम · Work, Energy and Power कार्य, ऊर्जा तथा शक्ति · Centre of Mass & System of Particles द्रव्यमान केन्द्र एवं कणों का नियम · Rotational Motion घूर्णी गति · Gravitation गुरुत्वाकर्षण · Mechanical Properties of Solids ठोसों के यांत्रिक गुणधर्म · Mechanical Properties of Fluids द्रवों की यांत्रिक गुणधर्म · Thermal Properties of Matter पदार्थ के ऊष्मीय गुण · Kinetic Theory गत्यात्मक सिद्धांत · Thermodynamics ऊष्मागतिकी (all Complete Chapters)","Some Basic Concepts of Chemistry रसायन विज्ञान की कुछ मूल अवधारणाएँ · Solutions विलयन · Redox Reaction अपचयोपचय अभिक्रियाएँ · Thermodynamics ऊष्मागतिकी · Equilibrium साम्यावस्था · Electrochemistry वैद्युत-रसायन · Chemical Kinetics रासायनिक बलगतिकी · Structure of Atom परमाणु की संरचना · Classification of Elements and Periodicity in Properties तत्त्वों का वर्गीकरण एवं गुणधर्मों में आवर्तिता · Chemical Bonding and Molecular Structure रासायनिक आबंधन तथा आण्विक संरचना (all Complete Chapters)","Cell: The Unit of Life कोशिका जीवन की इकाई · Cell Cycle and Cell Division कोशिका चक्र और कोशिका विभाजन · The Living World जीव जगत · Biological Classification जीव जगत का वर्गीकरण · Plant Kingdom वनस्पति जगत · Morphology of Flowering Plants पुष्पी पादपों की आकारिकी · Anatomy of Flowering Plants पुष्पी पादपों का शारीर (all Complete Chapters)","Structural Organization in Animals प्राणियों में संरचनात्मक संगठन · Breathing and Exchange of Gases श्वसन और गैसों का विनिमय · Body Fluids and Circulation शरीर द्रव तथा परिसंचरण · Excretory Products and their Elimination उत्सर्जी उत्पाद एवं उनका निष्कासन · Locomotion and Movement गमन एवं संचलन · Neural Control and Coordination तंत्रिकीय नियंत्रण एवं समन्वय · Chemical Coordination & Integration रासायनिक समन्वय तथा एकीकरण (all Complete Chapters)"]},
+{d:"2027-01-10",n:"NEET-7",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"NEET",m:"",s:["Oscillations दोलन · Waves तरंगें · Electric Charges and Fields वैद्युत आवेश तथा क्षेत्र · Electrostatic Potential स्थिर विद्युत विभव · Current Electricity विद्युत धारा · Capacitance धारिता (all Complete Chapters)","Organic Chemistry: SBPT (IUPAC Naming) कार्बनिक रसायन: नामकरण · (Isomerism) समावयता · (GOC) सामान्य कार्बनिक रसायन (all Complete Chapters)","Photosynthesis in Higher Plants उच्च पादपों में प्रकाश-संश्लेषण · Respiration in Plants पादप में श्वसन · Plant Growth and Development पादप वृद्धि एवं परिवर्धन (all Complete Chapters)","Animal Kingdom प्राणि जगत · Biomolecules जैव अणु · Human Reproduction मानव जनन (all Complete Chapters)"]},
+{d:"2027-01-17",n:"AITS-4",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"NEET",m:"",s:["Gravitation · Mechanical Properties of Fluids · Thermal Properties of Matter · Kinetic Theory (गुरुत्वाकर्षण, तरलों के यांत्रिकी गुण, द्रव्य के तापीय गुण, अणुगति सिद्धांत)","Solutions · Electrochemistry (विलयन, वैद्युत रसायन)","Plant Kingdom · Morphology of Flowering Plants (वनस्पति जगत, पुष्पी पादपों की आकारिकी)","Neural Control and Coordination · Chemical Coordination and Integration (तंत्रिकीय नियंत्रण एवं समन्वय, रासायनिक समन्वय एवं एकीकरण)"]},
+{d:"2027-01-31",n:"NEET-8",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"NEET",m:"",s:["Moving Charges and Magnetism गतिमान आवेश और चुंबकत्व · Magnetism and Matter चुम्बकत्व तथा पदार्थ · Electromagnetic Induction विद्युत चुम्बकीय प्रेरण (all Complete Chapters)","Hydrocarbon हाइड्रोकार्बन · Haloalkanes and Haloarenes हैलोऐल्केन तथा हैलोऐरीन (all Complete Chapters)","Sexual Reproduction in Flowering Plants पुष्पी पादपों में लैंगिक प्रजनन"+CC,"Reproductive Health जनन स्वास्थ्य · Human Health and Diseases मानव स्वास्थ्य तथा रोग (all Complete Chapters)"]},
+{d:"2027-02-14",n:"Rank Booster Test-4",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"Rank Booster Test",m:"",s:["Mathematical Tools · Vectors · Units and Measurements · Motion in a Straight Line · Motion in a Plane · Laws of Motion · Work, Energy and Power · Centre of Mass & System of Particles · Rotational Motion · Gravitation · Mechanical Properties of Solids · Mechanical Properties of Fluids · Thermal Properties of Matter · Kinetic Theory · Thermodynamics · Oscillations दोलन · Waves तरंगें · Electric Charges and Fields · Electrostatic Potential · Current Electricity · Capacitance · Moving Charges and Magnetism · Magnetism and Matter · Electromagnetic Induction (all Complete Chapters)","Some Basic Concepts of Chemistry · Solutions · Redox Reaction · Thermodynamics · Equilibrium · Electrochemistry · Chemical Kinetics · Structure of Atom · Classification of Elements and Periodicity in Properties · Chemical Bonding and Molecular Structure · Organic Chemistry: SBPT (IUPAC Naming) · (Isomerism) · (GOC) · Hydrocarbon · Haloalkanes and Haloarenes · Alcohols, Phenols and Ethers ऐल्कोहॉल, फ़ीनॉल एवं ईथर (all Complete Chapters)","Cell: The Unit of Life · Cell Cycle and Cell Division · The Living World · Biological Classification · Plant Kingdom · Morphology of Flowering Plants · Anatomy of Flowering Plants · Respiration in Plants · Plant Growth and Development · Sexual Reproduction in Flowering Plants (all Complete Chapters)","Structural Organization in Animals · Breathing and Exchange of Gases · Body Fluids and Circulation · Excretory Products and their Elimination · Locomotion and Movement · Neural Control and Coordination · Chemical Coordination & Integration · Animal Kingdom · Biomolecules · Human Reproduction · Reproductive Health · Human Health and Diseases (all Complete Chapters)"]},
+{d:"2027-02-21",n:"AITS-5",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"NEET",m:"",s:["Thermodynamics · Oscillations · Waves · Electric Charges and Fields (ऊष्मागतिकी, दोलन, तरंगें, वैद्युत आवेश और क्षेत्र)","Organic Chemistry - IUPAC Nomenclature · Isomerism · Chemical Kinetics (कार्बनिक रसायन - IUPAC नामकरण, समावयवता, रासायनिक बलगतिकी)","Anatomy of Flowering Plants · Sexual Reproduction in Flowering Plants (पुष्पी पादपों का शारीर, पुष्पी पादपों में लैंगिक जनन)","Animal Kingdom · Human Reproduction (प्राणि जगत, मानव जनन)"]},
+{d:"2027-02-28",n:"NEET-9",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"NEET",m:"",s:["Alternating Current प्रत्यावर्ती धारा · Electromagnetic Waves विद्युत चुम्बकीय तरंगें · Ray Optics and Optical Instruments किरण प्रकाशिकी और प्रकाशिक उपकरण · Wave Optics तरंग प्रकाशिकी · Dual Nature of Radiation and Matter विकिरण तथा पदार्थ की द्वैत प्रकृति (all Complete Chapters)","Alcohols, Phenols and Ethers ऐल्कोहॉल, फ़ीनॉल एवं ईथर · Aldehydes, Ketones and Carboxylic Acids एल्डिहाइड, कीटोन एवं कार्बोक्सिलिक अम्ल · Amines ऐमीन · Biomolecules जैव-अणु (all Complete Chapters)","Molecular Basis of Inheritance वंशागति के आणविक आधार"+CC,"Biotechnology: Principles and Processes जैव प्रौद्योगिकी-सिद्धांत व प्रक्रम · Biotechnology and its Applications जैव प्रौद्योगिकी एवं उसके उपयोग (all Complete Chapters)"]},
+{d:"2027-03-07",n:"NEET-10",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"NEET",m:"",s:["Atoms परमाणु · Nuclei नाभिक · Semiconductor Electronics: Materials, Devices and Simple Circuits अर्धचालक इलेक्ट्रॉनिक्स (all Complete Chapters)","Coordination Compounds उपसहसंयोजन यौगिक · The d and f-Block Elements d- एवं f- ब्लॉक के तत्व (all Complete Chapters)","Principles of Inheritance & Variation वंशागति तथा विविधता के सिद्धांत · Microbes in Human Welfare मानव कल्याण में सूक्ष्मजीव (all Complete Chapters)","Evolution विकास"+CC]},
+{d:"2027-03-14",n:"AITS-6",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"NEET",m:"",s:["Electrostatic Potential and Capacitance · Current Electricity (स्थिर वैद्युत विभव तथा धारिता, वैद्युत धारा)","Organic Chemistry - General Organic Chemistry · Hydrocarbon · Haloalkanes and Haloarenes (कार्बनिक रसायन - सामान्य कार्बनिक रसायन, हाइड्रोकार्बन, हैलोऐल्केन एवं हैलोऐरीन)","Molecular Basis of Inheritance (वंशागति के आण्विक आधार)","Reproductive Health · Biomolecules (जनन स्वास्थ्य, जैव अणु)"]},
+{d:"2027-03-14",n:"Test 18",b:"Dropper NRTS 18 - 2027",tt:"Full Test",p:"NEET",m:"",s:["Full Syllabus","Full Syllabus","Full Syllabus","Full Syllabus"]},
+{d:"2027-03-17",n:"NEET-11",b:"Yakeen NEET Hindi 2.0 2027",tt:"Full Test",p:"NEET",m:"",s:["Full Syllabus","Full Syllabus","Full Syllabus","Full Syllabus"]},
+{d:"2027-03-21",n:"AITS-7",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"NEET",m:"",s:["Moving Charges and Magnetism · Magnetism and Matter · Electromagnetic Induction (गतिमान आवेश और चुम्बकत्व, चुम्बकत्व और द्रव्य, विद्युतचुम्बकीय प्रेरण)","Alcohols, Phenols and Ethers · Aldehydes, Ketones and Carboxylic Acids · Amines · Bio-molecules (ऐल्कोहॉल, फीनोल एवं ईथर; ऐल्डिहाइड, कीटोन एवं कार्बोक्सिलिक अम्ल; ऐमीन; जैव-अणु)","Principles of Inheritance and Variation (वंशागति तथा विविधता के सिद्धांत)","Human Health and Disease (मानव स्वास्थ्य तथा रोग)"]},
+{d:"2027-03-24",n:"NEET-12",b:"Yakeen NEET Hindi 2.0 2027",tt:"Full Test",p:"NEET",m:"",s:["Full Syllabus","Full Syllabus","Full Syllabus","Full Syllabus"]},
+{d:"2027-03-28",n:"AITS-8",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"NEET",m:"",s:["Alternating Current · Electromagnetic Waves · Ray Optics and Optical Instruments · Wave Optics (प्रत्यावर्ती धारा, विद्युत चुम्बकीय तरंगें, किरण प्रकाशिकी एवं प्रकाशिक यंत्र, तरंग प्रकाशिकी)","Purification and Analysis of Organic Compound · Classification of Elements and Periodicity in Properties · Chemical Bonding and Molecular Structure (कार्बनिक यौगिकों का शोधन तथा विश्लेषण, तत्त्वों का वर्गीकरण एवं गुणधर्मों में आवर्तिता, रासायनिक आबंधन तथा आण्विक संरचना)","Respiration in Plants · Photosynthesis in Higher Plants · Plant Growth and Development (पादप में श्वसन, उच्च पादपों में प्रकाश संश्लेषण, पादप वृद्धि एवं परिवर्धन)","Evolution (विकास)"]},
+{d:"2027-04-04",n:"Test 20",b:"Dropper NRTS 20 - 2027",tt:"Full Test",p:"NEET",m:"",s:["Full Syllabus","Full Syllabus","Full Syllabus","Full Syllabus"]},
+{d:"2027-04-04",n:"AITS-9",b:"Yakeen NEET Hindi 2.0 2027",tt:"Full Test",p:"NEET",m:"",s:["Dual Nature of Radiation and Matter · Atoms · Nuclei · Semiconductor Electronics - Materials, Devices and Simple Circuits (विकिरण तथा द्रव्य की द्वैत प्रकृति, परमाणु, नाभिक, अर्धचालक इलेक्ट्रॉनिकी)","Coordination Compounds · The p-Block Elements · The d- and f-Block Elements · Salt Analysis (उपसहसंयोजन यौगिक, p-ब्लॉक तत्व, d- एवं f- ब्लॉक तत्व, लवण विश्लेषण)","Organisms and Population · Ecosystem · Biodiversity and Conservation (जीव और समष्टियाँ, पारितंत्र, जैव-विविधता एवं संरक्षण)","Biotechnology - Principles and Processes · Biotechnology and its Applications (जैव प्रौद्योगिकी-सिद्धांत व प्रक्रम, जैव प्रौद्योगिकी एवं उसके उपयोग)"]},
+{d:"2027-04-11",n:"Test 21",b:"Dropper NRTS 21 - 2027",tt:"Full Test",p:"NEET",m:"",s:["Full Syllabus","Full Syllabus","Full Syllabus","Full Syllabus"]},
+{d:"2027-04-11",n:"AITS-10",b:"Yakeen NEET Hindi 2.0 2027",tt:"Full Test",p:"NEET",m:"",s:["Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA"]},
+{d:"2027-04-18",n:"AITS-11",b:"Yakeen NEET Hindi 2.0 2027",tt:"Full Test",p:"NEET",m:"",s:["Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA"]},
+{d:"2027-04-21",n:"AITS-12",b:"Yakeen NEET Hindi 2.0 2027",tt:"Full Test",p:"NEET",m:"",s:["Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA"]}
+]}
+];
+
+/* ---------- State & helpers ---------- */
+let batchIdx=0, monthSel="all", showPast=false, q="";
+
+const PLANNER_SHEET_URL="https://docs.google.com/spreadsheets/d/1JDC-VWvDG6aPZgjkBjiPx-TiMDzJQuXAO0RSfE1-2dU/edit?gid=234264653#gid=234264653";
+const PLANNER_SNAPSHOT="18 Aug 2026";
+
+/* Class -> online batch (the planner is identical for VP and PS) */
+const COHORT_BATCH={
+  "11-NEET":"Arjuna NEET 2.0 2027",
+  "11-JEE":"Arjuna JEE 2.0 2027",
+  "12-NEET":"Lakshya NEET 2.0 2027",
+  "12-JEE":"Lakshya JEE 2.0 2027",
+  "dr-JEE":"Prayas JEE 2.0 2027",
+  "dr-NEET":"Yakeen NEET 2.0 2027"
+};
+const PLANNER_TABS=[
+  ["11-NEET","11th NEET","Arjuna NEET 2.0 2027"],
+  ["11-JEE","11th JEE","Arjuna JEE 2.0 2027"],
+  ["12-NEET","12th NEET","Lakshya NEET 2.0 2027"],
+  ["12-JEE","12th JEE","Lakshya JEE 2.0 2027"],
+  ["dr-JEE","Dropper JEE","Prayas JEE 2.0 2027"],
+  ["dr-NEET","Dropper NEET","Yakeen NEET 2.0 2027"],
+  ["dr-NEET-HI","NEET Dropper (Hindi)","Yakeen NEET Hindi 2.0 2027"]
+];
+const BATCH_DATA={}; D.forEach(b=>BATCH_DATA[b.name]=b);
+
+/* Category drives plan filtering and colour */
+function testCat(t){
+  const n=(t.n||"")+" "+(t.b||"");
+  if(/Pre-AITS/i.test(n)) return "PreAITS";
+  if(/RTS/i.test(t.b||"")) return "RTS";
+  if(/Rank Booster/i.test(t.n||"")) return "Ranker";
+  if(/^AITS/i.test(t.n||"")) return "AITS";
+  return "Batch";
+}
+const CAT_STYLE={
+  Batch:["Batch Test","#1D4ED8"], AITS:["AITS","#B45309"], Ranker:["Ranker Test","#7C3AED"],
+  RTS:["RTS / Real Test","#BE123C"], PreAITS:["Pre-AITS (App)","#5B21B6"], Mastery:["VP Mastery","#0F766E"]
+};
+
+function fmtDate(iso){
+  if(!iso) return "Date to be announced";
+  const d=new Date(iso+"T00:00:00");
+  return d.toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short",year:"numeric"});
+}
+function daysFromToday(iso){
+  const t=new Date(); t.setHours(0,0,0,0);
+  return Math.round((new Date(iso+"T00:00:00")-t)/86400000);
+}
+function dayLabel(n){ return n===0?"Today":n===1?"Tomorrow":"In "+n+" days"; }
+
+/* ---------- Planner tab ---------- */
+let PL_KEY="dr-NEET", PL_FILTER="upcoming";
+
+function buildPlannerTabs(){
+  document.getElementById("plChips").innerHTML=PLANNER_TABS.map(([k,lbl,batch])=>{
+    const has=!!BATCH_DATA[batch];
+    return '<div class="chip '+(k.includes("JEE")?"jee":"neet")+(k===PL_KEY?" active":"")+'" data-plk="'+k+'" tabindex="0" '+
+      'onclick="setPlannerCohort(\''+k+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();setPlannerCohort(\''+k+'\')}">'+
+      lbl+'<small>'+batch+(has?'':' \u00b7 not in sheet yet')+'</small></div>';
+  }).join("");
+}
+function setPlannerCohort(k){
+  PL_KEY=k;
+  document.querySelectorAll("#plChips .chip").forEach(c=>c.classList.toggle("active",c.dataset.plk===k));
+  drawPlanner();
+}
+function plannerBatchName(k){ const r=PLANNER_TABS.find(x=>x[0]===k); return r?r[2]:""; }
+
+function drawPlanner(){
+  const batch=plannerBatchName(PL_KEY), B=BATCH_DATA[batch];
+  const spot=document.getElementById("plSpot"), body=document.getElementById("plBody");
+  if(!B){
+    spot.innerHTML="";
+    body.innerHTML='<div class="pending">This batch is not in the planner sheet snapshot yet. Open the live planner to check whether the academic team has since added <b>'+batch+'</b>.</div>';
+    return;
+  }
+  const q=(document.getElementById("plSearch").value||"").toLowerCase().trim();
+  const all=[...B.tests].sort((a,b)=>a.d.localeCompare(b.d));
+  const up=all.filter(t=>daysFromToday(t.d)>=0);
+  const nx=up[0];
+
+  spot.innerHTML = nx ? (function(){
+    const [cl,cc]=CAT_STYLE[testCat(nx)], dd=daysFromToday(nx.d);
+    return '<div class="spot" style="--sc:'+cc+'">'+
+      '<div class="spot-tag">Next test for this class</div>'+
+      '<div class="spot-name">'+nx.n+' \u00b7 '+fmtDate(nx.d)+'</div>'+
+      '<div class="spot-meta">'+cl+' \u00b7 '+nx.tt+' \u00b7 '+nx.p+(nx.m?" \u00b7 "+nx.m:"")+' \u00b7 '+nx.b+'</div>'+
+      '<div class="spot-days">'+dayLabel(dd)+'</div></div>';
+  })() : '<div class="pending" style="margin-bottom:14px">No upcoming dated tests left for this batch in AY 2026-27.</div>';
+
+  let rows=all;
+  if(PL_FILTER==="upcoming") rows=rows.filter(t=>daysFromToday(t.d)>=0);
+  if(PL_FILTER==="30") rows=rows.filter(t=>daysFromToday(t.d)>=0&&daysFromToday(t.d)<=30);
+  if(q) rows=rows.filter(t=>(t.n+" "+t.b+" "+t.tt+" "+t.p+" "+(t.m||"")+" "+t.s.join(" ")).toLowerCase().includes(q));
+
+  let html="<tr><th style='text-align:left'>Date</th><th style='text-align:left'>Test</th><th>Category</th><th>Type</th><th>Pattern</th><th>Mode</th><th>Syllabus</th></tr>";
+  rows.forEach((t,i)=>{
+    const [cl,cc]=CAT_STYLE[testCat(t)], dd=daysFromToday(t.d), soon=dd>=0&&dd<=14;
+    html+="<tr><td style='text-align:left;white-space:nowrap'>"+fmtDate(t.d)+
+      (soon?"<div style='font-size:11px;font-weight:700;color:"+cc+"'>"+dayLabel(dd)+"</div>":"")+"</td>"+
+      "<td style='text-align:left'>"+t.n+"<div style='font-size:11.5px;color:#64748B;font-weight:400'>"+t.b+"</div></td>"+
+      "<td><span class='catchip' style='--sc:"+cc+"'>"+cl+"</span></td>"+
+      "<td style='white-space:nowrap'>"+t.tt+"</td><td style='white-space:nowrap'>"+t.p+"</td><td style='white-space:nowrap'>"+(t.m||"\u2014")+"</td>"+
+      "<td><button class='sylbtn' onclick=\"togSyl('psyl_"+i+"')\">View</button></td></tr>"+
+      "<tr id='psyl_"+i+"' class='sylrow hidden'><td colspan='7' style='text-align:left;background:#FAFBFE'><div class='sylgrid'>"+
+        B.subs.map((sub,si)=>"<div><b>"+sub+"</b><br>"+(t.s[si]||"\u2014")+"</div>").join("")+
+      "</div></td></tr>";
+  });
+  if(!rows.length) html+="<tr><td colspan='7' style='text-align:center;color:#64748B'>No tests match this filter.</td></tr>";
+  body.innerHTML="<div style='overflow-x:auto'><table>"+html+"</table></div>"+
+    "<div class='note'>"+all.length+" tests in this batch \u00b7 "+up.length+" still upcoming."+
+    (B.note?" "+B.note:"")+" Snapshot of the planner sheet taken "+PLANNER_SNAPSHOT+
+    " \u2014 <a href='"+PLANNER_SHEET_URL+"' target='_blank' rel='noopener' style='color:var(--pro);font-weight:600'>open the live sheet</a> to confirm dates before pitching.</div>";
+}
+function setPlannerFilter(v){ PL_FILTER=v; drawPlanner(); }
+function togSyl(id){ document.getElementById(id).classList.toggle("hidden"); }
+
+/* ---------- Next-test strip inside the offerings flow ---------- */
+function renderNextStrip(key,elId){
+  const el=document.getElementById(elId);
+  const B=BATCH_DATA[COHORT_BATCH[key]];
+  if(!B){ el.innerHTML=""; return; }
+  const up=[...B.tests].filter(t=>daysFromToday(t.d)>=0).sort((a,b)=>a.d.localeCompare(b.d));
+  if(!up.length){ el.innerHTML=""; return; }
+  const t=up[0], [cl,cc]=CAT_STYLE[testCat(t)], dd=daysFromToday(t.d);
+  el.innerHTML='<div class="spot" style="--sc:'+cc+'">'+
+    '<div class="spot-tag">Next test for this class \u00b7 '+COHORT_BATCH[key]+'</div>'+
+    '<div class="spot-name">'+t.n+' \u00b7 '+fmtDate(t.d)+'</div>'+
+    '<div class="spot-meta">'+cl+' \u00b7 '+t.tt+' \u00b7 '+t.p+(t.m?" \u00b7 "+t.m:"")+'</div>'+
+    '<div class="spot-days">'+dayLabel(dd)+'</div>'+
+    '<button class="spot-link" onclick="gotoPlanner(\''+key+'\')">See full test planner</button></div>';
+}
+function gotoPlanner(key){
+  showView("planner");
+  setPlannerCohort(key);
+  document.getElementById("plannerView").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+/* ---------- Top-level view switch ---------- */
+function showView(v){
+  document.querySelectorAll(".vtab").forEach(b=>b.classList.toggle("on",b.dataset.view===v));
+  document.getElementById("offerView").classList.toggle("hidden",v!=="offer");
+  document.getElementById("plannerView").classList.toggle("hidden",v!=="planner");
+}
+
+/* =====================================================================
+   MASTER TEST-COUNT MATRIX \u2014 MIP Counsellor Handbook AY 26-27, Section 4.
+   [row label, Batch, Ranker, AITS, RealTest, VPMastery, Basic, PRO, ProMax]
+   Ranker column is "\u2014" for JEE: the JEE tables in Section 4 do not list it.
+   ===================================================================== */
+const COUNT_MATRIX = {
+  NEET: {
+    head: "NEET \u2014 by test planner",
+    rows: [
+      ["11th NEET MIP-English", 4, 3, 6, 4, 0, 13, 17, 17],
+      ["12th NEET MIP-English", 4, 2, 12, 4, 6, 18, 22, 28],
+      ["Yakeen 2.0 / Dropper MIP-English", 9, 4, 11, 4, 6, 24, 28, 34],
+      ["Yakeen Hindi 2.0", 10, 4, 11, 4, 6, 25, 29, 35]
+    ]
+  },
+  JEE: {
+    head: "JEE \u2014 by class",
+    rows: [
+      ["11th JEE", 6, null, 9, 4, 0, 15, 19, 19],
+      ["12th JEE", 9, null, 17, 4, 6, 26, 30, 36],
+      ["Dropper JEE", 7, null, 15, 4, 6, 22, 26, 32]
+    ]
+  }
+};
+
+function renderCountMatrix(){
+  const cell=v=>v===null?'<td style="color:#9ca3af">\u2014</td>':'<td>'+v+'</td>';
+  const tbl=g=>{
+    const m=COUNT_MATRIX[g];
+    let h='<div style="overflow-x:auto;margin-bottom:16px"><table>'+
+      '<tr><th style="text-align:left">'+m.head+'</th><th>Batch Test</th><th>Rank Booster</th><th>AITS</th><th>Real Test</th><th>VP Mastery</th>'+
+      '<th style="background:var(--basic)">MIP Basic</th><th style="background:var(--pro)">MIP PRO</th><th style="background:var(--promax)">MIP Pro Max</th></tr>';
+    m.rows.forEach(r=>{
+      h+='<tr><td style="text-align:left">'+r[0]+'</td>'+cell(r[1])+cell(r[2])+cell(r[3])+cell(r[4])+cell(r[5])+
+        '<td style="font-weight:800;color:var(--basic);background:color-mix(in srgb,var(--basic) 9%,#fff)">'+r[6]+'</td>'+
+        '<td style="font-weight:800;color:var(--pro);background:color-mix(in srgb,var(--pro) 9%,#fff)">'+r[7]+'</td>'+
+        '<td style="font-weight:800;color:var(--promax);background:color-mix(in srgb,var(--promax) 11%,#fff)">'+r[8]+'</td></tr>';
+    });
+    return h+'</table></div>';
+  };
+  const html=tbl("NEET")+tbl("JEE")+
+    '<div class="note">Real Test (RTS) counts only in PRO and Pro Max. VP Mastery counts only in Pro Max, and applies to Class 12 &amp; Droppers only. '+
+    'AITS totals include the 2 Maha tests for Class 12 &amp; Droppers. The JEE tables in Section 4 do not list a Rank Booster column.</div>';
+  document.querySelectorAll(".matrixholder").forEach(e=>e.innerHTML=html);
 }
 
 /* Vertical toggle (VP / PS) */
@@ -1100,7 +1408,10 @@ function drawCentreTable(){
 renderCentres();
 buildPSChips();
 renderGlossary();
+renderCountMatrix();
 renderBatchTable();
+buildPlannerTabs();
+drawPlanner();
 document.body.style.setProperty("--plan","var(--vp)");
 
 function copyPitch(key,tk,ti){
