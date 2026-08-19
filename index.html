@@ -477,7 +477,10 @@ const PLAN_TYPES = {
 
 const TYPE_LABEL = {Batch:"Batch Test", AITS:"AITS (incl. 2 Maha for 12th & Dropper)", Ranker:"Rank Booster / Ranker Test", RTS:"RTS \u2014 Real Test (CBT mode)", Mastery:"VP Mastery Test"};
 
-function renderPlanCounts(key, ti, tableId, labelId, noteId){
+/* Pathshala wording: the same test series is branded "PS Mastery" in PS */
+const psify = t => String(t).replace(/VP Mastery/g,"PS Mastery");
+
+function renderPlanCounts(key, ti, tableId, labelId, noteId, isPS){
   const sp=TEST_SPLITS[key], types=PLAN_TYPES[key][ti], vt=VP_TIER_TOTALS[key];
   const planName=["MIP Basic","MIP PRO","MIP Pro Max"][ti];
   const label=(key.startsWith("11")?"11th ":key.startsWith("12")?"12th ":"Dropper ")+(key.endsWith("JEE")?"JEE":"NEET");
@@ -488,7 +491,8 @@ function renderPlanCounts(key, ti, tableId, labelId, noteId){
     const [pt,ft,tot]=sp[t];
     if(tot===0) return;
     derived+=tot; if(pt===null) hasNull=true;
-    html+='<tr><td style="text-align:left">'+TYPE_LABEL[t]+'</td>'+cell(pt)+cell(ft)+'<td style="font-weight:bold">'+tot+'</td></tr>';
+    const lab=isPS?psify(TYPE_LABEL[t]):TYPE_LABEL[t];
+    html+='<tr><td style="text-align:left">'+lab+'</td>'+cell(pt)+cell(ft)+'<td style="font-weight:bold">'+tot+'</td></tr>';
   });
   html+='<tr class="total"><td style="text-align:left">Total tests in '+planName+'</td><td colspan="2" style="color:#6b7280">'+
         (hasNull?'part/full split not stated for all types':'')+'</td><td>'+vt.totals[ti]+'</td></tr>';
@@ -877,9 +881,9 @@ function selectPS(key){
   TIER_META.forEach(([tk,tname,tcls],ti)=>{
     let lis="";
     lis+='<li class="hd">Total Tests in this plan \u2014 '+vt.totals[ti]+'</li>';
-    lis+='<li class="y">'+vt.breakdown[ti]+'</li>';
+    lis+='<li class="y">'+psify(vt.breakdown[ti])+'</li>';
     lis+='<li class="hd">Tests</li>';
-    vtests.forEach(([f,v])=>{lis+='<li class="'+(v[ti]?'y':'n')+'">'+f+'</li>';});
+    vtests.forEach(([f,v])=>{lis+='<li class="'+(v[ti]?'y':'n')+'">'+psify(f)+'</li>';});
     lis+='<li class="hd">Doubt Support</li>';
     c.support.forEach(([f,v])=>{lis+='<li class="'+(v[ti]?'y':'n')+'">'+f+'</li>';});
     lis+='<li class="hd">Online & Offline Benefits ('+c.onlineCount[ti]+')</li>';
@@ -906,7 +910,7 @@ function selectPS(key){
 function selectPlanPS(key,ti){
   document.querySelectorAll("#psTiers .tier").forEach(el=>el.classList.toggle("sel", +el.dataset.ti===ti));
   document.body.style.setProperty("--plan",PLAN_ACCENT[ti]);
-  renderPlanCounts(key,ti,"psCountTable","psCountLabel","psCountNote");
+  renderPlanCounts(key,ti,"psCountTable","psCountLabel","psCountNote",true);
 }
 
 function copyPitchPS(key,tk,ti){
@@ -914,7 +918,7 @@ function copyPitchPS(key,tk,ti){
   const cls=key.split("-")[0];
   const vt=VP_TIER_TOTALS[key];
   const inc=[
-    ...COHORTS[key].tests.filter(([f,v])=>v[ti]).map(([f])=>f),
+    ...COHORTS[key].tests.filter(([f,v])=>v[ti]).map(([f])=>psify(f)),
     ...c.support.filter(([f,v])=>v[ti]).map(([f])=>f)
   ];
   const online=c.online.filter(([f,v])=>v[ti]).map(([f])=>f);
@@ -923,7 +927,7 @@ function copyPitchPS(key,tk,ti){
 "\uD83D\uDCDD Batch: "+PS_BATCH_NAMES[tk]+"\n"+
 "\uD83D\uDCB0 Price: "+fmt(PRICING[cls][tk])+" (incl. GST)\n"+
 "\uD83D\uDCC5 Duration: August 2026 \u2013 June 2027 | Validity: Till the Exam\n"+
-"\uD83E\uDDEA Total Tests: "+vt.totals[ti]+" ("+vt.breakdown[ti]+")\n\n"+
+"\uD83E\uDDEA Total Tests: "+vt.totals[ti]+" ("+psify(vt.breakdown[ti])+")\n\n"+
 "\u2705 *Included:*\n"+inc.map(f=>"\u2022 "+f).join("\n")+"\n\n"+
 "\uD83D\uDCF1 *Online & Offline Benefits ("+c.onlineCount[ti]+"):*\n"+online.map(f=>"\u2022 "+f).join("\n")+"\n\n"+
 "Enrol now for AY 2026-27! \uD83C\uDFAF";
@@ -973,7 +977,13 @@ function renderGlossary(){
   const vpEl=document.querySelector("#vpIntro .gholder");
   const psEl=document.querySelector("#psIntro .gholder");
   if(vpEl) vpEl.innerHTML=glossaryHtml(GLOSSARY);
-  if(psEl) psEl.innerHTML=glossaryHtml(GLOSSARY.filter(g=>!PS_EXCLUDED_TERMS.includes(g[0])));
+  if(psEl){
+    const psList=GLOSSARY.filter(g=>!PS_EXCLUDED_TERMS.includes(g[0]))
+      .map(g=>g[0]==="VP Mastery Test"
+        ? ["PS Mastery Test","An exclusive, high-level test series only for Pathshala students, used in the final stretch before the exam. Available only for Class 12 and Droppers.",g[2],g[3]]
+        : g);
+    psEl.innerHTML=glossaryHtml(psList);
+  }
 }
 
 /* =====================================================================
@@ -1324,7 +1334,10 @@ function renderCountMatrix(){
   const html=tbl("NEET")+tbl("JEE")+
     '<div class="note">Real Test (RTS) counts only in PRO and Pro Max. VP Mastery counts only in Pro Max, and applies to Class 12 &amp; Droppers only. '+
     'AITS totals include the 2 Maha tests for Class 12 &amp; Droppers. The JEE tables in Section 4 do not list a Rank Booster column.</div>';
-  document.querySelectorAll(".matrixholder").forEach(e=>e.innerHTML=html);
+  const vpM=document.querySelector("#vpIntro .matrixholder");
+  const psM=document.querySelector("#psIntro .matrixholder");
+  if(vpM) vpM.innerHTML=html;
+  if(psM) psM.innerHTML=psify(html);
 }
 
 /* Vertical toggle (VP / PS) */
