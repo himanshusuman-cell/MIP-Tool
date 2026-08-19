@@ -956,8 +956,11 @@ const GLOSSARY = [
     "100 Questions \u00B7 CBT on App \u00B7 1 Day Before AITS"]
 ];
 
-function renderGlossary(){
-  const gHtml='<div class="gwrap">'+GLOSSARY.map(g=>{
+/* Terms that do not apply to Pathshala (PS) */
+const PS_EXCLUDED_TERMS = ["Last 45 Days Supervised Learning at VP"];
+
+function glossaryHtml(list){
+  return '<div class="gwrap">'+list.map(g=>{
     const [t,desc,accent,bg,bullets,meta]=g;
     let h='<div class="gcard'+(bullets?' wide':'')+'" style="background:'+bg+';border-color:'+accent+'33">';
     if(meta) h+='<div class="gmeta" style="background:'+accent+'">'+meta+'</div>';
@@ -965,7 +968,12 @@ function renderGlossary(){
     if(bullets) h+='<ul class="gb">'+bullets.map(b=>'<li>'+b+'</li>').join('')+'</ul>';
     return h+'</div>';
   }).join('')+'</div>';
-  document.querySelectorAll(".gholder").forEach(e=>e.innerHTML=gHtml);
+}
+function renderGlossary(){
+  const vpEl=document.querySelector("#vpIntro .gholder");
+  const psEl=document.querySelector("#psIntro .gholder");
+  if(vpEl) vpEl.innerHTML=glossaryHtml(GLOSSARY);
+  if(psEl) psEl.innerHTML=glossaryHtml(GLOSSARY.filter(g=>!PS_EXCLUDED_TERMS.includes(g[0])));
 }
 
 /* =====================================================================
@@ -976,7 +984,7 @@ const ONLINE_BATCHES = [
   ["11th NEET","Arjuna NEET 2.0 2027"],
   ["11th JEE","Arjuna JEE 2.0 2027"],
   ["12th JEE","Lakshya JEE 2.0 2027"],
-  ["11th NEET","Lakshya NEET 2.0 2027"],
+  ["12th NEET","Lakshya NEET 2.0 2027"],
   ["Dropper JEE","Prayas JEE 2.0 2027"],
   ["NEET Dropper","Yakeen NEET 2.0 2027"],
   ["NEET Dropper (HINDI)","Yakeen NEET 2.0 2027 (Hindi)"]
