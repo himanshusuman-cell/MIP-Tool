@@ -177,6 +177,10 @@
   .gcard ul.gb li{font-size:14.5px;line-height:1.65;color:#233052;margin-bottom:2px;}
   .gcard.wide{grid-column:1/-1;}
 
+  .plstatus{display:inline-block;font-size:11.5px;font-weight:700;padding:5px 12px;border-radius:999px;letter-spacing:.03em;}
+  .plstatus.live{background:#E7F7EF;color:#047857;border:1.5px solid #A7E3C8;}
+  .plstatus.snap{background:#FFF6E5;color:#92600B;border:1.5px solid #F3D89A;}
+  .plstatus.load{background:#EEF2FB;color:#3B4A6B;border:1.5px solid #CFD9EC;}
   .sheetlink{background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.35);color:#fff;text-decoration:none;
     font-size:12px;font-weight:700;padding:7px 14px;border-radius:999px;transition:.15s;}
   .sheetlink:hover{background:rgba(255,255,255,.26);}
@@ -317,6 +321,7 @@
     <div class="note" style="margin:-4px 0 10px">The planner is the same for Vidyapeeth and Pathshala. Dates and syllabus come from the academic team's live sheet &mdash;
       <a href="https://docs.google.com/spreadsheets/d/1JDC-VWvDG6aPZgjkBjiPx-TiMDzJQuXAO0RSfE1-2dU/edit?gid=234264653#gid=234264653" target="_blank" rel="noopener" style="color:var(--pro);font-weight:600">open the live sheet &#8599;</a>
       to confirm before you commit a date to a parent.</div>
+    <div style="margin:-4px 0 12px"><span class="plstatus snap">Snapshot</span></div>
     <div class="chips" id="plChips"></div>
     <div id="plSpot"></div>
     <div class="centre-controls">
@@ -332,7 +337,7 @@
 </div>
 
 <footer>Internal counselling aid &middot; Sources: MIP AY 26-27 Final Counselling Deck &middot; MIP Counsellor Handbook AY 26-27 (test counts &amp; features) &middot; PS MIP Batch Listing AY 26-27 &middot; MIP Targets AY26-27 (Final centers) &middot; MIP Planner 2026-2027<br>
-Planner data is a snapshot taken 18 Aug 2026. The academic team may add tests or move dates &mdash;
+Planner data is read from the academic team's sheet when a live feed is configured, otherwise from the built-in snapshot &mdash;
 <a href="https://docs.google.com/spreadsheets/d/1JDC-VWvDG6aPZgjkBjiPx-TiMDzJQuXAO0RSfE1-2dU/edit?gid=234264653#gid=234264653" target="_blank" rel="noopener" style="color:var(--pro);font-weight:600">check the live planner sheet</a> before committing a date to a parent.</footer>
 <div class="toast" id="toast">Copied!</div>
 
@@ -458,11 +463,11 @@ const COHORTS = {
    [part, full, total]; null = split not stated in source.
    ===================================================================== */
 const TEST_SPLITS = {
-  "11-JEE":  {Batch:[6,0,6],   AITS:[8,1,9],   RTS:[2,2,4], Mastery:[null,null,0]},
+  "11-JEE":  {Batch:[6,0,6],   AITS:[7,1,8],   RTS:[2,2,4], Mastery:[null,null,0]},
   "12-JEE":  {Batch:[8,1,9],   AITS:[5,12,17], RTS:[0,4,4], Mastery:[null,null,6]},
   "dr-JEE":  {Batch:[6,1,7],   AITS:[6,9,15],  RTS:[0,4,4], Mastery:[null,null,6]},
   "11-NEET": {Batch:[3,1,4],   AITS:[5,1,6],   Ranker:[2,1,3], RTS:[2,2,4], Mastery:[0,0,0]},
-  "12-NEET": {Batch:[4,0,4],   AITS:[6,6,12],  Ranker:[2,0,2], RTS:[1,3,4], Mastery:[3,3,6]},
+  "12-NEET": {Batch:[4,0,4],   AITS:[6,6,12],  Ranker:[1,0,1], RTS:[1,3,4], Mastery:[3,3,6]},
   "dr-NEET": {Batch:[7,2,9],   AITS:[7,4,11],  Ranker:[4,0,4], RTS:[1,3,4], Mastery:[3,3,6]}
 };
 
@@ -498,7 +503,7 @@ function renderPlanCounts(key, ti, tableId, labelId, noteId, isPS){
         (hasNull?'part/full split not stated for all types':'')+'</td><td>'+vt.totals[ti]+'</td></tr>';
   document.getElementById(tableId).innerHTML=html;
   document.getElementById(labelId).textContent=label+" \u00B7 "+planName;
-  const hindi=(key==="dr-NEET")?' Yakeen Hindi 2.0 runs one extra Batch Test \u2014 '+HINDI_TOTALS.totals[ti]+' tests in this plan.':'';
+  const hindi=(key==="dr-NEET")?' Yakeen Hindi 2.0 (NEET Dropper Hindi): '+HINDI_TOTALS.totals[ti]+' tests in this plan \u2014 10 Batch Tests and 3 Rank Booster tests, after the 23 Aug cancellation.':'';
   document.getElementById(noteId).innerHTML=
     'Showing only the tests included in <b>'+planName+'</b>. Click another plan card above to switch. Totals as per MIP Counsellor Handbook AY 26-27; Part/Full split as per the MIP planner.'+hindi+
     (derived!==vt.totals[ti]?' <span style="color:#b45309"><b>Note:</b> the listed test types add up to '+derived+', while the source states '+vt.totals[ti]+' \u2014 pending confirmation.</span>':'');
@@ -507,15 +512,15 @@ function renderPlanCounts(key, ti, tableId, labelId, noteId, isPS){
 /* VP & PS tier-wise test totals \u2014 Source: "MIP Handbook - AY 26-27.docx", Section 4.
    Every total below is verified to equal the sum of its own test-type breakdown. */
 const VP_TIER_TOTALS = {
-  "11-JEE": {totals:[15,19,19], breakdown:["Batch Test 6 + AITS 9","Batch Test 6 + AITS 9 + RTS 4","Batch Test 6 + AITS 9 + RTS 4"]},
+  "11-JEE": {totals:[14,18,18], breakdown:["Batch Test 6 + AITS 8","Batch Test 6 + AITS 8 + RTS 4","Batch Test 6 + AITS 8 + RTS 4"]},
   "12-JEE": {totals:[26,30,36], breakdown:["Batch Test 9 + AITS 17","Batch Test 9 + AITS 17 + RTS 4","Batch Test 9 + AITS 17 + RTS 4 + VP Mastery 6"]},
   "dr-JEE": {totals:[22,26,32], breakdown:["Batch Test 7 + AITS 15","Batch Test 7 + AITS 15 + RTS 4","Batch Test 7 + AITS 15 + RTS 4 + VP Mastery 6"]},
   "11-NEET": {totals:[13,17,17], breakdown:["Batch Test 4 + Rank Booster 3 + AITS 6","Batch Test 4 + Rank Booster 3 + AITS 6 + Real Test 4","Batch Test 4 + Rank Booster 3 + AITS 6 + Real Test 4"]},
-  "12-NEET": {totals:[18,22,28], breakdown:["Batch Test 4 + Rank Booster 2 + AITS 12","Batch Test 4 + Rank Booster 2 + AITS 12 + Real Test 4","Batch Test 4 + Rank Booster 2 + AITS 12 + Real Test 4 + VP Mastery 6"]},
+  "12-NEET": {totals:[17,21,27], breakdown:["Batch Test 4 + Rank Booster 1 + AITS 12","Batch Test 4 + Rank Booster 1 + AITS 12 + Real Test 4","Batch Test 4 + Rank Booster 1 + AITS 12 + Real Test 4 + VP Mastery 6"]},
   "dr-NEET": {totals:[24,28,34], breakdown:["Batch Test 9 + Rank Booster 4 + AITS 11","Batch Test 9 + Rank Booster 4 + AITS 11 + Real Test 4","Batch Test 9 + Rank Booster 4 + AITS 11 + Real Test 4 + VP Mastery 6"]}
 };
 /* Yakeen Hindi 2.0 (NEET Dropper Hindi) runs one extra Batch Test */
-const HINDI_TOTALS={totals:[25,29,35]};
+const HINDI_TOTALS={totals:[24,28,34]};
 
 /* Test counts — exactly as printed in the deck */
 const JEE_COUNTS = {
@@ -1014,7 +1019,6 @@ function renderBatchTable(){
 const CC=" (Complete Chapter)";
 const D=[
 {name:"Arjuna JEE 2.0 2027",subs:["Physics","Chemistry","Maths"],note:"",tests:[
-{d:"2026-08-23",n:"AITS-1",b:"Arjuna JEE 2.0 2027",tt:"Part Test",p:"Main",m:"OMR",s:["Mathematical Tools","Structure of Atom","Basic Maths"]},
 {d:"2026-08-30",n:"AITS-2",b:"Arjuna JEE 2.0 2027",tt:"Part Test",p:"Advanced",m:"CBT",s:["Mathematical Tools","Structure of Atom","Basic Maths"]},
 {d:"2026-09-13",n:"JEE Main-3",b:"Arjuna JEE 2.0 2027",tt:"Part Test",p:"JEE Main",m:"",s:["Motion in a Straight Line"+CC+" · Scalars and Vectors"+CC,"Structure of Atom"+CC+" · Classification of Elements and Periodicity in Properties"+CC,"Quadratic Equations"+CC+" · Trigonometric Functions"+CC]},
 {d:"2026-09-27",n:"JEE Main-4",b:"Arjuna JEE 2.0 2027",tt:"Part Test",p:"JEE Main",m:"",s:["Motion in a Plane"+CC,"Classification of Elements and Periodicity in Properties"+CC,"Trigonometric Equation"+CC]},
@@ -1054,7 +1058,6 @@ const D=[
 {d:"2027-03-21",n:"AITS-8",b:"Arjuna NEET 2.0 2027",tt:"Full Test",p:"NEET",m:"Offline",s:["11th Full Syllabus * As per NTA","11th Full Syllabus * As per NTA","11th Full Syllabus * As per NTA","11th Full Syllabus * As per NTA"]}
 ]},
 {name:"Lakshya NEET 2.0 2027",subs:["Physics","Chemistry","Botany","Zoology"],note:"VP NEET Mastery Test Series — 6 exclusive Vidyapeeth tests · April month · weekdays (dates to be announced).",tests:[
-{d:"2026-08-23",n:"Rank Booster Test-1",b:"Lakshya NEET 2.0 2027",tt:"Part Test",p:"Rank Booster Test",m:"Offline",s:["Electric Charges and Fields"+CC,"Solution"+CC,"Sexual Reproduction in Flowering Plants"+CC,"Human Reproduction"+CC]},
 {d:"2026-09-20",n:"NEET-3",b:"Lakshya NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Electrostatic Potential and Capacitance"+CC+" · Current Electricity"+CC,"Electrochemistry"+CC+" · Chemical Kinetics"+CC,"Principle of Inheritance and Variation: Introduction, Genetic Terminology, Mendel's Experiments on Pea Plant, Inheritance of One Gene, Mendel's Laws of Inheritance, Exceptions to Mendelian Principles, Inheritance of Two Genes, Polygenic Inheritance and Pleiotropy, Post-Mendelism, Sex Determination, Mutation, Genetic Disorders","Reproductive Health"+CC]},
 {d:"2026-10-11",n:"NEET-4",b:"Lakshya NEET 2.0 2027",tt:"Part Test",p:"NEET",m:"Offline",s:["Moving Charges and Magnetism"+CC+" · Magnetism and Matter"+CC,"Optical Isomerism"+CC,"Principle of Inheritance and Variation"+CC,"Human Health and Diseases"+CC]},
 {d:"2026-10-25",n:"Rank Booster Test-2",b:"Lakshya NEET 2.0 2027",tt:"Part Test",p:"Rank Booster Test",m:"Offline",s:["Electric Charges and Fields · Electrostatic Potential and Capacitance · Current Electricity · Moving Charges and Magnetism · Magnetism and Matter (all Complete Chapters)","Solution · Electrochemistry · Chemical Kinetics · Optical Isomerism (all Complete Chapters)","Sexual Reproduction in Flowering Plants · Principle of Inheritance and Variation (all Complete Chapters)","Human Reproduction · Reproductive Health · Human Health and Diseases (all Complete Chapters)"]},
@@ -1113,7 +1116,6 @@ const D=[
 {d:"2027-04-28",n:"AITS-14",b:"Yakeen NEET 2.0 2027",tt:"Full Test",p:"NEET",m:"Offline",s:["Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA","Full Syllabus * As per NTA"]}
 ]},
 {name:"Yakeen NEET Hindi 2.0 2027",subs:["Physics","Chemistry","Botany","Zoology"],note:"Bilingual batch — chapter names shown in English + हिंदी as per the official schedule. Mode not specified in the source sheet for this batch.",tests:[
-{d:"2026-08-23",n:"Rank Booster Test-1",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"Rank Booster Test",m:"",s:["Mathematical Tools गणितीय उपकरण"+CC+" · Vectors सदिश"+CC,"Some Basic Concepts of Chemistry रसायन विज्ञान की कुछ मूल अवधारणाएँ"+CC+" · Solutions विलयन"+CC,"Cell: The Unit of Life कोशिका जीवन की इकाई"+CC,"Structural Organization in Animals प्राणियों में संरचनात्मक संगठन"+CC]},
 {d:"2026-09-06",n:"NEET-3",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"NEET",m:"",s:["Units and Measurements इकाई तथा मापन · Motion in a Straight Line सरल रेखा में गति · Motion in a Plane समतल में गति (all Complete Chapters)","Redox Reaction अपचयोपचय अभिक्रियाएँ · Thermodynamics ऊष्मागतिकी (all Complete Chapters)","Cell Cycle and Cell Division कोशिका चक्र और कोशिका विभाजन · The Living World जीव जगत (all Complete Chapters)","Breathing and Exchange of Gases श्वसन और गैसों का विनिमय · Body Fluids and Circulation शरीर द्रव तथा परिसंचरण (all Complete Chapters)"]},
 {d:"2026-09-20",n:"NEET-4",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"NEET",m:"",s:["Laws of Motion गति के नियम"+CC,"Equilibrium साम्यावस्था"+CC+" · Electrochemistry वैद्युत-रसायन"+CC,"Biological Classification जीव जगत का वर्गीकरण"+CC,"Excretory Products and their Elimination उत्सर्जी उत्पाद एवं उनका निष्कासन"+CC]},
 {d:"2026-10-04",n:"Rank Booster Test-2",b:"Yakeen NEET Hindi 2.0 2027",tt:"Part Test",p:"Rank Booster Test",m:"",s:["Mathematical Tools गणितीय उपकरण · Vectors सदिश · Units and Measurements इकाई तथा मापन · Motion in a Straight Line सरल रेखा में गति · Motion in a Plane समतल में गति · Laws of Motion गति के नियम (all Complete Chapters)","Some Basic Concepts of Chemistry रसायन विज्ञान की कुछ मूल अवधारणाएँ · Solutions विलयन · Redox Reaction अपचयोपचय अभिक्रियाएँ · Thermodynamics ऊष्मागतिकी · Equilibrium साम्यावस्था · Electrochemistry वैद्युत-रसायन (all Complete Chapters)","Cell: The Unit of Life कोशिका जीवन की इकाई · Cell Cycle and Cell Division कोशिका चक्र और कोशिका विभाजन · The Living World जीव जगत · Biological Classification जीव जगत का वर्गीकरण (all Complete Chapters)","Structural Organization in Animals प्राणियों में संरचनात्मक संगठन · Breathing and Exchange of Gases श्वसन और गैसों का विनिमय · Body Fluids and Circulation शरीर द्रव तथा परिसंचरण · Excretory Products and their Elimination उत्सर्जी उत्पाद एवं उनका निष्कासन (all Complete Chapters)"]},
@@ -1149,7 +1151,54 @@ const D=[
 let batchIdx=0, monthSel="all", showPast=false, q="";
 
 const PLANNER_SHEET_URL="https://docs.google.com/spreadsheets/d/1JDC-VWvDG6aPZgjkBjiPx-TiMDzJQuXAO0RSfE1-2dU/edit?gid=234264653#gid=234264653";
-const PLANNER_SNAPSHOT="18 Aug 2026";
+let PLANNER_SNAPSHOT="18 Aug 2026";
+
+/* =====================================================================
+   LIVE PLANNER FEED
+   Paste the Apps Script /exec URL below and the tool reads the sheet on
+   every load. Leave it empty and the built-in snapshot is used silently.
+   The snapshot is always the fallback, so the tool never opens blank.
+   ===================================================================== */
+const LIVE_PLANNER_URL = "";   // e.g. "https://script.google.com/macros/s/AKfy.../exec"
+
+let PLANNER_LIVE=false;
+
+function setPlannerStatus(state,text){
+  document.querySelectorAll(".plstatus").forEach(el=>{
+    el.className="plstatus "+state;
+    el.textContent=text;
+  });
+}
+
+async function loadLivePlanner(){
+  if(!LIVE_PLANNER_URL){ setPlannerStatus("snap","Snapshot \u00b7 "+PLANNER_SNAPSHOT); return; }
+  setPlannerStatus("load","Checking live sheet\u2026");
+  try{
+    const ctrl=new AbortController();
+    const timer=setTimeout(()=>ctrl.abort(),8000);
+    const res=await fetch(LIVE_PLANNER_URL,{signal:ctrl.signal});
+    clearTimeout(timer);
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const data=await res.json();
+    if(!data||!data.ok||!Array.isArray(data.batches)||!data.batches.length) throw new Error("empty feed");
+    let loaded=0;
+    data.batches.forEach(b=>{
+      if(!b||!b.name||!Array.isArray(b.tests)||!b.tests.length) return;
+      BATCH_DATA[b.name]={name:b.name,subs:b.subs||[],note:b.note||"",tests:b.tests};
+      loaded++;
+    });
+    if(!loaded) throw new Error("no usable batches");
+    PLANNER_LIVE=true;
+    PLANNER_SNAPSHOT=data.generated||PLANNER_SNAPSHOT;
+    setPlannerStatus("live","Live from sheet \u00b7 "+PLANNER_SNAPSHOT);
+    buildPlannerTabs(); drawPlanner();
+    const vp=document.querySelector("#chips .chip.active"), ps=document.querySelector("#psChips .chip.active");
+    if(vp) renderNextStrip(vp.dataset.key,"vpNextStrip");
+    if(ps) renderNextStrip(ps.dataset.pskey,"psNextStrip");
+  }catch(err){
+    setPlannerStatus("snap","Live sheet unreachable \u2014 showing snapshot \u00b7 "+PLANNER_SNAPSHOT);
+  }
+}
 
 /* Class -> online batch (the planner is identical for VP and PS) */
 const COHORT_BATCH={
@@ -1301,15 +1350,15 @@ const COUNT_MATRIX = {
     head: "NEET \u2014 by test planner",
     rows: [
       ["11th NEET MIP-English", 4, 3, 6, 4, 0, 13, 17, 17],
-      ["12th NEET MIP-English", 4, 2, 12, 4, 6, 18, 22, 28],
+      ["12th NEET MIP-English", 4, 1, 12, 4, 6, 17, 21, 27],
       ["Yakeen 2.0 / Dropper MIP-English", 9, 4, 11, 4, 6, 24, 28, 34],
-      ["Yakeen Hindi 2.0", 10, 4, 11, 4, 6, 25, 29, 35]
+      ["Yakeen Hindi 2.0", 10, 3, 11, 4, 6, 24, 28, 34]
     ]
   },
   JEE: {
     head: "JEE \u2014 by class",
     rows: [
-      ["11th JEE", 6, null, 9, 4, 0, 15, 19, 19],
+      ["11th JEE", 6, null, 8, 4, 0, 14, 18, 18],
       ["12th JEE", 9, null, 17, 4, 6, 26, 30, 36],
       ["Dropper JEE", 7, null, 15, 4, 6, 22, 26, 32]
     ]
@@ -1333,7 +1382,7 @@ function renderCountMatrix(){
   };
   const html=tbl("NEET")+tbl("JEE")+
     '<div class="note">Real Test (RTS) counts only in PRO and Pro Max. VP Mastery counts only in Pro Max, and applies to Class 12 &amp; Droppers only. '+
-    'AITS totals include the 2 Maha tests for Class 12 &amp; Droppers. The JEE tables in Section 4 do not list a Rank Booster column.</div>';
+    'AITS totals include the 2 Maha tests for Class 12 &amp; Droppers. The JEE tables in Section 4 do not list a Rank Booster column. '+'<b>Update:</b> the 23 Aug 2026 tests were cancelled \u2014 11th JEE AITS-1, 12th NEET Rank Booster Test-1 and Yakeen Hindi 2.0 Rank Booster Test-1 \u2014 so those counts are one lower than Handbook Section 4.</div>';
   const vpM=document.querySelector("#vpIntro .matrixholder");
   const psM=document.querySelector("#psIntro .matrixholder");
   if(vpM) vpM.innerHTML=html;
@@ -1433,6 +1482,7 @@ renderCountMatrix();
 renderBatchTable();
 buildPlannerTabs();
 drawPlanner();
+loadLivePlanner();
 document.body.style.setProperty("--plan","var(--vp)");
 
 function copyPitch(key,tk,ti){
