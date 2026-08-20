@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MIP Counsellor Console — AY 26-27</title>
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<title>MIP Counsellxor Console — AY 26-27</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
@@ -177,6 +179,14 @@
   .gcard ul.gb li{font-size:14.5px;line-height:1.65;color:#233052;margin-bottom:2px;}
   .gcard.wide{grid-column:1/-1;}
 
+  .updatebar{position:fixed;left:0;right:0;bottom:0;z-index:9999;display:none;align-items:center;justify-content:center;
+    gap:14px;flex-wrap:wrap;background:linear-gradient(100deg,#0B1428,#1E3A8A);color:#fff;padding:14px 18px;
+    font-size:14px;font-weight:600;box-shadow:0 -6px 24px rgba(15,27,54,.3);border-top:3px solid var(--gold);}
+  .updatebar.show{display:flex;}
+  .updatebar button{background:var(--gold);color:#221703;border:none;border-radius:999px;padding:9px 18px;
+    font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+  .updatebar button.ghost{background:rgba(255,255,255,.16);color:#fff;}
+  .updatebar button:hover{filter:brightness(1.08);}
   .plstatus{display:inline-block;font-size:11.5px;font-weight:700;padding:5px 12px;border-radius:999px;letter-spacing:.03em;}
   .plstatus.live{background:#E7F7EF;color:#047857;border:1.5px solid #A7E3C8;}
   .plstatus.snap{background:#FFF6E5;color:#92600B;border:1.5px solid #F3D89A;}
@@ -336,9 +346,14 @@
   </div>
 </div>
 
-<footer>Internal counselling aid &middot; Sources: MIP AY 26-27 Final Counselling Deck &middot; MIP Counsellor Handbook AY 26-27 (test counts &amp; features) &middot; PS MIP Batch Listing AY 26-27 &middot; MIP Targets AY26-27 (Final centers) &middot; MIP Planner 2026-2027<br>
+<footer>Version <span class="buildstamp">—</span> &middot; Internal counselling aid &middot; Sources: MIP AY 26-27 Final Counselling Deck &middot; MIP Counsellor Handbook AY 26-27 (test counts &amp; features) &middot; PS MIP Batch Listing AY 26-27 &middot; MIP Targets AY26-27 (Final centers) &middot; MIP Planner 2026-2027<br>
 Planner data is read from the academic team's sheet when a live feed is configured, otherwise from the built-in snapshot &mdash;
 <a href="https://docs.google.com/spreadsheets/d/1JDC-VWvDG6aPZgjkBjiPx-TiMDzJQuXAO0RSfE1-2dU/edit?gid=234264653#gid=234264653" target="_blank" rel="noopener" style="color:var(--pro);font-weight:600">check the live planner sheet</a> before committing a date to a parent.</footer>
+<div class="updatebar" id="updateBar">
+  <span>A newer version of this tool has been published.</span>
+  <button onclick="location.reload(true)">Reload now</button>
+  <button class="ghost" onclick="document.getElementById('updateBar').classList.remove('show')">Later</button>
+</div>
 <div class="toast" id="toast">Copied!</div>
 
 <script>
@@ -543,24 +558,319 @@ const NEET_COUNTS = {
 
 /* =====================================================================
    VP CENTRE DATA — Source: "MIP Targets AY26-27" sheet, tab "Final centers"
-   BASIC_PRO_CENTERS  = Column C (MIP Basic & MIP PRO live)
-   PRO_MAX_CENTERS    = Column D (MIP Pro Max live), [name, remark]
+   BASIC_PRO_CENTERS  = MIP Basic & MIP PRO live (updated list, 19 Aug 2026)
+   PRO_MAX_CENTERS    = MIP Pro Max live (updated list, 19 Aug 2026)
    PS centre/offering data — pending (will be added when PS doc arrives).
    ===================================================================== */
 const BASIC_PRO_CENTERS = [
-"Ahmedabad - Chandkheda Vidyapeeth","Surat - Katargram Vidyapeeth","Vadodara - Sama Savli Vidyapeeth","Coimbatore Vidyapeeth","Mysore Vidyapeeth","Ahmedabad - Nikol Vidyapeeth","Gandhinagar Vidyapeeth","Ahmedabad - Satellite Vidyapeeth","Bharuch Vidyapeeth","Surat - Adajan Vidyapeeth","Pune - NalStop Vidyapeeth","Indore - Vijay Nagar Vidyapeeth","Mumbai - Panvel Vidyapeeth","Mumbai - Nerul Vidyapeeth","Panchkula Vidyapeeth","Delhi - Yamuna Vihar Vidyapeeth","Mumbai - Ghatkopar Vidyapeeth","Mumbai - Kharghar Vidyapeeth","Ahmedabad - Maninagar Vidyapeeth","Delhi - Punjabibagh Vidyapeeth","Vadodara - Alkapuri Vidyapeeth","Surat - Vesu Vidyapeeth","Dehradun - Ballupur Vidyapeeth","Pune - Viman Nagar Vidyapeeth","Greater Noida Vidyapeeth","Gurugram - Sector 47 Vidyapeeth","Haridwar - Ranipur Vidyapeeth","Moradabad Vidyapeeth","Noida Vidyapeeth (Residential Program)","Kanpur - SomBizness Vidyapeeth","Pune - Hadapsar Vidyapeeth","Mumbai - Chembur Vidyapeeth","Pune - FC Road Vidyapeeth","Pune - Pimpri Vidyapeeth","Goa - Madgaon Vidyapeeth","Goa - Panjim Vidyapeeth","Mumbai - Virar Vidyapeeth","Nagpur Vidyapeeth (Residential Program)","Mumbai - Borivali Vidyapeeth","Lucknow - Vrindavan Vidyapeeth","Delhi - Dwarka Vidyapeeth","Nashik Vidyapeeth","Dehradun - Rajpur Rd Vidyapeeth","Hisar Vidyapeeth","Nanded Vidyapeeth","Bhubaneswar - Chandrasekharpur Vidyapeeth","Latur Vidyapeeth","Mumbai - Kalyan Vidyapeeth","Kanpur - Kidwai Nagar Vidyapeeth","Varanasi - Pahariya Aashapur Vidyapeeth","Rohtak Vidyapeeth","Akola Vidyapeeth","Prayagraj - Naini Vidyapeeth","Ranchi - Harmu Vidyapeeth","Ghaziabad Vidyapeeth","Mumbai - Thane Vidyapeeth","Raipur Vidyapeeth","Anantnag Vidyapeeth","Ludhiana Vidyapeeth","Mumbai - Andheri Vidyapeeth","Jabalpur Vidyapeeth","Jammu - Akhnoor Road Vidyapeeth","Faridabad Vidyapeeth","Bokaro Vidyapeeth","Chhatrapati Sambhajinagar Vidyapeeth","Delhi - Jasola Vidyapeeth","Jamshedpur Vidyapeeth","Panipat Vidyapeeth","Gurugram Vidyapeeth","Dhanbad Vidyapeeth","Kharagpur Vidyapeeth","Chandigarh Vidyapeeth","Alipurduar - Samuktala Road Vidyapeeth","Indore - MG Road Vidyapeeth","Muzaffarpur Vidyapeeth","Meerut Vidyapeeth","Indore - Bhawarkuan Vidyapeeth","Bhopal Vidyapeeth","Imphal - Babupara Vidyapeeth","Itanagar - F Sector Vidyapeeth","Kolkata - Baruipur Vidyapeeth","Kolkata - Behala Vidyapeeth","Noida - Block C Vidyapeeth","Delhi - Kalusarai Vidyapeeth","Bilaspur Vidyapeeth","Bhagalpur Vidyapeeth","Bhilai Vidyapeeth","Patna - Boring Road Vidyapeeth","Gwalior Vidyapeeth","Agra Vidyapeeth","Aligarh Vidyapeeth","Gorakhpur - Medical Road Vidyapeeth","Varanasi - Indira Tower Vidyapeeth","Lucknow - Alambagh Vidyapeeth","Guwahati Vidyapeeth","Siliguri Vidyapeeth","Varanasi - Bhojuveer Vidyapeeth","Ambala Vidyapeeth","Jalandhar Vidyapeeth","Lucknow - Gomtinagar Vidyapeeth","Nagpur Vidyapeeth","Srinagar - Rajbagh Vidyapeeth","Durgapur Vidyapeeth","Bareilly Vidyapeeth","Patna - Ashiana Digha Vidyapeeth","Delhi - NSP Vidyapeeth","Kolkata - Barrackpore Vidyapeeth","Ranchi - Lalpur Vidyapeeth","Delhi - Preet Vihar Vidyapeeth","Lucknow - Kapoorthala Vidyapeeth","Lucknow - HazratGanj Vidyapeeth","Kanpur - JSTower Vidyapeeth","Bhubaneswar Vidyapeeth","Kolkata - NewTown Vidyapeeth","Jammu - Pacific Tower Vidyapeeth","Delhi - Janakpuri Vidyapeeth","Patna - Exhibition Rd Vidyapeeth","Kolkata - Gariahat Vidyapeeth","Malda Vidyapeeth","Agartala Vidyapeeth","Bardhaman Vidyapeeth","Howrah Vidyapeeth","Gorakhpur Vidyapeeth","Varanasi - BHU Vidyapeeth","Srinagar - Baghat Vidyapeeth","Prayagraj - Civil Lines Vidyapeeth","Patna - Iskcon Vidyapeeth","Pulwama Tuition Center","Rajouri - Kheora Tuition Center","Bengaluru - Banaswadi Vidyapeeth","Bengaluru - HSR layout Vidyapeeth","Bengaluru - RR Nagar Vidyapeeth","Bengaluru - JP Nagar Vidyapeeth","Bengaluru - RajajiNagar Vidyapeeth","Bengaluru - Whitefield Vidyapeeth","Bengaluru - Yelahanka Vidyapeeth","Chennai - Adyar Gandhi Nagar Vidyapeeth","Chennai - Annanagar Vidyapeeth","Chennai - Ashok Nagar Vidyapeeth","Chennai - Medavakkam Vidyapeeth","Alwar Vidyapeeth","Jaipur Vidyapeeth","Jodhpur Vidyapeeth","Kota Vidyapeeth","Sikar Vidyapeeth","Udaipur Vidyapeeth","Sriganganagar - Meera Marg Vidyapeeth","Ajmer - Civil Lines Vidyapeeth"
+"Ahmedabad - Chandkheda Vidyapeeth",
+"Surat - Katargram Vidyapeeth",
+"Vadodara - Sama Savli Vidyapeeth",
+"Coimbatore Vidyapeeth",
+"Mysore Vidyapeeth",
+"Ahmedabad - Nikol Vidyapeeth",
+"Gandhinagar Vidyapeeth",
+"Ahmedabad - Satellite Vidyapeeth",
+"Bharuch Vidyapeeth",
+"Surat - Adajan Vidyapeeth",
+"Pune - NalStop Vidyapeeth",
+"Indore - Vijay Nagar Vidyapeeth",
+"Mumbai - Panvel Vidyapeeth",
+"Mumbai - Nerul Vidyapeeth",
+"Panchkula Vidyapeeth",
+"Delhi - Yamuna Vihar Vidyapeeth",
+"Mumbai - Ghatkopar Vidyapeeth",
+"Mumbai - Kharghar Vidyapeeth",
+"Ahmedabad - Maninagar Vidyapeeth",
+"Delhi - Punjabibagh Vidyapeeth",
+"Vadodara - Alkapuri Vidyapeeth",
+"Surat - Vesu Vidyapeeth",
+"Dehradun - Ballupur Vidyapeeth",
+"Pune - Viman Nagar Vidyapeeth",
+"Greater Noida Vidyapeeth",
+"Gurugram - Sector 47 Vidyapeeth",
+"Haridwar - Ranipur Vidyapeeth",
+"Moradabad Vidyapeeth",
+"Noida Vidyapeeth (Residential Program)",
+"Kanpur - SomBizness Vidyapeeth",
+"Pune - Hadapsar Vidyapeeth",
+"Mumbai - Chembur Vidyapeeth",
+"Pune - FC Road Vidyapeeth",
+"Pune - Pimpri Vidyapeeth",
+"Goa - Madgaon Vidyapeeth",
+"Goa - Panjim Vidyapeeth",
+"Mumbai - Virar Vidyapeeth",
+"Nagpur Vidyapeeth (Residential Program)",
+"Mumbai - Borivali Vidyapeeth",
+"Lucknow - Vrindavan Vidyapeeth",
+"Delhi - Dwarka Vidyapeeth",
+"Nashik Vidyapeeth",
+"Dehradun - Rajpur Rd Vidyapeeth",
+"Hisar Vidyapeeth",
+"Nanded Vidyapeeth",
+"Bhubaneswar - Chandrasekharpur Vidyapeeth",
+"Latur Vidyapeeth",
+"Mumbai - Kalyan Vidyapeeth",
+"Kanpur - Kidwai Nagar Vidyapeeth",
+"Varanasi - Pahariya Aashapur Vidyapeeth",
+"Rohtak Vidyapeeth",
+"Akola Vidyapeeth",
+"Prayagraj - Naini Vidyapeeth",
+"Ranchi - Harmu Vidyapeeth",
+"Ghaziabad Vidyapeeth",
+"Mumbai - Thane Vidyapeeth",
+"Raipur Vidyapeeth",
+"Anantnag Vidyapeeth",
+"Ludhiana Vidyapeeth",
+"Mumbai - Andheri Vidyapeeth",
+"Jabalpur Vidyapeeth",
+"Jammu - Akhnoor Road Vidyapeeth",
+"Faridabad Vidyapeeth",
+"Bokaro Vidyapeeth",
+"Chhatrapati Sambhajinagar Vidyapeeth",
+"Delhi - Jasola Vidyapeeth",
+"Jamshedpur Vidyapeeth",
+"Panipat Vidyapeeth",
+"Gurugram Vidyapeeth",
+"Dhanbad Vidyapeeth",
+"Kharagpur Vidyapeeth",
+"Chandigarh Vidyapeeth",
+"Alipurduar - Samuktala Road Vidyapeeth",
+"Indore - MG Road Vidyapeeth",
+"Muzaffarpur Vidyapeeth",
+"Meerut Vidyapeeth",
+"Indore - Bhawarkuan Vidyapeeth",
+"Bhopal Vidyapeeth",
+"Imphal - Babupara Vidyapeeth",
+"Itanagar - F Sector Vidyapeeth",
+"Kolkata - Baruipur Vidyapeeth",
+"Kolkata - Behala Vidyapeeth",
+"Noida - Block C Vidyapeeth",
+"Delhi - Kalusarai Vidyapeeth",
+"Bilaspur Vidyapeeth",
+"Bhagalpur Vidyapeeth",
+"Bhilai Vidyapeeth",
+"Patna - Boring Road Vidyapeeth",
+"Gwalior Vidyapeeth",
+"Agra Vidyapeeth",
+"Aligarh Vidyapeeth",
+"Gorakhpur - Medical Road Vidyapeeth",
+"Varanasi - Indira Tower Vidyapeeth",
+"Lucknow - Alambagh Vidyapeeth",
+"Guwahati Vidyapeeth",
+"Siliguri Vidyapeeth",
+"Varanasi - Bhojuveer Vidyapeeth",
+"Ambala Vidyapeeth",
+"Jalandhar Vidyapeeth",
+"Lucknow - Gomtinagar Vidyapeeth",
+"Nagpur Vidyapeeth",
+"Srinagar - Rajbagh Vidyapeeth",
+"Durgapur Vidyapeeth",
+"Bareilly Vidyapeeth",
+"Patna - Ashiana Digha Vidyapeeth",
+"Delhi - NSP Vidyapeeth",
+"Kolkata - Barrackpore Vidyapeeth",
+"Ranchi - Lalpur Vidyapeeth",
+"Delhi - Preet Vihar Vidyapeeth",
+"Lucknow - Kapoorthala Vidyapeeth",
+"Lucknow - HazratGanj Vidyapeeth",
+"Kanpur - JSTower Vidyapeeth",
+"Bhubaneswar Vidyapeeth",
+"Kolkata - NewTown Vidyapeeth",
+"Jammu - Pacific Tower Vidyapeeth",
+"Delhi - Janakpuri Vidyapeeth",
+"Patna - Exhibition Rd Vidyapeeth",
+"Kolkata - Gariahat Vidyapeeth",
+"Malda Vidyapeeth",
+"Agartala Vidyapeeth",
+"Bardhaman Vidyapeeth",
+"Howrah Vidyapeeth",
+"Gorakhpur Vidyapeeth",
+"Varanasi - BHU Vidyapeeth",
+"Srinagar - Baghat Vidyapeeth",
+"Prayagraj - Civil Lines Vidyapeeth",
+"Patna - Iskcon Vidyapeeth",
+"Pulwama Tuition Center",
+"Rajouri - Kheora Tuition Center",
+"Bengaluru - Banaswadi Vidyapeeth",
+"Bengaluru - HSR layout Vidyapeeth",
+"Bengaluru - JP Nagar Vidyapeeth",
+"Bengaluru - RajajiNagar Vidyapeeth",
+"Bengaluru - RR Nagar Vidyapeeth",
+"Bengaluru - Whitefield Vidyapeeth",
+"Bengaluru - Yelahanka Vidyapeeth",
+"Chennai - Adyar Gandhi Nagar Vidyapeeth",
+"Chennai - Annanagar Vidyapeeth",
+"Chennai - Ashok Nagar Vidyapeeth",
+"Chennai - Medavakkam Vidyapeeth",
+"Alwar Vidyapeeth",
+"Jaipur - Pratap Nagar Vidyapeeth",
+"Jaipur - RS Circle Vidyapeeth",
+"Jodhpur - Akhaliya Vidyapeeth",
+"Jodhpur - Paota Vidyapeeth",
+"Jodhpur - Sardarpura Vidyapeeth",
+"Kota Vidyapeeth",
+"Sikar Vidyapeeth",
+"Udaipur Vidyapeeth",
+"Sriganganagar - Meera Marg Vidyapeeth",
+"Ajmer - Civil Lines Vidyapeeth",
+"Delhi - Najafgarh Tuition Center",
+"Delhi - Rohini Tuition Center",
+"Kalyani Tuition Center",
+"Bankura - Katjuridanga Tuition Center",
+"Vapi - Chala Vapi Tuition Center",
+"Nagpur - Wardhman Nagar Tuition Center",
+"Pune - Pimple Saudagar Tuition Center",
+"Dombivali Kalyan Tuition Center",
+"Gwalior - DD Nagar Tuition Center",
+"Meerut Tuition Center",
+"Noida - Sector 4 Tuition Center",
+"Lucknow - Jankipuram Tuition Center",
+"Prayagraj - Jhusi Tuition Center",
+"Varanasi - Sigra Tuition Center"
 ];
 
 const PRO_MAX_CENTERS = [
-["Vizag Vidyapeeth",""],["Vijayawada Vidyapeeth",""],["Patna - Exhibition Rd Vidyapeeth",""],["Ranchi - Harmu Vidyapeeth",""],["Patna - Iskcon Vidyapeeth",""],["Ranchi - Lalpur Vidyapeeth",""],["Bhagalpur Vidyapeeth",""],["Dhanbad Vidyapeeth",""],["Patna - Ashiana Digha Vidyapeeth",""],["Muzaffarpur Vidyapeeth",""],["Jamshedpur Vidyapeeth",""],["Patna - Boring Road Vidyapeeth",""],
-["Delhi - Janakpuri Vidyapeeth","JEE & NEET for both"],["Delhi - Kalusarai Vidyapeeth","Only NEET not in JEE (at Saket)"],["Delhi - NSP Vidyapeeth","Only NEET"],["Rohtak Vidyapeeth",""],["Hisar Vidyapeeth",""],["Delhi - Preet Vihar Vidyapeeth","Only in Gagan Vihar Campus"],["Delhi - Jasola Vidyapeeth","JEE & NEET"],["Delhi - Punjabibagh Vidyapeeth","JEE & NEET for both"],["Panipat Vidyapeeth",""],["Delhi - Yamuna Vihar Vidyapeeth","JEE & NEET for both"],
-["Kolkata - NewTown Vidyapeeth",""],["Siliguri Vidyapeeth",""],["Malda Vidyapeeth",""],["Bhubaneswar Vidyapeeth",""],["Guwahati Vidyapeeth",""],["Kolkata - Gariahat Vidyapeeth",""],["Durgapur Vidyapeeth",""],["Kolkata - Baruipur Vidyapeeth",""],["Kolkata - Barrackpore Vidyapeeth",""],["Bhubaneswar - Chandrasekharpur Vidyapeeth",""],["Kharagpur Vidyapeeth",""],["Howrah Vidyapeeth",""],["Agartala Vidyapeeth",""],["Bardhaman Vidyapeeth",""],["Kolkata - Behala Vidyapeeth",""],["Alipurduar - Samuktala Road Vidyapeeth",""],["Itanagar - F Sector Vidyapeeth",""],["Imphal - Babupara Vidyapeeth",""],
-["Nanded Vidyapeeth",""],["Chhatrapati Sambhajinagar Vidyapeeth",""],["Pune - Hadapsar Vidyapeeth",""],["Nashik Vidyapeeth",""],["Nagpur Vidyapeeth",""],["Mumbai - Andheri Vidyapeeth","Only 50 students can be accommodated"],["Mumbai - Thane Vidyapeeth","Only 50 students can be accommodated"],["Mumbai - Kalyan Vidyapeeth","Only 50 students can be accommodated"],["Pune - Pimpri Vidyapeeth",""],["Pune - NalStop Vidyapeeth","Only 50 students can be accommodated"],["Pune - Viman Nagar Vidyapeeth",""],["Mumbai - Panvel Vidyapeeth","Only 30 students can be accommodated"],["Akola Vidyapeeth",""],["Latur Vidyapeeth",""],["Goa - Madgaon Vidyapeeth",""],["Mumbai - Kharghar Vidyapeeth",""],["Goa - Panjim Vidyapeeth",""],
-["Indore - Bhawarkuan Vidyapeeth",""],["Indore - MG Road Vidyapeeth",""],["Bhilai Vidyapeeth",""],["Bilaspur Vidyapeeth",""],["Indore - Vijay Nagar Vidyapeeth",""],["Jabalpur Vidyapeeth","Only 50 students can be accommodated"],["Raipur Vidyapeeth",""],
-["Dehradun - Rajpur Rd Vidyapeeth",""],["Meerut Vidyapeeth",""],["Dehradun - Ballupur Vidyapeeth",""],["Chandigarh Vidyapeeth",""],["Srinagar - Baghat Vidyapeeth",""],["Panchkula Vidyapeeth",""],["Jammu - Pacific Tower Vidyapeeth",""],["Ludhiana Vidyapeeth",""],["Jammu - Akhnoor Road Vidyapeeth",""],["Srinagar - Rajbagh Vidyapeeth",""],["Ambala Vidyapeeth",""],["Jalandhar Vidyapeeth",""],["Anantnag Vidyapeeth",""],["Pulwama Tuition Center","Only NEET"],["Rajouri - Kheora Tuition Center","Only NEET"],
-["Bengaluru - HSR layout Vidyapeeth",""],["Bengaluru - Banaswadi Vidyapeeth",""],["Bengaluru - Yelahanka Vidyapeeth",""],["Chennai - Ashok Nagar Vidyapeeth",""],["Chennai - Annanagar Vidyapeeth",""],["Chennai - Medavakkam Vidyapeeth",""],["Coimbatore Vidyapeeth",""],["Mysore Vidyapeeth",""],["Chennai - Adyar Gandhi Nagar Vidyapeeth",""],["Bengaluru - RR Nagar Vidyapeeth",""],
-["Lucknow - HazratGanj Vidyapeeth",""],["Gorakhpur Vidyapeeth",""],["Kanpur - JSTower Vidyapeeth",""],["Varanasi - BHU Vidyapeeth",""],["Prayagraj - Civil Lines Vidyapeeth",""],["Lucknow - Gomtinagar Vidyapeeth",""],["Lucknow - Kapoorthala Vidyapeeth",""],["Varanasi - Bhojuveer Vidyapeeth",""],["Lucknow - Alambagh Vidyapeeth",""],["Bareilly Vidyapeeth",""],["Lucknow - Vrindavan Vidyapeeth",""],["Kanpur - SomBizness Vidyapeeth",""],["Prayagraj - Naini Vidyapeeth",""],["Kanpur - Kidwai Nagar Vidyapeeth",""],["Agra Vidyapeeth","Only Test is possible as Faculties bandwidth is not available for the doubts"],["Gorakhpur - Medical Road Vidyapeeth",""],["Varanasi - Pahariya Aashapur Vidyapeeth",""],["Varanasi - Indira Tower Vidyapeeth",""],
-["Jaipur - RS Circle Vidyapeeth",""],["Jodhpur - Sardarpura Vidyapeeth",""],["Udaipur Vidyapeeth",""]
+"Vizag Vidyapeeth",
+"Vijayawada Vidyapeeth",
+"Patna - Exhibition Rd Vidyapeeth",
+"Ranchi - Harmu Vidyapeeth",
+"Patna - Iskcon Vidyapeeth",
+"Ranchi - Lalpur Vidyapeeth",
+"Bhagalpur Vidyapeeth",
+"Dhanbad Vidyapeeth",
+"Patna - Ashiana Digha Vidyapeeth",
+"Muzaffarpur Vidyapeeth",
+"Jamshedpur Vidyapeeth",
+"Patna - Boring Road Vidyapeeth",
+"Delhi - Janakpuri Vidyapeeth",
+"Delhi - Kalusarai Vidyapeeth",
+"Delhi - NSP Vidyapeeth",
+"Rohtak Vidyapeeth",
+"Hisar Vidyapeeth",
+"Delhi - Preet Vihar Vidyapeeth",
+"Delhi - Jasola Vidyapeeth",
+"Delhi - Punjabibagh Vidyapeeth",
+"Panipat Vidyapeeth",
+"Delhi - Yamuna Vihar Vidyapeeth",
+"Kolkata - NewTown Vidyapeeth",
+"Siliguri Vidyapeeth",
+"Malda Vidyapeeth",
+"Bhubaneswar Vidyapeeth",
+"Guwahati Vidyapeeth",
+"Kolkata - Gariahat Vidyapeeth",
+"Durgapur Vidyapeeth",
+"Kolkata - Baruipur Vidyapeeth",
+"Kolkata - Barrackpore Vidyapeeth",
+"Bhubaneswar - Chandrasekharpur Vidyapeeth",
+"Kharagpur Vidyapeeth",
+"Howrah Vidyapeeth",
+"Agartala Vidyapeeth",
+"Bardhaman Vidyapeeth",
+"Kolkata - Behala Vidyapeeth",
+"Alipurduar - Samuktala Road Vidyapeeth",
+"Itanagar - F Sector Vidyapeeth",
+"Imphal - Babupara Vidyapeeth",
+"Nanded Vidyapeeth",
+"Chhatrapati Sambhajinagar Vidyapeeth",
+"Pune - Hadapsar Vidyapeeth",
+"Nashik Vidyapeeth",
+"Nagpur Vidyapeeth",
+"Mumbai - Andheri Vidyapeeth",
+"Mumbai - Thane Vidyapeeth",
+"Mumbai - Kalyan Vidyapeeth",
+"Pune - Pimpri Vidyapeeth",
+"Pune - NalStop Vidyapeeth",
+"Pune - Viman Nagar Vidyapeeth",
+"Mumbai - Panvel Vidyapeeth",
+"Akola Vidyapeeth",
+"Latur Vidyapeeth",
+"Goa - Madgaon Vidyapeeth",
+"Mumbai - Kharghar Vidyapeeth",
+"Goa - Panjim Vidyapeeth",
+"Indore - Bhawarkuan Vidyapeeth",
+"Indore - MG Road Vidyapeeth",
+"Bhilai Vidyapeeth",
+"Bilaspur Vidyapeeth",
+"Bhopal Vidyapeeth",
+"Indore - Vijay Nagar Vidyapeeth",
+"Jabalpur Vidyapeeth",
+"Raipur Vidyapeeth",
+"Dehradun - Rajpur Rd Vidyapeeth",
+"Meerut Vidyapeeth",
+"Dehradun - Ballupur Vidyapeeth",
+"Chandigarh Vidyapeeth",
+"Srinagar - Baghat Vidyapeeth",
+"Panchkula Vidyapeeth",
+"Jammu - Pacific Tower Vidyapeeth",
+"Ludhiana Vidyapeeth",
+"Jammu - Akhnoor Road Vidyapeeth",
+"Srinagar - Rajbagh Vidyapeeth",
+"Ambala Vidyapeeth",
+"Jalandhar Vidyapeeth",
+"Anantnag Vidyapeeth",
+"Pulwama Tuition Center",
+"Rajouri - Kheora Tuition Center",
+"Kota Vidyapeeth",
+"Sikar Vidyapeeth",
+"Jaipur - RS Circle Vidyapeeth",
+"Jodhpur - Sardarpura Vidyapeeth",
+"Udaipur Vidyapeeth",
+"Bengaluru - HSR layout Vidyapeeth",
+"Bengaluru - Banaswadi Vidyapeeth",
+"Bengaluru - Yelahanka Vidyapeeth",
+"Chennai - Ashok Nagar Vidyapeeth",
+"Chennai - Annanagar Vidyapeeth",
+"Chennai - Medavakkam Vidyapeeth",
+"Coimbatore Vidyapeeth",
+"Mysore Vidyapeeth",
+"Chennai - Adyar Gandhi Nagar Vidyapeeth",
+"Bengaluru - RR Nagar Vidyapeeth",
+"Lucknow - HazratGanj Vidyapeeth",
+"Gorakhpur Vidyapeeth",
+"Kanpur - JSTower Vidyapeeth",
+"Varanasi - BHU Vidyapeeth",
+"Prayagraj - Civil Lines Vidyapeeth",
+"Lucknow - Gomtinagar Vidyapeeth",
+"Lucknow - Kapoorthala Vidyapeeth",
+"Varanasi - Bhojuveer Vidyapeeth",
+"Lucknow - Alambagh Vidyapeeth",
+"Bareilly Vidyapeeth",
+"Lucknow - Vrindavan Vidyapeeth",
+"Kanpur - SomBizness Vidyapeeth",
+"Prayagraj - Naini Vidyapeeth",
+"Kanpur - Kidwai Nagar Vidyapeeth",
+"Agra Vidyapeeth",
+"Gorakhpur - Medical Road Vidyapeeth",
+"Varanasi - Pahariya Aashapur Vidyapeeth",
+"Varanasi - Indira Tower Vidyapeeth",
+"Surat - Vesu Vidyapeeth",
+"Bharuch Vidyapeeth",
+"Ahmedabad - Nikol Vidyapeeth",
+"Vadodara - Sama Savli Vidyapeeth",
+"Vadodara - Alkapuri Vidyapeeth",
+"Gwalior Vidyapeeth",
+"Noida - Block C Vidyapeeth",
+"Gurugram Vidyapeeth",
+"Greater Noida Vidyapeeth",
+"Moradabad Vidyapeeth",
+"Haridwar - Ranipur Vidyapeeth",
+"Gurugram - Sector 47 Vidyapeeth",
+"Aligarh Vidyapeeth",
+"Delhi - Najafgarh Tuition Center",
+"Delhi - Rohini Tuition Center",
+"Kalyani Tuition Center",
+"Bankura - Katjuridanga Tuition Center",
+"Vapi - Chala Vapi Tuition Center",
+"Nagpur - Wardhman Nagar Tuition Center",
+"Pune - Pimple Saudagar Tuition Center",
+"Dombivali Kalyan Tuition Center",
+"Gwalior - DD Nagar Tuition Center",
+"Meerut Tuition Center",
+"Noida - Sector 4 Tuition Center",
+"Lucknow - Jankipuram Tuition Center",
+"Prayagraj - Jhusi Tuition Center",
+"Varanasi - Sigra Tuition Center"
 ];
 
 /* ===================== RENDER LOGIC (no edits needed below) ===================== */
@@ -634,7 +944,7 @@ function selectPlan(key,ti){
 
 /* =====================================================================
    PS (PATHSHALA) CENTRE DATA — Source: PS centres list (AY 26-27)
-   [Centre, Region] — offerings/pricing pending (PS doc awaited).
+   [Centre, Region] — all PS centres run MIP Basic, MIP PRO and MIP Pro Max.
    ===================================================================== */
 const PS_CENTERS = [
 ["Narnaul - City Vidyapeeth (Pathshala Centre)","Region 4 (North)"],
@@ -644,18 +954,18 @@ const PS_CENTERS = [
 ["Rewa Vidyapeeth (Pathshala Centre)","Region 5 (UP South & MP)"],
 ["Deoria Vidyapeeth (Pathshala Centre)","Region 1 (Patna)"],
 ["Mathura Vidyapeeth (Pathshala Centre)","Region 4 (North)"],
-["Chhindwara Vidyapeeth (Pathshala Centre)","Region 5 (UP South & MP)"],
+["Chhindwara Vidyapeeth (Pathshala Centre)","Region 6 (North East & Maharashtra)"],
 ["Jorhat Vidyapeeth (Pathshala Centre)","Region 9 (Assam)"],
 ["Ghazipur Vidyapeeth (Pathshala Centre)","Region 1 (Patna)"],
 ["Bidar Vidyapeeth (Pathshala Centre)","Region 8 (South Maharashtra & Karnataka)"],
-["Chandrapur Vidyapeeth (Pathshala Centre)","Region 6 (North East Maharashtra)"],
-["Amrawati - Gadge Nagar Vidyapeeth (Pathshala Centre)","Region 6 (North East Maharashtra)"],
+["Chandrapur Vidyapeeth (Pathshala Centre)","Region 6 (North East & Maharashtra)"],
+["Amrawati - Gadge Nagar Vidyapeeth (Pathshala Centre)","Region 6 (North East & Maharashtra)"],
 ["Beed Vidyapeeth (Pathshala Centre)","Region 7 (North Maharashtra)"],
-["Yavatmal Vidyapeeth (Pathshala Centre)","Region 6 (North East Maharashtra)"],
-["Gondia Vidyapeeth (Pathshala Centre)","Region 6 (North East Maharashtra)"],
+["Yavatmal Vidyapeeth (Pathshala Centre)","Region 6 (North East & Maharashtra)"],
+["Gondia Vidyapeeth (Pathshala Centre)","Region 6 (North East & Maharashtra)"],
 ["Ayodhya Vidyapeeth (Pathshala Centre)","Region 5 (UP South & MP)"],
 ["Patna Vidyapeeth (Pathshala Centre)","Region 1 (Patna)"],
-["Hingoli Vidyapeeth (Pathshala Centre)","Region 6 (North East Maharashtra)"],
+["Hingoli Vidyapeeth (Pathshala Centre)","Region 6 (North East & Maharashtra)"],
 ["Jalna Vidyapeeth (Pathshala Centre)","Region 7 (North Maharashtra)"],
 ["Raigarh Vidyapeeth (Pathshala Centre)","Region 3 (Orissa/Chhattisgarh)"],
 ["Satna Vidyapeeth (Pathshala Centre)","Region 5 (UP South & MP)"],
@@ -691,7 +1001,7 @@ const PS_CENTERS = [
 ["Purnea Vidyapeeth (Pathshala Centre)","Region 1 (Patna)"],
 ["Hazaribagh Vidyapeeth (Pathshala Centre)","Region 2 (Jharkhand)"],
 ["Murshidabad (West Bengal) Vidyapeeth (Pathshala Centre)","Region 2 (Jharkhand)"],
-["Amrawati - Rajapeth Vidyapeeth (Pathshala Centre)","Region 6 (North East Maharashtra)"],
+["Amrawati - Rajapeth Vidyapeeth (Pathshala Centre)","Region 6 (North East & Maharashtra)"],
 ["Cuttack Vidyapeeth (Pathshala Centre)","Region 3 (Orissa/Chhattisgarh)"],
 ["Sambalpur Vidyapeeth (Pathshala Centre)","Region 3 (Orissa/Chhattisgarh)"],
 ["Berhampur (Odisha) Vidyapeeth (Pathshala Centre)","Region 3 (Orissa/Chhattisgarh)"],
@@ -703,8 +1013,8 @@ const PS_CENTERS = [
 ["Aurangabad Vidyapeeth (Pathshala Centre)","Region 2 (Jharkhand)"],
 ["Lakhimpur Kheri Vidyapeeth (Pathshala Centre)","Region 4 (North)"],
 ["Shahjahanpur Vidyapeeth (Pathshala Centre)","Region 4 (North)"],
-["Parbhani Vidyapeeth (Pathshala Centre)","Region 6 (North East Maharashtra)"],
-["Wardha Vidyapeeth (Pathshala Centre)","Region 6 (North East Maharashtra)"],
+["Parbhani Vidyapeeth (Pathshala Centre)","Region 6 (North East & Maharashtra)"],
+["Wardha Vidyapeeth (Pathshala Centre)","Region 7 (North Maharashtra)"],
 ["Belagavi Vidyapeeth (Pathshala Centre)","Region 8 (South Maharashtra & Karnataka)"],
 ["Vijayapura Vidyapeeth (Pathshala Centre)","Region 8 (South Maharashtra & Karnataka)"]
 ];
@@ -1389,6 +1699,39 @@ function renderCountMatrix(){
   if(psM) psM.innerHTML=psify(html);
 }
 
+/* =====================================================================
+   AUTO UPDATE CHECK
+   GitHub Pages serves this file from a CDN, so a counsellor who leaves the
+   tab open (or whose browser caches it) can sit on an old copy for hours.
+   Every few minutes \u2014 and whenever the tab regains focus \u2014 the tool asks
+   the server whether this file has changed. If it has, a bar appears at the
+   bottom offering a reload. It never reloads on its own mid-conversation.
+   ===================================================================== */
+const BUILD_STAMP = "19 Aug 2026";      // shown in the footer
+const UPDATE_CHECK_MINUTES = 5;
+let PAGE_TAG = null;
+
+async function pageTag(){
+  try{
+    const res = await fetch(location.pathname + "?cb=" + Date.now(), {method:"HEAD", cache:"no-store"});
+    return res.headers.get("etag") || res.headers.get("last-modified") || null;
+  }catch(e){ return null; }
+}
+
+async function checkForUpdate(){
+  const tag = await pageTag();
+  if(!tag) return;                       // offline or blocked \u2014 stay quiet
+  if(PAGE_TAG === null){ PAGE_TAG = tag; return; }
+  if(tag !== PAGE_TAG) document.getElementById("updateBar").classList.add("show");
+}
+
+function startUpdateWatch(){
+  checkForUpdate();
+  setInterval(checkForUpdate, UPDATE_CHECK_MINUTES*60*1000);
+  document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) checkForUpdate(); });
+  window.addEventListener("focus", checkForUpdate);
+}
+
 /* Vertical toggle (VP / PS) */
 function selectVertical(v){
   document.querySelectorAll(".vchip").forEach(c=>c.classList.toggle("active",c.dataset.v===v));
@@ -1416,31 +1759,31 @@ function renderPSCentres(){
     '<select id="psRegion" onchange="drawPSTable()"><option value="">All Regions ('+PS_CENTERS.length+' centres)</option>'+
     regions.map(r=>'<option>'+r+'</option>').join('')+'</select></div>'+
     '<div style="overflow-x:auto"><table id="psTable"></table></div>'+
-    '<div class="note">Source: PS centres list (AY 26-27). Offering/pricing availability per centre will be mapped once the PS offerings doc is shared.</div>';
+    '<div class="note"><b>All three plans \u2014 MIP Basic, MIP PRO and MIP Pro Max \u2014 are live at all '+PS_CENTERS.length+' Pathshala centres.</b> Source: PS centres list (AY 26-27).</div>';
   drawPSTable();
 }
 function drawPSTable(){
   const q=document.getElementById("psSearch").value.toLowerCase().trim();
   const rg=document.getElementById("psRegion").value;
   const list=PS_CENTERS.filter(([n,r])=>(!rg||r===rg)&&(!q||n.toLowerCase().includes(q)));
-  let html="<tr><th style='text-align:left'>Centre</th><th>Region</th><th>PS Status</th></tr>";
+  let html="<tr><th style='text-align:left'>Centre</th><th>Region</th><th>MIP Basic</th><th>MIP PRO</th><th>MIP Pro Max</th></tr>";
   list.forEach(([n,r])=>{
-    html+="<tr><td style='text-align:left'>"+n+"</td><td>"+r+"</td><td class='ok'>\u2713 Live</td></tr>";
+    html+="<tr><td style='text-align:left'>"+n+"</td><td>"+r+"</td>"+
+      "<td class='ok'>\u2713 Live</td><td class='ok'>\u2713 Live</td><td class='ok'>\u2713 Live</td></tr>";
   });
-  if(!list.length) html+='<tr><td colspan="3" style="text-align:center;color:var(--grey)">No centres match your search.</td></tr>';
+  if(!list.length) html+='<tr><td colspan="5" style="text-align:center;color:var(--grey)">No centres match your search.</td></tr>';
   document.getElementById("psTable").innerHTML=html;
 }
 renderPSCentres();
 
 /* Merged centre lookup: union of both lists, per-tier availability + remarks */
 const CENTRE_MERGED = (() => {
-  const pmMap = new Map(PRO_MAX_CENTERS.map(([n,r])=>[n,r]));
-  const names = [...new Set([...BASIC_PRO_CENTERS, ...PRO_MAX_CENTERS.map(([n])=>n)])].sort((a,b)=>a.localeCompare(b));
+  const pmSet = new Set(PRO_MAX_CENTERS);
+  const names = [...new Set([...BASIC_PRO_CENTERS, ...PRO_MAX_CENTERS])].sort((a,b)=>a.localeCompare(b));
   return names.map(n=>({
     name: n,
     basicPro: BASIC_PRO_CENTERS.includes(n),
-    proMax: pmMap.has(n),
-    remark: pmMap.get(n) || ""
+    proMax: pmSet.has(n)
   }));
 })();
 
@@ -1456,7 +1799,7 @@ function renderCentres(){
       '<option value="pmOnly">Pro Max NOT Live</option>'+
     '</select></div>'+
     '<div style="overflow-x:auto"><table id="centreTable"></table></div>'+
-    '<div class="note">Source: MIP Targets AY26-27 — "Final centers" tab. Basic/PRO and Pro Max are separate live lists; a centre may be live in one and not the other. Remarks (capacity / JEE-NEET / campus) apply to Pro Max availability.</div>';
+    '<div class="note">Basic/PRO and Pro Max are separate live lists, so a centre may be live in one and not the other. '+BASIC_PRO_CENTERS.length+' centres run Basic &amp; PRO; '+PRO_MAX_CENTERS.length+' run Pro Max. Source: VP centre lists (AY 26-27).</div>';
   drawCentreTable();
 }
 function drawCentreTable(){
@@ -1467,12 +1810,11 @@ function drawCentreTable(){
   if(tf==="pm") list=list.filter(c=>c.proMax);
   if(tf==="pmOnly") list=list.filter(c=>!c.proMax);
   const cell=v=>'<td class="'+(v?'ok':'no')+'">'+(v?'\u2713 Live':'\u2715 Not Live')+'</td>';
-  let html="<tr><th>Centre</th><th>MIP Basic</th><th>MIP PRO</th><th>MIP Pro Max</th><th style='text-align:left'>Remarks</th></tr>";
+  let html="<tr><th style='text-align:left'>Centre</th><th>MIP Basic</th><th>MIP PRO</th><th>MIP Pro Max</th></tr>";
   list.forEach(c=>{
-    html+="<tr><td>"+c.name+"</td>"+cell(c.basicPro)+cell(c.basicPro)+cell(c.proMax)+
-      '<td style="text-align:left;font-size:12px;color:'+(c.remark?'#8a6d1a':'var(--grey)')+'">'+(c.remark||"—")+"</td></tr>";
+    html+="<tr><td style='text-align:left'>"+c.name+"</td>"+cell(c.basicPro)+cell(c.basicPro)+cell(c.proMax)+"</tr>";
   });
-  if(!list.length) html+='<tr><td colspan="5" style="text-align:center;color:var(--grey)">No centres match your search.</td></tr>';
+  if(!list.length) html+='<tr><td colspan="4" style="text-align:center;color:var(--grey)">No centres match your search.</td></tr>';
   document.getElementById("centreTable").innerHTML=html;
 }
 renderCentres();
@@ -1483,6 +1825,8 @@ renderBatchTable();
 buildPlannerTabs();
 drawPlanner();
 loadLivePlanner();
+startUpdateWatch();
+document.querySelectorAll(".buildstamp").forEach(e=>e.textContent=BUILD_STAMP);
 document.body.style.setProperty("--plan","var(--vp)");
 
 function copyPitch(key,tk,ti){
