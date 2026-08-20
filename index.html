@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
-<title>MIP Counsellxor Console — AY 26-27</title>
+<title>MIP Counsellor Console — AY 26-27</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
@@ -179,6 +179,14 @@
   .gcard ul.gb li{font-size:14.5px;line-height:1.65;color:#233052;margin-bottom:2px;}
   .gcard.wide{grid-column:1/-1;}
 
+  .pwrow{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 4px;}
+  .pwlink{display:inline-block;background:var(--ink);color:#fff;text-decoration:none;font-family:'Sora',sans-serif;
+    font-size:13px;font-weight:700;padding:11px 18px;border-radius:999px;transition:.15s;}
+  .pwlink:hover{filter:brightness(1.15);}
+  .pwlink.ghost{background:var(--card);color:var(--ink);border:1.5px solid var(--line);}
+  .pwlink.ghost:hover{border-color:var(--ink);filter:none;}
+  .pwmini{color:var(--pro);text-decoration:none;font-size:12px;font-weight:700;white-space:nowrap;}
+  .pwmini:hover{text-decoration:underline;}
   .updatebar{position:fixed;left:0;right:0;bottom:0;z-index:9999;display:none;align-items:center;justify-content:center;
     gap:14px;flex-wrap:wrap;background:linear-gradient(100deg,#0B1428,#1E3A8A);color:#fff;padding:14px 18px;
     font-size:14px;font-weight:600;box-shadow:0 -6px 24px rgba(15,27,54,.3);border-top:3px solid var(--gold);}
@@ -267,6 +275,7 @@
       <div class="note" style="margin:-4px 0 8px">&#8505;&#65039; Click any plan card to see its exact test breakdown in the table below.</div>
       <div class="tiers" id="psTiers"></div>
       <div id="psNextStrip"></div>
+      <div class="pwrow" id="psPwLinks"></div>
 
       <h2 class="sec">No. of Tests — <span id="psCountLabel"></span></h2>
       <div style="overflow-x:auto"><table id="psCountTable"></table></div>
@@ -301,6 +310,7 @@
     <div class="note" style="margin:-4px 0 8px">&#8505;&#65039; Click any plan card to see its exact test breakdown in the table below.</div>
     <div class="tiers" id="tiers"></div>
     <div id="vpNextStrip"></div>
+    <div class="pwrow" id="vpPwLinks"></div>
 
     <h2 class="sec">No. of Tests — <span id="countLabel"></span></h2>
     <div style="overflow-x:auto"><table id="countTable"></table></div>
@@ -931,6 +941,7 @@ function select(key){
 
   selectPlan(key,0);
   renderNextStrip(key,"vpNextStrip");
+  renderPwLink(key,"vpPwLinks");
   document.getElementById("result").scrollIntoView({behavior:"smooth",block:"start"});
 }
 
@@ -1219,6 +1230,7 @@ function selectPS(key){
   });
   selectPlanPS(key,0);
   renderNextStrip(key,"psNextStrip");
+  renderPwLink(key,"psPwLinks");
   document.getElementById("psResult").scrollIntoView({behavior:"smooth",block:"start"});
 }
 
@@ -1732,6 +1744,35 @@ function startUpdateWatch(){
   window.addEventListener("focus", checkForUpdate);
 }
 
+/* =====================================================================
+   pw.live DEEP LINKS
+   Verified public URL pattern on the PW centres site. Cohort pages list
+   the live batches for that class/stream; the centre directory is where
+   a counsellor checks a specific centre's batches and fee structure.
+   ===================================================================== */
+const PW_BASE="https://www.pw.live/offline-centres/batches/vidyapeeth";
+const PW_COHORT_URL={
+  "11-JEE"  : PW_BASE+"/iit-jee-coaching/class/class-11",
+  "12-JEE"  : PW_BASE+"/iit-jee-coaching/class/class-12",
+  "dr-JEE"  : PW_BASE+"/iit-jee-coaching/class/dropper",
+  "11-NEET" : PW_BASE+"/neet-coaching/class/class-11",
+  "12-NEET" : PW_BASE+"/neet-coaching/class/class-12",
+  "dr-NEET" : PW_BASE+"/neet-coaching/class/dropper"
+};
+const PW_DIRECTORY=PW_BASE;
+/* Centre pages use a city slug we do not hold per centre, so a centre row
+   opens a site-scoped search instead of a guessed URL that could 404. */
+const pwCentreSearch = name =>
+  "https://www.google.com/search?q=" + encodeURIComponent("site:pw.live " + name.replace(/ \(.*\)/,""));
+
+function renderPwLink(key,elId){
+  const el=document.getElementById(elId);
+  if(!el) return;
+  const url=PW_COHORT_URL[key];
+  el.innerHTML='<a class="pwlink" href="'+url+'" target="_blank" rel="noopener">Open this batch on pw.live \u2197</a>'+
+    '<a class="pwlink ghost" href="'+PW_DIRECTORY+'" target="_blank" rel="noopener">All centres &amp; fee structure \u2197</a>';
+}
+
 /* Vertical toggle (VP / PS) */
 function selectVertical(v){
   document.querySelectorAll(".vchip").forEach(c=>c.classList.toggle("active",c.dataset.v===v));
@@ -1766,12 +1807,13 @@ function drawPSTable(){
   const q=document.getElementById("psSearch").value.toLowerCase().trim();
   const rg=document.getElementById("psRegion").value;
   const list=PS_CENTERS.filter(([n,r])=>(!rg||r===rg)&&(!q||n.toLowerCase().includes(q)));
-  let html="<tr><th style='text-align:left'>Centre</th><th>Region</th><th>MIP Basic</th><th>MIP PRO</th><th>MIP Pro Max</th></tr>";
+  let html="<tr><th style='text-align:left'>Centre</th><th>Region</th><th>MIP Basic</th><th>MIP PRO</th><th>MIP Pro Max</th><th>pw.live</th></tr>";
   list.forEach(([n,r])=>{
     html+="<tr><td style='text-align:left'>"+n+"</td><td>"+r+"</td>"+
-      "<td class='ok'>\u2713 Live</td><td class='ok'>\u2713 Live</td><td class='ok'>\u2713 Live</td></tr>";
+      "<td class='ok'>\u2713 Live</td><td class='ok'>\u2713 Live</td><td class='ok'>\u2713 Live</td>"+
+      "<td><a class='pwmini' href='"+pwCentreSearch(n)+"' target='_blank' rel='noopener'>Look up \u2197</a></td></tr>";
   });
-  if(!list.length) html+='<tr><td colspan="5" style="text-align:center;color:var(--grey)">No centres match your search.</td></tr>';
+  if(!list.length) html+='<tr><td colspan="6" style="text-align:center;color:var(--grey)">No centres match your search.</td></tr>';
   document.getElementById("psTable").innerHTML=html;
 }
 renderPSCentres();
@@ -1810,11 +1852,12 @@ function drawCentreTable(){
   if(tf==="pm") list=list.filter(c=>c.proMax);
   if(tf==="pmOnly") list=list.filter(c=>!c.proMax);
   const cell=v=>'<td class="'+(v?'ok':'no')+'">'+(v?'\u2713 Live':'\u2715 Not Live')+'</td>';
-  let html="<tr><th style='text-align:left'>Centre</th><th>MIP Basic</th><th>MIP PRO</th><th>MIP Pro Max</th></tr>";
+  let html="<tr><th style='text-align:left'>Centre</th><th>MIP Basic</th><th>MIP PRO</th><th>MIP Pro Max</th><th>pw.live</th></tr>";
   list.forEach(c=>{
-    html+="<tr><td style='text-align:left'>"+c.name+"</td>"+cell(c.basicPro)+cell(c.basicPro)+cell(c.proMax)+"</tr>";
+    html+="<tr><td style='text-align:left'>"+c.name+"</td>"+cell(c.basicPro)+cell(c.basicPro)+cell(c.proMax)+
+      "<td><a class='pwmini' href='"+pwCentreSearch(c.name)+"' target='_blank' rel='noopener'>Look up \u2197</a></td></tr>";
   });
-  if(!list.length) html+='<tr><td colspan="4" style="text-align:center;color:var(--grey)">No centres match your search.</td></tr>';
+  if(!list.length) html+='<tr><td colspan="5" style="text-align:center;color:var(--grey)">No centres match your search.</td></tr>';
   document.getElementById("centreTable").innerHTML=html;
 }
 renderCentres();
