@@ -248,7 +248,7 @@
     <h1>MIP with RTS — Counsellor Console</h1>
     <div class="sub">Marks Improvement Program · Offline Test Series · AY 2026-27 · PW Vidyapeeth</div>
   </div>
-  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="badge">Starting @ ₹3,999* · Prices incl. GST · Same for VP &amp; PS</span><a class="sheetlink" href="https://docs.google.com/spreadsheets/d/1JDC-VWvDG6aPZgjkBjiPx-TiMDzJQuXAO0RSfE1-2dU/edit?gid=234264653#gid=234264653" target="_blank" rel="noopener">Open live planner sheet ↗</a><a class="sheetlink" href="https://script.google.com/a/macros/pw.live/s/AKfycbwJWQOGyKvrCBVSHTfru9vmKMhcmsyetPzThgZj7nVG2BkC2Il4FMrhbFiFqoglQNtP/exec" target="_blank" rel="noopener">PW Test Schedule Console ↗</a></div>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="badge">Starting @ ₹3,999* · Prices incl. GST · Same for VP &amp; PS</span><a class="sheetlink" href="https://docs.google.com/spreadsheets/d/1JDC-VWvDG6aPZgjkBjiPx-TiMDzJQuXAO0RSfE1-2dU/edit?gid=234264653#gid=234264653" target="_blank" rel="noopener">Open live planner sheet ↗</a><a class="sheetlink" href="https://script.google.com/a/macros/pw.live/s/AKfycbyGpesKOLdHhXC--17YlXbfPqBDOC1gaUF_OGmEpaaE5cwlswjOYWKhD0QC_lDEAsHr/exec" target="_blank" rel="noopener">PW Test Schedule Console ↗</a></div>
 </header>
 
 <div class="wrap">
@@ -341,7 +341,7 @@
     <div class="note" style="margin:-4px 0 10px">The planner is the same for Vidyapeeth and Pathshala. Dates and syllabus come from the academic team's live sheet &mdash;
       <a href="https://docs.google.com/spreadsheets/d/1JDC-VWvDG6aPZgjkBjiPx-TiMDzJQuXAO0RSfE1-2dU/edit?gid=234264653#gid=234264653" target="_blank" rel="noopener" style="color:var(--pro);font-weight:600">open the live sheet &#8599;</a>
       to confirm before you commit a date to a parent. You can also open the
-      <a href="https://script.google.com/a/macros/pw.live/s/AKfycbwJWQOGyKvrCBVSHTfru9vmKMhcmsyetPzThgZj7nVG2BkC2Il4FMrhbFiFqoglQNtP/exec" target="_blank" rel="noopener" style="color:var(--pro);font-weight:600">PW Test Schedule Console &#8599;</a>
+      <a href="https://script.google.com/a/macros/pw.live/s/AKfycbyGpesKOLdHhXC--17YlXbfPqBDOC1gaUF_OGmEpaaE5cwlswjOYWKhD0QC_lDEAsHr/exec" target="_blank" rel="noopener" style="color:var(--pro);font-weight:600">PW Test Schedule Console &#8599;</a>
       (pw.live sign-in required) for the academic team's own live view.</div>
     <div style="margin:-4px 0 12px"><span class="plstatus snap">Snapshot</span></div>
     <div class="chips" id="plChips"></div>
@@ -360,7 +360,7 @@
 
 <footer>Version <span class="buildstamp">—</span> &middot; Internal counselling aid &middot; Sources: MIP AY 26-27 Final Counselling Deck &middot; MIP Counsellor Handbook AY 26-27 (test counts &amp; features) &middot; PS MIP Batch Listing AY 26-27 &middot; MIP Targets AY26-27 (Final centers) &middot; MIP Planner 2026-2027<br>
 Planner data is read from the academic team's sheet when a live feed is configured, otherwise from the built-in snapshot &mdash;
-<a href="https://docs.google.com/spreadsheets/d/1JDC-VWvDG6aPZgjkBjiPx-TiMDzJQuXAO0RSfE1-2dU/edit?gid=234264653#gid=234264653" target="_blank" rel="noopener" style="color:var(--pro);font-weight:600">check the live planner sheet</a> or the <a href="https://script.google.com/a/macros/pw.live/s/AKfycbwJWQOGyKvrCBVSHTfru9vmKMhcmsyetPzThgZj7nVG2BkC2Il4FMrhbFiFqoglQNtP/exec" target="_blank" rel="noopener" style="color:var(--pro);font-weight:600">PW Test Schedule Console</a> before committing a date to a parent.</footer>
+<a href="https://docs.google.com/spreadsheets/d/1JDC-VWvDG6aPZgjkBjiPx-TiMDzJQuXAO0RSfE1-2dU/edit?gid=234264653#gid=234264653" target="_blank" rel="noopener" style="color:var(--pro);font-weight:600">check the live planner sheet</a> or the <a href="https://script.google.com/a/macros/pw.live/s/AKfycbyGpesKOLdHhXC--17YlXbfPqBDOC1gaUF_OGmEpaaE5cwlswjOYWKhD0QC_lDEAsHr/exec" target="_blank" rel="noopener" style="color:var(--pro);font-weight:600">PW Test Schedule Console</a> before committing a date to a parent.</footer>
 <div class="updatebar" id="updateBar">
   <span>A newer version of this tool has been published.</span>
   <button onclick="location.reload(true)">Reload now</button>
@@ -484,7 +484,9 @@ const COHORTS = {
 };
 
 /* =====================================================================
-   PLAN-WISE TEST BREAKDOWN  \u2014  Source: MIP test-count table (AY 26-27)
+   PLAN-WISE TEST BREAKDOWN \u2014 Sources: MIP test-count table (AY 26-27),
+   overridden where the live Dashboard tab (updated 22 Aug 2026) differs.
+   {total:N} = dashboard total; type-wise split awaited from the academic team.
    PLAN_COUNTS[cohort][plan] = [ [testType, count], ... ]
    Reproduced exactly as supplied; "\u2014" columns are simply omitted.
    Totals are computed from these rows, so nothing can drift out of step.
@@ -508,12 +510,12 @@ const PLAN_COUNTS = {
   "11-NEET": [
     [["Batch",4],["Ranker",0],["AITS",6],["Mastery",0]],
     [["Batch",4],["Ranker",0],["AITS",6],["Mastery",4]],
-    [["Batch",4],["Ranker",3],["PreAITS",3],["AITS",6],["RTS",0],["Mastery",4]]
+    {total:17}
   ],
   "12-NEET": [
-    [["Batch",4],["Ranker",0],["AITS",10],["Mastery",0]],
+    {total:16},
     [["Batch",4],["Ranker",0],["AITS",12],["Mastery",4]],
-    [["Batch",4],["Ranker",1],["PreAITS",0],["AITS",12],["RTS",0],["Mastery",4]]
+    {total:27}
   ],
   "dr-NEET": [
     [["Batch",9],["Ranker",0],["AITS",11],["Mastery",0]],
@@ -532,13 +534,15 @@ const HINDI_COUNTS = [
 const TYPE_LABEL = {Batch:"Batch Test", AITS:"AITS", Ranker:"Rank Booster Test", RTS:"RTS \u2014 Real Test", PreAITS:"Pre-AITS", Mastery:"VP Mastery"};
 const TYPE_SHORT = TYPE_LABEL;
 
-const planTotal = rows => rows.reduce((a,r)=>a+r[1],0);
+const planTotal = rows => Array.isArray(rows) ? rows.reduce((a,r)=>a+r[1],0) : rows.total;
 
 const VP_TIER_TOTALS = (()=>{
   const o={};
   for(const k in PLAN_COUNTS){
     o[k]={ totals: PLAN_COUNTS[k].map(planTotal),
-           breakdown: PLAN_COUNTS[k].map(rows=>rows.filter(r=>r[1]>0).map(r=>TYPE_SHORT[r[0]]+" "+r[1]).join(" + ")) };
+           breakdown: PLAN_COUNTS[k].map(rows=>Array.isArray(rows)
+             ? rows.filter(r=>r[1]>0).map(r=>TYPE_SHORT[r[0]]+" "+r[1]).join(" + ")
+             : "Total as per live dashboard (22 Aug 2026) \u2014 type-wise split awaited") };
   }
   return o;
 })();
@@ -552,11 +556,15 @@ function renderPlanCounts(key, ti, tableId, labelId, noteId, isPS){
   const planName=["MIP Basic","MIP PRO","MIP Pro Max"][ti];
   const label=(key.startsWith("11")?"11th ":key.startsWith("12")?"12th ":"Dropper ")+(key.endsWith("JEE")?"JEE":"NEET");
   let html='<tr><th style="text-align:left">Test Type</th><th>No. of Tests</th></tr>';
-  rows.forEach(([t,n])=>{
-    if(n===0) return;
-    const lab=isPS?psify(TYPE_LABEL[t]):TYPE_LABEL[t];
-    html+='<tr><td style="text-align:left">'+lab+'</td><td style="font-weight:bold">'+n+'</td></tr>';
-  });
+  if(Array.isArray(rows)){
+    rows.forEach(([t,n])=>{
+      if(n===0) return;
+      const lab=isPS?psify(TYPE_LABEL[t]):TYPE_LABEL[t];
+      html+='<tr><td style="text-align:left">'+lab+'</td><td style="font-weight:bold">'+n+'</td></tr>';
+    });
+  } else {
+    html+='<tr><td style="text-align:left;color:#92600B">Type-wise split awaited from the academic team \u2014 total as per the live dashboard (22 Aug 2026).</td><td style="color:#9ca3af">\u2014</td></tr>';
+  }
   html+='<tr class="total"><td style="text-align:left">Total tests in '+planName+'</td><td>'+planTotal(rows)+'</td></tr>';
   document.getElementById(tableId).innerHTML=html;
   document.getElementById(labelId).textContent=label+" \u00B7 "+planName;
@@ -1357,9 +1365,19 @@ function renderBatchTable(){
    Snapshot taken 18 Aug 2026. Batch datasets keyed by online batch name.
    ===================================================================== */
 const CC=" (Complete Chapter)";
+/* Next-known tests from the live Dashboard tab (22 Aug 2026) for the two
+   batches whose full schedules are not yet in the sheet snapshot. */
+const DASHBOARD_ONLY=[
+{name:"Lakshya JEE 2.0 2027",subs:["Physics","Chemistry","Maths"],
+ note:"Only the next test is known from the live dashboard \u2014 full schedule awaited in the planner sheet. VP Mastery: 6 tests, November\u2013April.",
+ tests:[{d:"2026-09-06",n:"JEE Main-3",b:"Lakshya JEE 2.0 2027",tt:"",p:"JEE Main",m:"",s:["Syllabus as per the live planner sheet","",""]}]},
+{name:"Prayas JEE 2.0 2027",subs:["Physics","Chemistry","Maths"],
+ note:"Only the next test is known from the live dashboard (batch listed there as Prayas 2.0 2027) \u2014 full schedule awaited. VP Mastery: 6 tests, November\u2013April.",
+ tests:[{d:"2026-09-06",n:"JEE Main-4",b:"Prayas 2.0 2027",tt:"",p:"JEE Main",m:"",s:["Syllabus as per the live planner sheet","",""]}]}
+];
 const D=[
 {name:"Arjuna JEE 2.0 2027",subs:["Physics","Chemistry","Maths"],note:"",tests:[
-{d:"2026-08-30",n:"AITS-2",b:"Arjuna JEE 2.0 2027",tt:"Part Test",p:"Advanced",m:"CBT",s:["Mathematical Tools","Structure of Atom","Basic Maths"]},
+{d:"2026-08-30",n:"AITS-2",b:"Arjuna JEE 2.0 2027",tt:"Part Test",p:"JEE Advanced",m:"OMR",s:["Mathematical Tools","Structure of Atom","Basic Maths"]},
 {d:"2026-09-13",n:"JEE Main-3",b:"Arjuna JEE 2.0 2027",tt:"Part Test",p:"JEE Main",m:"",s:["Motion in a Straight Line"+CC+" · Scalars and Vectors"+CC,"Structure of Atom"+CC+" · Classification of Elements and Periodicity in Properties"+CC,"Quadratic Equations"+CC+" · Trigonometric Functions"+CC]},
 {d:"2026-09-27",n:"JEE Main-4",b:"Arjuna JEE 2.0 2027",tt:"Part Test",p:"JEE Main",m:"",s:["Motion in a Plane"+CC,"Classification of Elements and Periodicity in Properties"+CC,"Trigonometric Equation"+CC]},
 {d:"2026-10-04",n:"AITS-3",b:"Arjuna JEE 2.0 2027",tt:"Part Test",p:"Main",m:"CBT",s:["Units and Measurements · Motion in a Straight Line · + 30% Questions from cumulative syllabus of previously conducted all JEE Main AITS tests","Some Basic Concepts of Chemistry · Classification of Elements and Periodicity in Properties · + 30% cumulative (JEE Main AITS)","Sets · Quadratic Equations · + 30% cumulative (JEE Main AITS)"]},
@@ -1491,7 +1509,7 @@ const D=[
 let batchIdx=0, monthSel="all", showPast=false, q="";
 
 const PLANNER_SHEET_URL="https://docs.google.com/spreadsheets/d/1JDC-VWvDG6aPZgjkBjiPx-TiMDzJQuXAO0RSfE1-2dU/edit?gid=234264653#gid=234264653";
-let PLANNER_SNAPSHOT="18 Aug 2026";
+let PLANNER_SNAPSHOT="22 Aug 2026 (sheet 18 Aug + dashboard 22 Aug)";
 
 /* =====================================================================
    LIVE PLANNER FEED
@@ -1558,7 +1576,7 @@ const PLANNER_TABS=[
   ["dr-NEET","Dropper NEET","Yakeen NEET 2.0 2027"],
   ["dr-NEET-HI","NEET Dropper (Hindi)","Yakeen NEET Hindi 2.0 2027"]
 ];
-const BATCH_DATA={}; D.forEach(b=>BATCH_DATA[b.name]=b);
+const BATCH_DATA={}; D.forEach(b=>BATCH_DATA[b.name]=b); DASHBOARD_ONLY.forEach(b=>BATCH_DATA[b.name]=b);
 
 /* Category drives plan filtering and colour */
 function testCat(t){
@@ -1593,7 +1611,7 @@ function buildPlannerTabs(){
     const has=!!BATCH_DATA[batch];
     return '<div class="chip '+(k.includes("JEE")?"jee":"neet")+(k===PL_KEY?" active":"")+'" data-plk="'+k+'" tabindex="0" '+
       'onclick="setPlannerCohort(\''+k+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();setPlannerCohort(\''+k+'\')}">'+
-      lbl+'<small>'+batch+(has?'':' \u00b7 not in sheet yet')+'</small></div>';
+      lbl+'<small>'+batch+(has?'':' \u00b7 no data yet')+'</small></div>';
   }).join("");
 }
 function setPlannerCohort(k){
@@ -1700,7 +1718,7 @@ function renderCountMatrix(){
     MATRIX_ROWS[g].forEach(([label,key])=>{
       const counts = key==="HINDI" ? HINDI_COUNTS : PLAN_COUNTS[key];
       ["MIP Basic","MIP PRO","MIP Pro Max"].forEach((pn,ti)=>{
-        const map={}; counts[ti].forEach(([t,n])=>map[t]=n);
+        const map={}; if(Array.isArray(counts[ti])) counts[ti].forEach(([t,n])=>map[t]=n);
         const accent=["var(--basic)","var(--pro)","var(--promax)"][ti];
         h+='<tr>'+(ti===0?'<td rowspan="3" style="text-align:left;font-weight:700">'+label+'</td>':'')+
           '<td style="font-weight:700;color:'+accent+'">'+pn+'</td>'+
@@ -1726,7 +1744,7 @@ function renderCountMatrix(){
    the server whether this file has changed. If it has, a bar appears at the
    bottom offering a reload. It never reloads on its own mid-conversation.
    ===================================================================== */
-const BUILD_STAMP = "19 Aug 2026";      // shown in the footer
+const BUILD_STAMP = "22 Aug 2026";      // shown in the footer
 const UPDATE_CHECK_MINUTES = 5;
 let PAGE_TAG = null;
 
