@@ -248,7 +248,7 @@
     <h1>MIP with RTS — Counsellor Console</h1>
     <div class="sub">Marks Improvement Program · Offline Test Series · AY 2026-27 · PW Vidyapeeth</div>
   </div>
-  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="badge">Starting @ ₹3,999* · Prices incl. GST · Same for VP &amp; PS</span><a class="sheetlink" href="https://docs.google.com/spreadsheets/d/1JDC-VWvDG6aPZgjkBjiPx-TiMDzJQuXAO0RSfE1-2dU/edit?gid=234264653#gid=234264653" target="_blank" rel="noopener">Open live planner sheet ↗</a></div>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="badge">Starting @ ₹3,999* · Prices incl. GST · Same for VP &amp; PS</span><a class="sheetlink" href="https://docs.google.com/spreadsheets/d/1JDC-VWvDG6aPZgjkBjiPx-TiMDzJQuXAO0RSfE1-2dU/edit?gid=234264653#gid=234264653" target="_blank" rel="noopener">Open live planner sheet ↗</a><a class="sheetlink" href="https://script.google.com/a/macros/pw.live/s/AKfycbwJWQOGyKvrCBVSHTfru9vmKMhcmsyetPzThgZj7nVG2BkC2Il4FMrhbFiFqoglQNtP/exec" target="_blank" rel="noopener">PW Test Schedule Console ↗</a></div>
 </header>
 
 <div class="wrap">
@@ -340,7 +340,9 @@
     <h2 class="sec">Test Planner — pick the class</h2>
     <div class="note" style="margin:-4px 0 10px">The planner is the same for Vidyapeeth and Pathshala. Dates and syllabus come from the academic team's live sheet &mdash;
       <a href="https://docs.google.com/spreadsheets/d/1JDC-VWvDG6aPZgjkBjiPx-TiMDzJQuXAO0RSfE1-2dU/edit?gid=234264653#gid=234264653" target="_blank" rel="noopener" style="color:var(--pro);font-weight:600">open the live sheet &#8599;</a>
-      to confirm before you commit a date to a parent.</div>
+      to confirm before you commit a date to a parent. You can also open the
+      <a href="https://script.google.com/a/macros/pw.live/s/AKfycbwJWQOGyKvrCBVSHTfru9vmKMhcmsyetPzThgZj7nVG2BkC2Il4FMrhbFiFqoglQNtP/exec" target="_blank" rel="noopener" style="color:var(--pro);font-weight:600">PW Test Schedule Console &#8599;</a>
+      (pw.live sign-in required) for the academic team's own live view.</div>
     <div style="margin:-4px 0 12px"><span class="plstatus snap">Snapshot</span></div>
     <div class="chips" id="plChips"></div>
     <div id="plSpot"></div>
@@ -358,7 +360,7 @@
 
 <footer>Version <span class="buildstamp">—</span> &middot; Internal counselling aid &middot; Sources: MIP AY 26-27 Final Counselling Deck &middot; MIP Counsellor Handbook AY 26-27 (test counts &amp; features) &middot; PS MIP Batch Listing AY 26-27 &middot; MIP Targets AY26-27 (Final centers) &middot; MIP Planner 2026-2027<br>
 Planner data is read from the academic team's sheet when a live feed is configured, otherwise from the built-in snapshot &mdash;
-<a href="https://docs.google.com/spreadsheets/d/1JDC-VWvDG6aPZgjkBjiPx-TiMDzJQuXAO0RSfE1-2dU/edit?gid=234264653#gid=234264653" target="_blank" rel="noopener" style="color:var(--pro);font-weight:600">check the live planner sheet</a> before committing a date to a parent.</footer>
+<a href="https://docs.google.com/spreadsheets/d/1JDC-VWvDG6aPZgjkBjiPx-TiMDzJQuXAO0RSfE1-2dU/edit?gid=234264653#gid=234264653" target="_blank" rel="noopener" style="color:var(--pro);font-weight:600">check the live planner sheet</a> or the <a href="https://script.google.com/a/macros/pw.live/s/AKfycbwJWQOGyKvrCBVSHTfru9vmKMhcmsyetPzThgZj7nVG2BkC2Il4FMrhbFiFqoglQNtP/exec" target="_blank" rel="noopener" style="color:var(--pro);font-weight:600">PW Test Schedule Console</a> before committing a date to a parent.</footer>
 <div class="updatebar" id="updateBar">
   <span>A newer version of this tool has been published.</span>
   <button onclick="location.reload(true)">Reload now</button>
@@ -482,70 +484,87 @@ const COHORTS = {
 };
 
 /* =====================================================================
-   PLAN-WISE TEST BREAKDOWN
-   Type totals: MIP Counsellor Handbook AY 26-27 (Section 4).
-   Part/Full split: MIP planner. Every split below sums to the handbook total.
-   [part, full, total]; null = split not stated in source.
+   PLAN-WISE TEST BREAKDOWN  \u2014  Source: MIP test-count table (AY 26-27)
+   PLAN_COUNTS[cohort][plan] = [ [testType, count], ... ]
+   Reproduced exactly as supplied; "\u2014" columns are simply omitted.
+   Totals are computed from these rows, so nothing can drift out of step.
    ===================================================================== */
-const TEST_SPLITS = {
-  "11-JEE":  {Batch:[6,0,6],   AITS:[7,1,8],   RTS:[2,2,4], Mastery:[null,null,0]},
-  "12-JEE":  {Batch:[8,1,9],   AITS:[5,12,17], RTS:[0,4,4], Mastery:[null,null,6]},
-  "dr-JEE":  {Batch:[6,1,7],   AITS:[6,9,15],  RTS:[0,4,4], Mastery:[null,null,6]},
-  "11-NEET": {Batch:[3,1,4],   AITS:[5,1,6],   Ranker:[2,1,3], RTS:[2,2,4], Mastery:[0,0,0]},
-  "12-NEET": {Batch:[4,0,4],   AITS:[6,6,12],  Ranker:[1,0,1], RTS:[1,3,4], Mastery:[3,3,6]},
-  "dr-NEET": {Batch:[7,2,9],   AITS:[7,4,11],  Ranker:[4,0,4], RTS:[1,3,4], Mastery:[3,3,6]}
+const PLAN_COUNTS = {
+  "11-JEE": [
+    [["Batch",8],["AITS",9]],
+    [["Batch",5],["AITS",8],["RTS",4]],
+    [["Batch",5],["AITS",8],["RTS",4],["Mastery",0]]
+  ],
+  "12-JEE": [
+    [["Batch",7],["AITS",19]],
+    [["Batch",7],["AITS",17],["RTS",4]],
+    [["Batch",7],["AITS",17],["RTS",4],["Mastery",6]]
+  ],
+  "dr-JEE": [
+    [["Batch",6],["AITS",19]],
+    [["Batch",6],["AITS",15],["RTS",4]],
+    [["Batch",6],["AITS",15],["RTS",4],["Mastery",6]]
+  ],
+  "11-NEET": [
+    [["Batch",4],["Ranker",0],["AITS",6],["Mastery",0]],
+    [["Batch",4],["Ranker",0],["AITS",6],["Mastery",4]],
+    [["Batch",4],["Ranker",3],["PreAITS",3],["AITS",6],["RTS",0],["Mastery",4]]
+  ],
+  "12-NEET": [
+    [["Batch",4],["Ranker",0],["AITS",10],["Mastery",0]],
+    [["Batch",4],["Ranker",0],["AITS",12],["Mastery",4]],
+    [["Batch",4],["Ranker",1],["PreAITS",0],["AITS",12],["RTS",0],["Mastery",4]]
+  ],
+  "dr-NEET": [
+    [["Batch",9],["Ranker",0],["AITS",11],["Mastery",0]],
+    [["Batch",9],["Ranker",0],["AITS",11],["Mastery",4]],
+    [["Batch",9],["Ranker",4],["PreAITS",5],["AITS",11],["RTS",4],["Mastery",6]]
+  ]
 };
 
-const PLAN_TYPES = {
-  "11-JEE":  [["Batch","AITS"],["Batch","AITS","RTS"],["Batch","AITS","RTS"]],
-  "12-JEE":  [["Batch","AITS"],["Batch","AITS","RTS"],["Batch","AITS","RTS","Mastery"]],
-  "dr-JEE":  [["Batch","AITS"],["Batch","AITS","RTS"],["Batch","AITS","RTS","Mastery"]],
-  "11-NEET": [["Batch","Ranker","AITS"],["Batch","Ranker","AITS","RTS"],["Batch","Ranker","AITS","RTS"]],
-  "12-NEET": [["Batch","Ranker","AITS"],["Batch","Ranker","AITS","RTS"],["Batch","Ranker","AITS","RTS","Mastery"]],
-  "dr-NEET": [["Batch","Ranker","AITS"],["Batch","Ranker","AITS","RTS"],["Batch","Ranker","AITS","RTS","Mastery"]]
-};
+/* Yakeen Hindi 2.0 (NEET Dropper Hindi) */
+const HINDI_COUNTS = [
+  [["Batch",10],["Ranker",0],["AITS",11],["Mastery",0]],
+  [["Batch",10],["Ranker",0],["AITS",11],["Mastery",4]],
+  [["Batch",10],["Ranker",3],["PreAITS",0],["AITS",11],["RTS",4],["Mastery",6]]
+];
 
-const TYPE_LABEL = {Batch:"Batch Test", AITS:"AITS (incl. 2 Maha for 12th & Dropper)", Ranker:"Rank Booster / Ranker Test", RTS:"RTS \u2014 Real Test (CBT mode)", Mastery:"VP Mastery Test"};
+const TYPE_LABEL = {Batch:"Batch Test", AITS:"AITS", Ranker:"Rank Booster Test", RTS:"RTS \u2014 Real Test", PreAITS:"Pre-AITS", Mastery:"VP Mastery"};
+const TYPE_SHORT = TYPE_LABEL;
+
+const planTotal = rows => rows.reduce((a,r)=>a+r[1],0);
+
+const VP_TIER_TOTALS = (()=>{
+  const o={};
+  for(const k in PLAN_COUNTS){
+    o[k]={ totals: PLAN_COUNTS[k].map(planTotal),
+           breakdown: PLAN_COUNTS[k].map(rows=>rows.filter(r=>r[1]>0).map(r=>TYPE_SHORT[r[0]]+" "+r[1]).join(" + ")) };
+  }
+  return o;
+})();
+const HINDI_TOTALS={totals:HINDI_COUNTS.map(planTotal)};
 
 /* Pathshala wording: the same test series is branded "PS Mastery" in PS */
 const psify = t => String(t).replace(/VP Mastery/g,"PS Mastery");
 
 function renderPlanCounts(key, ti, tableId, labelId, noteId, isPS){
-  const sp=TEST_SPLITS[key], types=PLAN_TYPES[key][ti], vt=VP_TIER_TOTALS[key];
+  const rows=PLAN_COUNTS[key][ti];
   const planName=["MIP Basic","MIP PRO","MIP Pro Max"][ti];
   const label=(key.startsWith("11")?"11th ":key.startsWith("12")?"12th ":"Dropper ")+(key.endsWith("JEE")?"JEE":"NEET");
-  const cell=v=>v===null?'<td style="color:#9ca3af">\u2014</td>':'<td>'+v+'</td>';
-  let derived=0, hasNull=false;
-  let html='<tr><th style="text-align:left">Test Type</th><th>Part Test</th><th>Full Syllabus Test</th><th>Total</th></tr>';
-  types.forEach(t=>{
-    const [pt,ft,tot]=sp[t];
-    if(tot===0) return;
-    derived+=tot; if(pt===null) hasNull=true;
+  let html='<tr><th style="text-align:left">Test Type</th><th>No. of Tests</th></tr>';
+  rows.forEach(([t,n])=>{
+    if(n===0) return;
     const lab=isPS?psify(TYPE_LABEL[t]):TYPE_LABEL[t];
-    html+='<tr><td style="text-align:left">'+lab+'</td>'+cell(pt)+cell(ft)+'<td style="font-weight:bold">'+tot+'</td></tr>';
+    html+='<tr><td style="text-align:left">'+lab+'</td><td style="font-weight:bold">'+n+'</td></tr>';
   });
-  html+='<tr class="total"><td style="text-align:left">Total tests in '+planName+'</td><td colspan="2" style="color:#6b7280">'+
-        (hasNull?'part/full split not stated for all types':'')+'</td><td>'+vt.totals[ti]+'</td></tr>';
+  html+='<tr class="total"><td style="text-align:left">Total tests in '+planName+'</td><td>'+planTotal(rows)+'</td></tr>';
   document.getElementById(tableId).innerHTML=html;
   document.getElementById(labelId).textContent=label+" \u00B7 "+planName;
-  const hindi=(key==="dr-NEET")?' Yakeen Hindi 2.0 (NEET Dropper Hindi): '+HINDI_TOTALS.totals[ti]+' tests in this plan \u2014 10 Batch Tests and 3 Rank Booster tests, after the 23 Aug cancellation.':'';
+  const hindi=(key==="dr-NEET")
+    ? ' Yakeen Hindi 2.0 (NEET Dropper Hindi): '+HINDI_TOTALS.totals[ti]+' tests in this plan.' : '';
   document.getElementById(noteId).innerHTML=
-    'Showing only the tests included in <b>'+planName+'</b>. Click another plan card above to switch. Totals as per MIP Counsellor Handbook AY 26-27; Part/Full split as per the MIP planner.'+hindi+
-    (derived!==vt.totals[ti]?' <span style="color:#b45309"><b>Note:</b> the listed test types add up to '+derived+', while the source states '+vt.totals[ti]+' \u2014 pending confirmation.</span>':'');
+    'Showing only the tests included in <b>'+planName+'</b>. Click another plan card above to switch. Counts as per the MIP test-count table (AY 26-27).'+hindi;
 }
-
-/* VP & PS tier-wise test totals \u2014 Source: "MIP Handbook - AY 26-27.docx", Section 4.
-   Every total below is verified to equal the sum of its own test-type breakdown. */
-const VP_TIER_TOTALS = {
-  "11-JEE": {totals:[14,18,18], breakdown:["Batch Test 6 + AITS 8","Batch Test 6 + AITS 8 + RTS 4","Batch Test 6 + AITS 8 + RTS 4"]},
-  "12-JEE": {totals:[26,30,36], breakdown:["Batch Test 9 + AITS 17","Batch Test 9 + AITS 17 + RTS 4","Batch Test 9 + AITS 17 + RTS 4 + VP Mastery 6"]},
-  "dr-JEE": {totals:[22,26,32], breakdown:["Batch Test 7 + AITS 15","Batch Test 7 + AITS 15 + RTS 4","Batch Test 7 + AITS 15 + RTS 4 + VP Mastery 6"]},
-  "11-NEET": {totals:[13,17,17], breakdown:["Batch Test 4 + Rank Booster 3 + AITS 6","Batch Test 4 + Rank Booster 3 + AITS 6 + Real Test 4","Batch Test 4 + Rank Booster 3 + AITS 6 + Real Test 4"]},
-  "12-NEET": {totals:[17,21,27], breakdown:["Batch Test 4 + Rank Booster 1 + AITS 12","Batch Test 4 + Rank Booster 1 + AITS 12 + Real Test 4","Batch Test 4 + Rank Booster 1 + AITS 12 + Real Test 4 + VP Mastery 6"]},
-  "dr-NEET": {totals:[24,28,34], breakdown:["Batch Test 9 + Rank Booster 4 + AITS 11","Batch Test 9 + Rank Booster 4 + AITS 11 + Real Test 4","Batch Test 9 + Rank Booster 4 + AITS 11 + Real Test 4 + VP Mastery 6"]}
-};
-/* Yakeen Hindi 2.0 (NEET Dropper Hindi) runs one extra Batch Test */
-const HINDI_TOTALS={totals:[24,28,34]};
 
 /* Test counts — exactly as printed in the deck */
 const JEE_COUNTS = {
@@ -1662,48 +1681,37 @@ function showView(v){
 }
 
 /* =====================================================================
-   MASTER TEST-COUNT MATRIX \u2014 MIP Counsellor Handbook AY 26-27, Section 4.
-   [row label, Batch, Ranker, AITS, RealTest, VPMastery, Basic, PRO, ProMax]
-   Ranker column is "\u2014" for JEE: the JEE tables in Section 4 do not list it.
+   MASTER TEST-COUNT MATRIX \u2014 derived from PLAN_COUNTS, so it can never
+   disagree with the plan cards or the plan-wise breakdown tables.
    ===================================================================== */
-const COUNT_MATRIX = {
-  NEET: {
-    head: "NEET \u2014 by test planner",
-    rows: [
-      ["11th NEET MIP-English", 4, 3, 6, 4, 0, 13, 17, 17],
-      ["12th NEET MIP-English", 4, 1, 12, 4, 6, 17, 21, 27],
-      ["Yakeen 2.0 / Dropper MIP-English", 9, 4, 11, 4, 6, 24, 28, 34],
-      ["Yakeen Hindi 2.0", 10, 3, 11, 4, 6, 24, 28, 34]
-    ]
-  },
-  JEE: {
-    head: "JEE \u2014 by class",
-    rows: [
-      ["11th JEE", 6, null, 8, 4, 0, 14, 18, 18],
-      ["12th JEE", 9, null, 17, 4, 6, 26, 30, 36],
-      ["Dropper JEE", 7, null, 15, 4, 6, 22, 26, 32]
-    ]
-  }
+const MATRIX_ROWS = {
+  NEET: [["11th NEET MIP-English","11-NEET"],["12th NEET MIP-English","12-NEET"],
+         ["Yakeen 2.0 / Dropper MIP-English","dr-NEET"],["Yakeen Hindi 2.0","HINDI"]],
+  JEE:  [["11th JEE MIP","11-JEE"],["12th JEE MIP","12-JEE"],["Dropper JEE MIP","dr-JEE"]]
 };
+const MATRIX_TYPES = ["Batch","Ranker","PreAITS","AITS","RTS","Mastery"];
 
 function renderCountMatrix(){
-  const cell=v=>v===null?'<td style="color:#9ca3af">\u2014</td>':'<td>'+v+'</td>';
-  const tbl=g=>{
-    const m=COUNT_MATRIX[g];
+  const tbl=(g,head)=>{
     let h='<div style="overflow-x:auto;margin-bottom:16px"><table>'+
-      '<tr><th style="text-align:left">'+m.head+'</th><th>Batch Test</th><th>Rank Booster</th><th>AITS</th><th>Real Test</th><th>VP Mastery</th>'+
-      '<th style="background:var(--basic)">MIP Basic</th><th style="background:var(--pro)">MIP PRO</th><th style="background:var(--promax)">MIP Pro Max</th></tr>';
-    m.rows.forEach(r=>{
-      h+='<tr><td style="text-align:left">'+r[0]+'</td>'+cell(r[1])+cell(r[2])+cell(r[3])+cell(r[4])+cell(r[5])+
-        '<td style="font-weight:800;color:var(--basic);background:color-mix(in srgb,var(--basic) 9%,#fff)">'+r[6]+'</td>'+
-        '<td style="font-weight:800;color:var(--pro);background:color-mix(in srgb,var(--pro) 9%,#fff)">'+r[7]+'</td>'+
-        '<td style="font-weight:800;color:var(--promax);background:color-mix(in srgb,var(--promax) 11%,#fff)">'+r[8]+'</td></tr>';
+      '<tr><th style="text-align:left">'+head+'</th><th>Plan</th>'+
+      MATRIX_TYPES.map(t=>'<th>'+TYPE_LABEL[t]+'</th>').join('')+
+      '<th style="background:var(--gold);color:#221703">Overall Total</th></tr>';
+    MATRIX_ROWS[g].forEach(([label,key])=>{
+      const counts = key==="HINDI" ? HINDI_COUNTS : PLAN_COUNTS[key];
+      ["MIP Basic","MIP PRO","MIP Pro Max"].forEach((pn,ti)=>{
+        const map={}; counts[ti].forEach(([t,n])=>map[t]=n);
+        const accent=["var(--basic)","var(--pro)","var(--promax)"][ti];
+        h+='<tr>'+(ti===0?'<td rowspan="3" style="text-align:left;font-weight:700">'+label+'</td>':'')+
+          '<td style="font-weight:700;color:'+accent+'">'+pn+'</td>'+
+          MATRIX_TYPES.map(t=>map[t]===undefined?'<td style="color:#9ca3af">\u2014</td>':'<td>'+map[t]+'</td>').join('')+
+          '<td style="font-weight:800;color:'+accent+';background:color-mix(in srgb,'+accent+' 10%,#fff)">'+planTotal(counts[ti])+'</td></tr>';
+      });
     });
     return h+'</table></div>';
   };
-  const html=tbl("NEET")+tbl("JEE")+
-    '<div class="note">Real Test (RTS) counts only in PRO and Pro Max. VP Mastery counts only in Pro Max, and applies to Class 12 &amp; Droppers only. '+
-    'AITS totals include the 2 Maha tests for Class 12 &amp; Droppers. The JEE tables in Section 4 do not list a Rank Booster column. '+'<b>Update:</b> the 23 Aug 2026 tests were cancelled \u2014 11th JEE AITS-1, 12th NEET Rank Booster Test-1 and Yakeen Hindi 2.0 Rank Booster Test-1 \u2014 so those counts are one lower than Handbook Section 4.</div>';
+  const html=tbl("NEET","NEET \u2014 by test planner")+tbl("JEE","JEE \u2014 by class")+
+    '<div class="note">Every figure comes from the MIP test-count table (AY 26-27). The plan cards, the plan-wise tables and this matrix are all generated from the same data, so they always agree. A dash means the column does not apply to that plan.</div>';
   const vpM=document.querySelector("#vpIntro .matrixholder");
   const psM=document.querySelector("#psIntro .matrixholder");
   if(vpM) vpM.innerHTML=html;
