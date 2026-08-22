@@ -273,6 +273,7 @@
       <div class="tiers" id="psTiers"></div>
       <div id="psNextStrip"></div>
       <div class="pwrow" id="psPwLinks"></div>
+      <div id="psHindiSec" class="hidden"></div>
 
       <h2 class="sec">No. of Tests — <span id="psCountLabel"></span></h2>
       <div style="overflow-x:auto"><table id="psCountTable"></table></div>
@@ -308,6 +309,7 @@
     <div class="tiers" id="tiers"></div>
     <div id="vpNextStrip"></div>
     <div class="pwrow" id="vpPwLinks"></div>
+    <div id="vpHindiSec" class="hidden"></div>
 
     <h2 class="sec">No. of Tests — <span id="countLabel"></span></h2>
     <div style="overflow-x:auto"><table id="countTable"></table></div>
@@ -978,6 +980,9 @@ function select(key){
   selectPlan(key,0);
   renderNextStrip(key,"vpNextStrip");
   renderPwLink(key,"vpPwLinks");
+  const vh=document.getElementById("vpHindiSec");
+  if(key==="dr-NEET"){ renderHindiCentres("vpHindiSec",false); vh.classList.remove("hidden"); }
+  else { vh.classList.add("hidden"); vh.innerHTML=""; }
   document.getElementById("result").scrollIntoView({behavior:"smooth",block:"start"});
 }
 
@@ -1253,6 +1258,9 @@ function selectPS(key){
   selectPlanPS(key,0);
   renderNextStrip(key,"psNextStrip");
   renderPwLink(key,"psPwLinks");
+  const ph=document.getElementById("psHindiSec");
+  if(key==="dr-NEET"){ renderHindiCentres("psHindiSec",true); ph.classList.remove("hidden"); }
+  else { ph.classList.add("hidden"); ph.innerHTML=""; }
   document.getElementById("psResult").scrollIntoView({behavior:"smooth",block:"start"});
 }
 
@@ -1847,6 +1855,26 @@ function renderPwLink(key,elId){
     '<a class="pwlink ghost" href="'+PW_DIRECTORY+'" target="_blank" rel="noopener">All centres &amp; fee structure \u2197</a>';
 }
 
+
+/* Hindi Dropper centre section \u2014 rendered only when Dropper NEET is selected */
+function renderHindiCentres(boxId,isPS){
+  const el=document.getElementById(boxId);
+  if(!el) return;
+  let rows;
+  if(isPS){
+    rows=[...PS_HINDI].sort().map(n=>"<tr><td style='text-align:left'>"+n+"</td><td class='ok'>\u2713 Basic / PRO / Pro Max</td></tr>").join("");
+    el.innerHTML='<h2 class="sec">Yakeen Hindi 2.0 (NEET Dropper Hindi) \u2014 Pathshala centres</h2>'+
+      '<div class="note" style="margin:-4px 0 10px">The Hindi Dropper batch runs only at these '+PS_HINDI.size+' Pathshala centres. At every other PS centre it is not offered. Source: PS Hindi Centers sheet (AY 26-27).</div>'+
+      "<div style='overflow-x:auto'><table><tr><th style='text-align:left'>Centre</th><th>Hindi Dropper</th></tr>"+rows+"</table></div>";
+  } else {
+    rows=VP_HINDI.map(([n,bp,pm])=>"<tr><td style='text-align:left'>"+n+"</td>"+
+      "<td class='ok'>\u2713 Live</td>"+
+      "<td class='"+(pm?"ok":"no")+"'>"+(pm?"\u2713 Live":"\u2715 Not Live")+"</td></tr>").join("");
+    el.innerHTML='<h2 class="sec">Yakeen Hindi 2.0 (NEET Dropper Hindi) \u2014 Vidyapeeth centres</h2>'+
+      '<div class="note" style="margin:-4px 0 10px">The Hindi Dropper batch runs only at these '+VP_HINDI.length+' VP centres. At every other VP centre it is not offered. Jaipur - Vaishali Nagar runs the Hindi batch only (English MIP plans not live there). Source: VP Hindi Centers sheet (AY 26-27).</div>'+
+      "<div style='overflow-x:auto'><table><tr><th style='text-align:left'>Centre</th><th>Hindi \u2014 Basic / PRO</th><th>Hindi \u2014 Pro Max (DT)</th></tr>"+rows+"</table></div>";
+  }
+}
 /* Vertical toggle (VP / PS) */
 function selectVertical(v){
   document.querySelectorAll(".vchip").forEach(c=>c.classList.toggle("active",c.dataset.v===v));
@@ -1905,21 +1933,20 @@ function renderPSCentres(){
     '<select id="psRegion" onchange="drawPSTable()"><option value="">All Regions ('+PS_CENTERS.length+' centres)</option>'+
     regions.map(r=>'<option>'+r+'</option>').join('')+'</select></div>'+
     '<div style="overflow-x:auto"><table id="psTable"></table></div>'+
-    '<div class="note"><b>All three plans \u2014 MIP Basic, MIP PRO and MIP Pro Max \u2014 are live at all '+PS_CENTERS.length+' Pathshala centres.</b> <b>Yakeen Hindi 2.0 (NEET Dropper Hindi)</b> runs only at the '+PS_HINDI.size+' centres marked \u2713 in the Hindi column. Source: PS centres list + PS Hindi Centers sheet (AY 26-27).</div>';
+    '<div class="note"><b>All three plans \u2014 MIP Basic, MIP PRO and MIP Pro Max \u2014 are live at all '+PS_CENTERS.length+' Pathshala centres.</b> Source: PS centres list (AY 26-27).</div>';
   drawPSTable();
 }
 function drawPSTable(){
   const q=document.getElementById("psSearch").value.toLowerCase().trim();
   const rg=document.getElementById("psRegion").value;
   const list=PS_CENTERS.filter(([n,r])=>(!rg||r===rg)&&(!q||n.toLowerCase().includes(q)));
-  let html="<tr><th style='text-align:left'>Centre</th><th>Region</th><th>MIP Basic</th><th>MIP PRO</th><th>MIP Pro Max</th><th>Hindi Dropper</th><th>pw.live</th></tr>";
+  let html="<tr><th style='text-align:left'>Centre</th><th>Region</th><th>MIP Basic</th><th>MIP PRO</th><th>MIP Pro Max</th><th>pw.live</th></tr>";
   list.forEach(([n,r])=>{
     html+="<tr><td style='text-align:left'>"+n+"</td><td>"+r+"</td>"+
       "<td class='ok'>\u2713 Live</td><td class='ok'>\u2713 Live</td><td class='ok'>\u2713 Live</td>"+
-      (PS_HINDI.has(n)?"<td class='ok'>\u2713 Live</td>":"<td class='no'>\u2715 Not offered</td>")+
       "<td><a class='pwmini' href='"+pwCentreSearch(n)+"' target='_blank' rel='noopener'>Look up \u2197</a></td></tr>";
   });
-  if(!list.length) html+='<tr><td colspan="7" style="text-align:center;color:var(--grey)">No centres match your search.</td></tr>';
+  if(!list.length) html+='<tr><td colspan="6" style="text-align:center;color:var(--grey)">No centres match your search.</td></tr>';
   document.getElementById("psTable").innerHTML=html;
 }
 renderPSCentres();
@@ -1927,7 +1954,7 @@ renderPSCentres();
 /* Merged centre lookup: union of both lists, per-tier availability + remarks */
 const CENTRE_MERGED = (() => {
   const pmSet = new Set(PRO_MAX_CENTERS);
-  const names = [...new Set([...BASIC_PRO_CENTERS, ...PRO_MAX_CENTERS, ...VP_HINDI.map(x=>x[0])])].sort((a,b)=>a.localeCompare(b));
+  const names = [...new Set([...BASIC_PRO_CENTERS, ...PRO_MAX_CENTERS])].sort((a,b)=>a.localeCompare(b));
   return names.map(n=>({
     name: n,
     basicPro: BASIC_PRO_CENTERS.includes(n),
@@ -1945,10 +1972,9 @@ function renderCentres(){
       '<option value="bp">Basic / PRO Live</option>'+
       '<option value="pm">Pro Max Live</option>'+
       '<option value="pmOnly">Pro Max NOT Live</option>'+
-      '<option value="hi">Hindi Dropper live</option>'+
     '</select></div>'+
     '<div style="overflow-x:auto"><table id="centreTable"></table></div>'+
-    '<div class="note">Basic/PRO and Pro Max are separate live lists, so a centre may be live in one and not the other. '+BASIC_PRO_CENTERS.length+' centres run Basic &amp; PRO; '+PRO_MAX_CENTERS.length+' run Pro Max. <b>Yakeen Hindi 2.0 (NEET Dropper Hindi)</b> runs only at the '+VP_HINDI.length+' centres marked in the Hindi column \u2014 at every other centre it is not offered. Source: VP centre lists + VP Hindi Centers sheet (AY 26-27).</div>';
+    '<div class="note">Basic/PRO and Pro Max are separate live lists, so a centre may be live in one and not the other. '+BASIC_PRO_CENTERS.length+' centres run Basic &amp; PRO; '+PRO_MAX_CENTERS.length+' run Pro Max. Source: VP centre lists (AY 26-27).</div>';
   drawCentreTable();
 }
 function drawCentreTable(){
@@ -1958,19 +1984,13 @@ function drawCentreTable(){
   if(tf==="bp") list=list.filter(c=>c.basicPro);
   if(tf==="pm") list=list.filter(c=>c.proMax);
   if(tf==="pmOnly") list=list.filter(c=>!c.proMax);
-  if(tf==="hi") list=list.filter(c=>VP_HINDI_MAP.has(c.name));
   const cell=v=>'<td class="'+(v?'ok':'no')+'">'+(v?'\u2713 Live':'\u2715 Not Live')+'</td>';
-  const hcell=n=>{
-    const h=VP_HINDI_MAP.get(n);
-    if(!h) return "<td style='color:#9ca3af'>\u2014</td>";
-    return "<td style='white-space:nowrap'><span class='ok'>\u2713 Basic/PRO</span><br><span class='"+(h.pm?"ok":"no")+"'>"+(h.pm?"\u2713":"\u2715")+" Pro Max (DT)</span></td>";
-  };
-  let html="<tr><th style='text-align:left'>Centre</th><th>MIP Basic</th><th>MIP PRO</th><th>MIP Pro Max</th><th>Hindi Dropper (Yakeen Hindi 2.0)</th><th>pw.live</th></tr>";
+  let html="<tr><th style='text-align:left'>Centre</th><th>MIP Basic</th><th>MIP PRO</th><th>MIP Pro Max</th><th>pw.live</th></tr>";
   list.forEach(c=>{
-    html+="<tr><td style='text-align:left'>"+c.name+"</td>"+cell(c.basicPro)+cell(c.basicPro)+cell(c.proMax)+hcell(c.name)+
+    html+="<tr><td style='text-align:left'>"+c.name+"</td>"+cell(c.basicPro)+cell(c.basicPro)+cell(c.proMax)+
       "<td><a class='pwmini' href='"+pwCentreSearch(c.name)+"' target='_blank' rel='noopener'>Look up \u2197</a></td></tr>";
   });
-  if(!list.length) html+='<tr><td colspan="6" style="text-align:center;color:var(--grey)">No centres match your search.</td></tr>';
+  if(!list.length) html+='<tr><td colspan="5" style="text-align:center;color:var(--grey)">No centres match your search.</td></tr>';
   document.getElementById("centreTable").innerHTML=html;
 }
 renderCentres();
