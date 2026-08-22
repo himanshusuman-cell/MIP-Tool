@@ -1860,21 +1860,39 @@ function renderPwLink(key,elId){
 function renderHindiCentres(boxId,isPS){
   const el=document.getElementById(boxId);
   if(!el) return;
-  let rows;
-  if(isPS){
-    rows=[...PS_HINDI].sort().map(n=>"<tr><td style='text-align:left'>"+n+"</td><td class='ok'>\u2713 Basic / PRO / Pro Max</td></tr>").join("");
-    el.innerHTML='<h2 class="sec">Yakeen Hindi 2.0 (NEET Dropper Hindi) \u2014 Pathshala centres</h2>'+
-      '<div class="note" style="margin:-4px 0 10px">The Hindi Dropper batch runs only at these '+PS_HINDI.size+' Pathshala centres. At every other PS centre it is not offered. Source: PS Hindi Centers sheet (AY 26-27).</div>'+
-      "<div style='overflow-x:auto'><table><tr><th style='text-align:left'>Centre</th><th>Hindi Dropper</th></tr>"+rows+"</table></div>";
-  } else {
-    rows=VP_HINDI.map(([n,bp,pm])=>"<tr><td style='text-align:left'>"+n+"</td>"+
-      "<td class='ok'>\u2713 Live</td>"+
-      "<td class='"+(pm?"ok":"no")+"'>"+(pm?"\u2713 Live":"\u2715 Not Live")+"</td></tr>").join("");
-    el.innerHTML='<h2 class="sec">Yakeen Hindi 2.0 (NEET Dropper Hindi) \u2014 Vidyapeeth centres</h2>'+
-      '<div class="note" style="margin:-4px 0 10px">The Hindi Dropper batch runs only at these '+VP_HINDI.length+' VP centres. At every other VP centre it is not offered. Jaipur - Vaishali Nagar runs the Hindi batch only (English MIP plans not live there). Source: VP Hindi Centers sheet (AY 26-27).</div>'+
-      "<div style='overflow-x:auto'><table><tr><th style='text-align:left'>Centre</th><th>Hindi \u2014 Basic / PRO</th><th>Hindi \u2014 Pro Max (DT)</th></tr>"+rows+"</table></div>";
-  }
+  const sid=boxId+"Search", tid=boxId+"Table";
+  const head=isPS
+    ? '<h2 class="sec">Yakeen Hindi 2.0 (NEET Dropper Hindi) \u2014 Pathshala centres</h2>'+
+      '<div class="note" style="margin:-4px 0 10px">The Hindi Dropper batch runs only at these '+PS_HINDI.size+' Pathshala centres. At every other PS centre it is not offered. Source: PS Hindi Centers sheet (AY 26-27).</div>'
+    : '<h2 class="sec">Yakeen Hindi 2.0 (NEET Dropper Hindi) \u2014 Vidyapeeth centres</h2>'+
+      '<div class="note" style="margin:-4px 0 10px">The Hindi Dropper batch runs only at these '+VP_HINDI.length+' VP centres. At every other VP centre it is not offered. Jaipur - Vaishali Nagar runs the Hindi batch only (English MIP plans not live there). Source: VP Hindi Centers sheet (AY 26-27).</div>';
+  el.innerHTML=head+
+    '<div class="centre-controls"><input type="text" id="'+sid+'" placeholder="Type centre / city name... (e.g. Kota, Bhopal, Deoria)" style="flex:1;min-width:240px" oninput="drawHindiCentres(\''+boxId+'\','+isPS+')"></div>'+
+    '<div style="overflow-x:auto"><table id="'+tid+'"></table></div>';
+  drawHindiCentres(boxId,isPS);
 }
+
+function drawHindiCentres(boxId,isPS){
+  const q=(document.getElementById(boxId+"Search").value||"").toLowerCase().trim();
+  let html,empty;
+  if(isPS){
+    const list=[...PS_HINDI].sort().filter(n=>!q||n.toLowerCase().includes(q));
+    html="<tr><th style='text-align:left'>Centre</th><th>Hindi Dropper</th></tr>"+
+      list.map(n=>"<tr><td style='text-align:left'>"+n+"</td><td class='ok'>\u2713 Basic / PRO / Pro Max</td></tr>").join("");
+    empty=!list.length;
+    if(empty) html+='<tr><td colspan="2" style="text-align:center;color:var(--grey)">No Hindi centres match \u2014 the Hindi batch is not offered at other PS centres.</td></tr>';
+  } else {
+    const list=VP_HINDI.filter(([n])=>!q||n.toLowerCase().includes(q));
+    html="<tr><th style='text-align:left'>Centre</th><th>Hindi \u2014 Basic / PRO</th><th>Hindi \u2014 Pro Max (DT)</th></tr>"+
+      list.map(([n,bp,pm])=>"<tr><td style='text-align:left'>"+n+"</td>"+
+        "<td class='ok'>\u2713 Live</td>"+
+        "<td class='"+(pm?"ok":"no")+"'>"+(pm?"\u2713 Live":"\u2715 Not Live")+"</td></tr>").join("");
+    empty=!list.length;
+    if(empty) html+='<tr><td colspan="3" style="text-align:center;color:var(--grey)">No Hindi centres match \u2014 the Hindi batch is not offered at other VP centres.</td></tr>';
+  }
+  document.getElementById(boxId+"Table").innerHTML=html;
+}
+
 /* Vertical toggle (VP / PS) */
 function selectVertical(v){
   document.querySelectorAll(".vchip").forEach(c=>c.classList.toggle("active",c.dataset.v===v));
