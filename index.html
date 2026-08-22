@@ -380,7 +380,8 @@ Planner data is read from the academic team's sheet when a live feed is configur
 const PRICING = {
   "11": { basic: 3999, pro: 5999, promax: 9499 },
   "12": { basic: 5499, pro: 8499, promax: 13999 },
-  "dr": { basic: 5499, pro: 8499, promax: 13999 }
+  "dr": { basic: 5499, pro: 8499, promax: 13999 },
+  "hi": { basic: 5499, pro: 8499, promax: 13999 }
 };
 
 function tagline(key,tk){ return TAGLINES[tk]; }
@@ -485,6 +486,21 @@ const COHORTS = {
       ["Physics premium practice material",[0,0,1]]
     ],
     onlineCount: [3,5,8]
+  },
+  "hi-NEET": {
+    label: "Dropper NEET (Hindi)",
+    tests: [["Batch Test",[1,1,1]],["AITS (+ 2 Maha NEET)",[1,1,1]],["Rank Booster Test (3)",[0,0,1]],["RTS \u2014 Real Test Series (CBT mode)",[0,1,1]],["VP Mastery Test series",[0,0,1]]],
+    support: [["Doubt support",[0,0,1]],["Last 45 Days Supervised Learning at VP",[0,0,1]]],
+    online: [
+      ["Detailed test analysis & video solutions",[1,1,1]],
+      ["Test report with AIR ranking + improvement areas",[1,1,1]],
+      ["Personalised career guidance at VP (by counsellor)",[1,1,1]],
+      ["AITS M2M Sheet (PDF)",[0,1,1]],
+      ["Achiever Handbook",[0,1,1]],
+      ["NCERT assertion-reason sheets, chapterwise",[0,0,1]],
+      ["Physics premium practice material",[0,0,1]]
+    ],
+    onlineCount: [3,5,7]
   }
 };
 
@@ -526,6 +542,11 @@ const PLAN_COUNTS = {
     [["Batch",9],["AITS",11]],
     [["Batch",9],["AITS",11],["RTS",4]],
     [["Batch",9],["Ranker",4],["PreAITS",5],["AITS",11],["RTS",4],["Mastery",6]]
+  ],
+  "hi-NEET": [
+    [["Batch",10],["AITS",11]],
+    [["Batch",10],["AITS",11],["RTS",4]],
+    [["Batch",10],["Ranker",3],["AITS",11],["RTS",4],["Mastery",6]]
   ]
 };
 
@@ -559,7 +580,7 @@ const psify = t => String(t).replace(/VP Mastery/g,"PS Mastery");
 function renderPlanCounts(key, ti, tableId, labelId, noteId, isPS){
   const rows=PLAN_COUNTS[key][ti];
   const planName=["MIP Basic","MIP PRO","MIP Pro Max"][ti];
-  const label=(key.startsWith("11")?"11th ":key.startsWith("12")?"12th ":"Dropper ")+(key.endsWith("JEE")?"JEE":"NEET");
+  const label=key==="hi-NEET"?"NEET Dropper (Hindi)":(key.startsWith("11")?"11th ":key.startsWith("12")?"12th ":"Dropper ")+(key.endsWith("JEE")?"JEE":"NEET");
   let html='<tr><th style="text-align:left">Test Type</th><th>No. of Tests</th></tr>';
   if(Array.isArray(rows)){
     rows.forEach(([t,n])=>{
@@ -574,7 +595,8 @@ function renderPlanCounts(key, ti, tableId, labelId, noteId, isPS){
   document.getElementById(tableId).innerHTML=html;
   document.getElementById(labelId).textContent=label+" \u00B7 "+planName;
   const hindi=(key==="dr-NEET")
-    ? ' Yakeen Hindi 2.0 (NEET Dropper Hindi): '+HINDI_TOTALS.totals[ti]+' tests in this plan.' : '';
+    ? ' Hindi medium? See the Dropper NEET (Hindi) cohort tab \u2014 '+HINDI_TOTALS.totals[ti]+' tests in this plan.'
+    : (key==="hi-NEET" ? ' English medium (Yakeen 2.0): see the Dropper NEET cohort tab.' : '');
   document.getElementById(noteId).innerHTML=
     'Showing only the tests included in <b>'+planName+'</b>. Click another plan card above to switch. Counts derived test-by-test from the MIP Planner workbook (22 Aug 2026); VP Mastery as per the live dashboard.'+hindi;
 }
@@ -916,7 +938,7 @@ const PRO_MAX_CENTERS = [
 ];
 
 /* ===================== RENDER LOGIC (no edits needed below) ===================== */
-const CHIP_ORDER = [["11-JEE","11th JEE"],["11-NEET","11th NEET"],["12-JEE","12th JEE"],["12-NEET","12th NEET"],["dr-JEE","Dropper JEE"],["dr-NEET","Dropper NEET"]];
+const CHIP_ORDER = [["11-JEE","11th JEE"],["11-NEET","11th NEET"],["12-JEE","12th JEE"],["12-NEET","12th NEET"],["dr-JEE","Dropper JEE"],["dr-NEET","Dropper NEET"],["hi-NEET","Dropper NEET (Hindi)"]];
 const TIER_META = [["basic","MIP Basic","basic"],["pro","MIP PRO","pro"],["promax","MIP Pro Max","promax"]];
 const fmt = n => "\u20B9" + n.toLocaleString("en-IN");
 
@@ -975,7 +997,7 @@ function select(key){
   renderNextStrip(key,"vpNextStrip");
   renderPwLink(key,"vpPwLinks");
   const vh=document.getElementById("vpHindiSec");
-  if(key==="dr-NEET"){ renderHindiCentres("vpHindiSec",false); vh.classList.remove("hidden"); }
+  if(key==="dr-NEET"||key==="hi-NEET"){ renderHindiCentres("vpHindiSec",false); vh.classList.remove("hidden"); }
   else { vh.classList.add("hidden"); vh.innerHTML=""; }
   document.getElementById("result").scrollIntoView({behavior:"smooth",block:"start"});
 }
@@ -1197,6 +1219,27 @@ const PS_COHORTS = {
       ["Physics Premium Practice Material (600+ questions)", [0,0,1]]
     ],
     onlineCount: [4,5,8]
+  },
+  "hi-NEET": {
+    label: "Dropper NEET (Hindi) (PS)",
+    tests: [
+      ["Batch Test", [1,1,1]],
+      ["AITS (+ 2 Maha NEET)", [1,1,1]],
+      ["Rank Booster Test (3)", [0,0,1]],
+      ["RTS \u2014 Real Test Series (CBT mode)", [0,1,1]],
+      ["Mastery Test Series (6 exclusive Pathshala tests, April)", [0,0,1]]
+    ],
+    support: [["Doubt Support \u2014 8 Hrs weekly offline, personalised", [0,0,1]]],
+    online: [
+      ["Achiever Handbook", [1,1,1]],
+      ["Detailed test analysis & video solutions", [1,1,1]],
+      ["Test report with AIR ranking + improvement areas", [1,1,1]],
+      ["Personalised career guidance at Pathshala Centers (by counsellor)", [1,1,1]],
+      ["AITS Mistakes to Mastery (M2M)", [0,1,1]],
+      ["NCERT Assertion\u2013Reason + Statement Sheets (chapterwise)", [0,0,1]],
+      ["Physics Premium Practice Material (600+ questions)", [0,0,1]]
+    ],
+    onlineCount: [4,5,7]
   }
 };
 
@@ -1254,7 +1297,7 @@ function selectPS(key){
   renderNextStrip(key,"psNextStrip");
   renderPwLink(key,"psPwLinks");
   const ph=document.getElementById("psHindiSec");
-  if(key==="dr-NEET"){ renderHindiCentres("psHindiSec",true); ph.classList.remove("hidden"); }
+  if(key==="dr-NEET"||key==="hi-NEET"){ renderHindiCentres("psHindiSec",true); ph.classList.remove("hidden"); }
   else { ph.classList.add("hidden"); ph.innerHTML=""; }
   document.getElementById("psResult").scrollIntoView({behavior:"smooth",block:"start"});
 }
@@ -1612,7 +1655,8 @@ const COHORT_BATCH={
   "12-NEET":"Lakshya NEET 2.0 2027",
   "12-JEE":"Lakshya JEE 2.0 2027",
   "dr-JEE":"Prayas JEE 2.0 2027",
-  "dr-NEET":"Yakeen NEET 2.0 2027"
+  "dr-NEET":"Yakeen NEET 2.0 2027",
+  "hi-NEET":"Yakeen NEET Hindi 2.0 2027"
 };
 const PLANNER_TABS=[
   ["11-NEET","11th NEET","Arjuna NEET 2.0 2027"],
@@ -1739,7 +1783,7 @@ function renderNextStrip(key,elId,ti){
 }
 function gotoPlanner(key){
   showView("planner");
-  setPlannerCohort(key);
+  setPlannerCohort(key==="hi-NEET"?"dr-NEET-HI":key);
   document.getElementById("plannerView").scrollIntoView({behavior:"smooth",block:"start"});
 }
 
@@ -1834,7 +1878,8 @@ const PW_COHORT_URL={
   "dr-JEE"  : PW_BASE+"/iit-jee-coaching/class/dropper",
   "11-NEET" : PW_BASE+"/neet-coaching/class/class-11",
   "12-NEET" : PW_BASE+"/neet-coaching/class/class-12",
-  "dr-NEET" : PW_BASE+"/neet-coaching/class/dropper"
+  "dr-NEET" : PW_BASE+"/neet-coaching/class/dropper",
+  "hi-NEET" : PW_BASE+"/neet-coaching/class/dropper"
 };
 const PW_DIRECTORY=PW_BASE;
 /* Centre pages use a city slug we do not hold per centre, so a centre row
