@@ -1870,20 +1870,21 @@ function renderHindiCentres(boxId,isPS){
 function drawHindiCentres(boxId,isPS){
   const q=(document.getElementById(boxId+"Search").value||"").toLowerCase().trim();
   let html,empty;
+  const pw=n=>"<td><a class='pwmini' href='"+pwCentreSearch(n)+"' target='_blank' rel='noopener'>Look up \u2197</a></td>";
   if(isPS){
     const list=[...PS_HINDI].sort().filter(n=>!q||n.toLowerCase().includes(q));
-    html="<tr><th style='text-align:left'>Centre</th><th>Hindi Dropper</th></tr>"+
-      list.map(n=>"<tr><td style='text-align:left'>"+n+"</td><td class='ok'>\u2713 Basic / PRO / Pro Max</td></tr>").join("");
+    html="<tr><th style='text-align:left'>Centre</th><th>Hindi Dropper</th><th>pw.live</th></tr>"+
+      list.map(n=>"<tr><td style='text-align:left'>"+n+"</td><td class='ok'>\u2713 Basic / PRO / Pro Max</td>"+pw(n)+"</tr>").join("");
     empty=!list.length;
-    if(empty) html+='<tr><td colspan="2" style="text-align:center;color:var(--grey)">No Hindi centres match \u2014 the Hindi batch is not offered at other PS centres.</td></tr>';
+    if(empty) html+='<tr><td colspan="3" style="text-align:center;color:var(--grey)">No Hindi centres match \u2014 the Hindi batch is not offered at other PS centres.</td></tr>';
   } else {
     const list=VP_HINDI.filter(([n])=>!q||n.toLowerCase().includes(q));
-    html="<tr><th style='text-align:left'>Centre</th><th>Hindi \u2014 Basic / PRO</th><th>Hindi \u2014 Pro Max (DT)</th></tr>"+
+    html="<tr><th style='text-align:left'>Centre</th><th>Hindi \u2014 Basic / PRO</th><th>Hindi \u2014 Pro Max (DT)</th><th>pw.live</th></tr>"+
       list.map(([n,bp,pm])=>"<tr><td style='text-align:left'>"+n+"</td>"+
         "<td class='ok'>\u2713 Live</td>"+
-        "<td class='"+(pm?"ok":"no")+"'>"+(pm?"\u2713 Live":"\u2715 Not Live")+"</td></tr>").join("");
+        "<td class='"+(pm?"ok":"no")+"'>"+(pm?"\u2713 Live":"\u2715 Not Live")+"</td>"+pw(n)+"</tr>").join("");
     empty=!list.length;
-    if(empty) html+='<tr><td colspan="3" style="text-align:center;color:var(--grey)">No Hindi centres match \u2014 the Hindi batch is not offered at other VP centres.</td></tr>';
+    if(empty) html+='<tr><td colspan="4" style="text-align:center;color:var(--grey)">No Hindi centres match \u2014 the Hindi batch is not offered at other VP centres.</td></tr>';
   }
   document.getElementById(boxId+"Table").innerHTML=html;
 }
