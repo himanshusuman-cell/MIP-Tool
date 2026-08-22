@@ -134,14 +134,10 @@
     text-transform:uppercase;letter-spacing:.1em;border-bottom:none;
   }
   .tier li.hd::before{content:"";}
-  .copybtn{
     margin:10px 15px 15px;padding:11px;border:none;border-radius:10px;background:var(--c);color:#fff;
     font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.02em;
     transition:filter .14s ease;
   }
-  .copybtn:hover{filter:brightness(1.08);}
-  .copybtn:active{transform:translateY(1px);}
-  .copybtn:focus-visible{outline:3px solid var(--gold);outline-offset:2px;}
 
   /* ---------- Tables ---------- */
   table{width:100%;border-collapse:separate;border-spacing:0;background:var(--card);
@@ -232,10 +228,6 @@
   .sylrow td{border-top:2px solid var(--line);}
   footer{text-align:center;font-size:11.5px;color:var(--muted);margin-top:40px;padding:0 18px;line-height:1.7;}
 
-  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(8px);
-    background:var(--ink);color:#fff;padding:12px 22px;border-radius:999px;font-size:13.5px;font-weight:600;
-    opacity:0;transition:.25s ease;pointer-events:none;box-shadow:0 10px 30px rgba(15,27,54,.35);}
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
   @media (max-width:640px){
     header{padding:18px 16px;} header h1{font-size:19px;}
@@ -377,7 +369,6 @@ Planner data is read from the academic team's sheet when a live feed is configur
   <button onclick="location.reload(true)">Reload now</button>
   <button class="ghost" onclick="document.getElementById('updateBar').classList.remove('show')">Later</button>
 </div>
-<div class="toast" id="toast">Copied!</div>
 
 <script>
 /* =====================================================================
@@ -980,7 +971,7 @@ function select(key){
       '<div class="picktag">\u2B07 Test breakdown shown below</div>'+
       '<div class="tag">'+tagline(key,tk)+'</div>'+
       '<ul>'+lis+'</ul>'+
-      '<button class="copybtn" onclick="copyPitch(\''+key+'\',\''+tk+'\','+ti+')">\uD83D\uDCCB Copy Pitch (WhatsApp)</button>';
+      '';
     tiersEl.appendChild(card);
   });
 
@@ -1256,7 +1247,7 @@ function selectPS(key){
       '<div class="picktag">\u2B07 Test breakdown shown below</div>'+
       '<div class="tag">'+PS_BATCH_NAMES[tk]+'</div>'+
       '<ul>'+lis+'</ul>'+
-      '<button class="copybtn" onclick="copyPitchPS(\''+key+'\',\''+tk+'\','+ti+')">\uD83D\uDCCB Copy Pitch (WhatsApp)</button>';
+      '';
     tiersEl.appendChild(card);
   });
   selectPlanPS(key,0);
@@ -1272,30 +1263,6 @@ function selectPlanPS(key,ti){
   renderNextStrip(key,"psNextStrip",ti);
 }
 
-function copyPitchPS(key,tk,ti){
-  const c=PS_COHORTS[key];
-  const cls=key.split("-")[0];
-  const vt=VP_TIER_TOTALS[key];
-  const inc=[
-    ...COHORTS[key].tests.filter(([f,v])=>v[ti]).map(([f])=>psify(f)),
-    ...c.support.filter(([f,v])=>v[ti]).map(([f])=>f)
-  ];
-  const online=c.online.filter(([f,v])=>v[ti]).map(([f])=>f);
-  const txt=
-"*PW Pathshala \u2014 "+PS_TIER_NAMES[tk]+" ("+c.label+") | AY 2026-27*\n"+
-"\uD83D\uDCDD Batch: "+PS_BATCH_NAMES[tk]+"\n"+
-"\uD83D\uDCB0 Price: "+fmt(PRICING[cls][tk])+" (incl. GST)\n"+
-"\uD83D\uDCC5 Duration: August 2026 \u2013 June 2027 | Validity: Till the Exam\n"+
-"\uD83E\uDDEA Total Tests: "+vt.totals[ti]+" ("+psify(vt.breakdown[ti])+")\n\n"+
-"\u2705 *Included:*\n"+inc.map(f=>"\u2022 "+f).join("\n")+"\n\n"+
-"\uD83D\uDCF1 *Online & Offline Benefits ("+c.onlineCount[ti]+"):*\n"+online.map(f=>"\u2022 "+f).join("\n")+"\n\n"+
-"Enrol now for AY 2026-27! \uD83C\uDFAF";
-  navigator.clipboard.writeText(txt).then(()=>{
-    const t=document.getElementById("toast");
-    t.classList.add("show");
-    setTimeout(()=>t.classList.remove("show"),1500);
-  });
-}
 
 /* =====================================================================
    GLOSSARY — Source: "MIP Handbook.docx" (MIP Counsellor Handbook AY 2026-27, Sec. 3)
@@ -1897,6 +1864,37 @@ function resetCohort(){
   ["vpIntro","psIntro"].forEach(id=>document.getElementById(id).classList.remove("hidden"));
 }
 
+/* =====================================================================
+   YAKEEN HINDI 2.0 (NEET Dropper Hindi) \u2014 centre availability.
+   Source: "VP Hindi Centers" / "PS Hindi Centers" sheet (22 Aug 2026).
+   VP_HINDI: [centre, Basic/PRO Hindi batch, Pro Max (DT) Hindi batch]
+   Centres not listed do NOT offer the Hindi Dropper batch.
+   ===================================================================== */
+const VP_HINDI = [
+["Raipur Vidyapeeth",1,1],["Jabalpur Vidyapeeth",1,1],["Indore - MG Road Vidyapeeth",1,1],
+["Indore - Bhawarkuan Vidyapeeth",1,1],["Bhopal Vidyapeeth",1,1],["Bilaspur Vidyapeeth",1,1],
+["Bhilai Vidyapeeth",1,1],
+["Moradabad Vidyapeeth",1,0],
+["Ajmer - Civil Lines Vidyapeeth",1,1],["Alwar Vidyapeeth",1,1],["Jaipur - Pratap Nagar Vidyapeeth",1,1],
+["Jaipur - RS Circle Vidyapeeth",1,1],["Jaipur - Vaishali Nagar Vidyapeeth",1,1],
+["Jodhpur - Akhaliya Vidyapeeth",1,1],["Jodhpur - Paota Vidyapeeth",1,1],["Jodhpur - Sardarpura Vidyapeeth",1,1],
+["Kota Vidyapeeth",1,1],["Sikar Vidyapeeth",1,1],["Sriganganagar - Meera Marg Vidyapeeth",1,1],["Udaipur Vidyapeeth",1,1],
+["Gorakhpur - Medical Road Vidyapeeth",1,1],["Varanasi - Indira Tower Vidyapeeth",1,1],
+["Lucknow - Gomtinagar Vidyapeeth",1,1],["Lucknow - HazratGanj Vidyapeeth",1,1],
+["Kanpur - JSTower Vidyapeeth",1,1],["Gorakhpur Vidyapeeth",1,1],["Prayagraj - Civil Lines Vidyapeeth",1,1]
+];
+const VP_HINDI_MAP=new Map(VP_HINDI.map(([n,bp,pm])=>[n,{bp,pm}]));
+
+const PS_HINDI = new Set([
+"Deoria Vidyapeeth (Pathshala Centre)","Darbhanga - Kathalbari Vidyapeeth (Pathshala Centre)",
+"Ballia Vidyapeeth (Pathshala Centre)","Ghazipur Vidyapeeth (Pathshala Centre)",
+"Samastipur Vidyapeeth (Pathshala Centre)","Sitamarhi Vidyapeeth (Pathshala Centre)",
+"Bihar Sharif-Nalanda Vidyapeeth (Pathshala Centre)","Sasaram Vidyapeeth (Pathshala Centre)",
+"Deoghar Vidyapeeth (Pathshala Centre)","Bijnor Vidyapeeth (Pathshala Centre)",
+"Jhansi Vidyapeeth (Pathshala Centre)","Chhatarpur Vidyapeeth (Pathshala Centre)",
+"Ayodhya Vidyapeeth (Pathshala Centre)","Sagar Vidyapeeth (Pathshala Centre)","Satna Vidyapeeth (Pathshala Centre)"
+]);
+
 /* PS centre table: search + region filter */
 function renderPSCentres(){
   const box=document.getElementById("psCentreBox");
@@ -1907,20 +1905,21 @@ function renderPSCentres(){
     '<select id="psRegion" onchange="drawPSTable()"><option value="">All Regions ('+PS_CENTERS.length+' centres)</option>'+
     regions.map(r=>'<option>'+r+'</option>').join('')+'</select></div>'+
     '<div style="overflow-x:auto"><table id="psTable"></table></div>'+
-    '<div class="note"><b>All three plans \u2014 MIP Basic, MIP PRO and MIP Pro Max \u2014 are live at all '+PS_CENTERS.length+' Pathshala centres.</b> Source: PS centres list (AY 26-27).</div>';
+    '<div class="note"><b>All three plans \u2014 MIP Basic, MIP PRO and MIP Pro Max \u2014 are live at all '+PS_CENTERS.length+' Pathshala centres.</b> <b>Yakeen Hindi 2.0 (NEET Dropper Hindi)</b> runs only at the '+PS_HINDI.size+' centres marked \u2713 in the Hindi column. Source: PS centres list + PS Hindi Centers sheet (AY 26-27).</div>';
   drawPSTable();
 }
 function drawPSTable(){
   const q=document.getElementById("psSearch").value.toLowerCase().trim();
   const rg=document.getElementById("psRegion").value;
   const list=PS_CENTERS.filter(([n,r])=>(!rg||r===rg)&&(!q||n.toLowerCase().includes(q)));
-  let html="<tr><th style='text-align:left'>Centre</th><th>Region</th><th>MIP Basic</th><th>MIP PRO</th><th>MIP Pro Max</th><th>pw.live</th></tr>";
+  let html="<tr><th style='text-align:left'>Centre</th><th>Region</th><th>MIP Basic</th><th>MIP PRO</th><th>MIP Pro Max</th><th>Hindi Dropper</th><th>pw.live</th></tr>";
   list.forEach(([n,r])=>{
     html+="<tr><td style='text-align:left'>"+n+"</td><td>"+r+"</td>"+
       "<td class='ok'>\u2713 Live</td><td class='ok'>\u2713 Live</td><td class='ok'>\u2713 Live</td>"+
+      (PS_HINDI.has(n)?"<td class='ok'>\u2713 Live</td>":"<td class='no'>\u2715 Not offered</td>")+
       "<td><a class='pwmini' href='"+pwCentreSearch(n)+"' target='_blank' rel='noopener'>Look up \u2197</a></td></tr>";
   });
-  if(!list.length) html+='<tr><td colspan="6" style="text-align:center;color:var(--grey)">No centres match your search.</td></tr>';
+  if(!list.length) html+='<tr><td colspan="7" style="text-align:center;color:var(--grey)">No centres match your search.</td></tr>';
   document.getElementById("psTable").innerHTML=html;
 }
 renderPSCentres();
@@ -1928,7 +1927,7 @@ renderPSCentres();
 /* Merged centre lookup: union of both lists, per-tier availability + remarks */
 const CENTRE_MERGED = (() => {
   const pmSet = new Set(PRO_MAX_CENTERS);
-  const names = [...new Set([...BASIC_PRO_CENTERS, ...PRO_MAX_CENTERS])].sort((a,b)=>a.localeCompare(b));
+  const names = [...new Set([...BASIC_PRO_CENTERS, ...PRO_MAX_CENTERS, ...VP_HINDI.map(x=>x[0])])].sort((a,b)=>a.localeCompare(b));
   return names.map(n=>({
     name: n,
     basicPro: BASIC_PRO_CENTERS.includes(n),
@@ -1946,9 +1945,10 @@ function renderCentres(){
       '<option value="bp">Basic / PRO Live</option>'+
       '<option value="pm">Pro Max Live</option>'+
       '<option value="pmOnly">Pro Max NOT Live</option>'+
+      '<option value="hi">Hindi Dropper live</option>'+
     '</select></div>'+
     '<div style="overflow-x:auto"><table id="centreTable"></table></div>'+
-    '<div class="note">Basic/PRO and Pro Max are separate live lists, so a centre may be live in one and not the other. '+BASIC_PRO_CENTERS.length+' centres run Basic &amp; PRO; '+PRO_MAX_CENTERS.length+' run Pro Max. Source: VP centre lists (AY 26-27).</div>';
+    '<div class="note">Basic/PRO and Pro Max are separate live lists, so a centre may be live in one and not the other. '+BASIC_PRO_CENTERS.length+' centres run Basic &amp; PRO; '+PRO_MAX_CENTERS.length+' run Pro Max. <b>Yakeen Hindi 2.0 (NEET Dropper Hindi)</b> runs only at the '+VP_HINDI.length+' centres marked in the Hindi column \u2014 at every other centre it is not offered. Source: VP centre lists + VP Hindi Centers sheet (AY 26-27).</div>';
   drawCentreTable();
 }
 function drawCentreTable(){
@@ -1958,13 +1958,19 @@ function drawCentreTable(){
   if(tf==="bp") list=list.filter(c=>c.basicPro);
   if(tf==="pm") list=list.filter(c=>c.proMax);
   if(tf==="pmOnly") list=list.filter(c=>!c.proMax);
+  if(tf==="hi") list=list.filter(c=>VP_HINDI_MAP.has(c.name));
   const cell=v=>'<td class="'+(v?'ok':'no')+'">'+(v?'\u2713 Live':'\u2715 Not Live')+'</td>';
-  let html="<tr><th style='text-align:left'>Centre</th><th>MIP Basic</th><th>MIP PRO</th><th>MIP Pro Max</th><th>pw.live</th></tr>";
+  const hcell=n=>{
+    const h=VP_HINDI_MAP.get(n);
+    if(!h) return "<td style='color:#9ca3af'>\u2014</td>";
+    return "<td style='white-space:nowrap'><span class='ok'>\u2713 Basic/PRO</span><br><span class='"+(h.pm?"ok":"no")+"'>"+(h.pm?"\u2713":"\u2715")+" Pro Max (DT)</span></td>";
+  };
+  let html="<tr><th style='text-align:left'>Centre</th><th>MIP Basic</th><th>MIP PRO</th><th>MIP Pro Max</th><th>Hindi Dropper (Yakeen Hindi 2.0)</th><th>pw.live</th></tr>";
   list.forEach(c=>{
-    html+="<tr><td style='text-align:left'>"+c.name+"</td>"+cell(c.basicPro)+cell(c.basicPro)+cell(c.proMax)+
+    html+="<tr><td style='text-align:left'>"+c.name+"</td>"+cell(c.basicPro)+cell(c.basicPro)+cell(c.proMax)+hcell(c.name)+
       "<td><a class='pwmini' href='"+pwCentreSearch(c.name)+"' target='_blank' rel='noopener'>Look up \u2197</a></td></tr>";
   });
-  if(!list.length) html+='<tr><td colspan="5" style="text-align:center;color:var(--grey)">No centres match your search.</td></tr>';
+  if(!list.length) html+='<tr><td colspan="6" style="text-align:center;color:var(--grey)">No centres match your search.</td></tr>';
   document.getElementById("centreTable").innerHTML=html;
 }
 renderCentres();
@@ -1979,28 +1985,6 @@ startUpdateWatch();
 document.querySelectorAll(".buildstamp").forEach(e=>e.textContent=BUILD_STAMP);
 document.body.style.setProperty("--plan","var(--vp)");
 
-function copyPitch(key,tk,ti){
-  const c=COHORTS[key], cls=key.split("-")[0];
-  const tname={basic:"MIP Basic",pro:"MIP PRO",promax:"MIP Pro Max"}[tk];
-  const inc=[
-    ...c.tests.filter(([f,v])=>v[ti]).map(([f])=>f),
-    ...c.support.filter(([f,v])=>v[ti]).map(([f])=>f)
-  ];
-  const online=c.online.filter(([f,v])=>v[ti]).map(([f])=>f);
-  const txt=
-"*PW Vidyapeeth \u2014 "+tname+" ("+c.label+") | AY 2026-27*\n"+
-"\uD83D\uDCB0 Price: "+fmt(PRICING[cls][tk])+" (incl. GST)\n"+
-(VP_TIER_TOTALS[key]?"\uD83E\uDDEA Total Tests: "+VP_TIER_TOTALS[key].totals[ti]+" ("+VP_TIER_TOTALS[key].breakdown[ti]+")\n":"")+"\n"+
-"\u2705 *Included:*\n"+inc.map(f=>"\u2022 "+f).join("\n")+"\n\n"+
-"\uD83D\uDCF1 *Online Features ("+c.onlineCount[ti]+"):*\n"+online.map(f=>"\u2022 "+f).join("\n")+"\n\n"+
-"_"+tagline(key,tk)+"_\n"+
-"Enrol now for AY 2026-27! \uD83C\uDFAF";
-  navigator.clipboard.writeText(txt).then(()=>{
-    const t=document.getElementById("toast");
-    t.classList.add("show");
-    setTimeout(()=>t.classList.remove("show"),1500);
-  });
-}
 </script>
 </body>
 </html>
