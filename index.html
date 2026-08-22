@@ -390,6 +390,13 @@ const PRICING = {
   "dr": { basic: 5499, pro: 8499, promax: 13999 }
 };
 
+function tagline(key,tk){
+  if(key==="11-NEET"){
+    if(tk==="pro") return "MIP PRO \u2014 everything in Basic + 4 extra Batch Tests + more online support (no RTS for 11th NEET).";
+    if(tk==="promax") return "MIP Pro Max \u2014 everything in PRO + 3 Rank Booster Tests + doubt support features.";
+  }
+  return TAGLINES[tk];
+}
 const TAGLINES = {
   basic:  "MIP Basic \u2014 without RTS. Extra offline test exposure at the most affordable price.",
   pro:    "MIP PRO \u2014 with RTS. Everything in Basic + Real Test Series (CBT mode) + more online support.",
@@ -415,7 +422,7 @@ const COHORTS = {
   },
   "11-NEET": {
     label: "11th NEET",
-    tests: [["Batch Test",[1,1,1]],["AITS",[1,1,1]],["RTS \u2014 Real Test Series (CBT mode)",[0,1,1]]],
+    tests: [["Batch Test \u2014 4 in Basic \u00b7 8 in PRO & Pro Max",[1,1,1]],["AITS",[1,1,1]],["Rank Booster Test (3)",[0,0,1]]],
     support: [["Doubt support",[0,0,1]],["Last 45 Days Supervised Learning at VP",[0,0,0]]],
     online: [
       ["Detailed test analysis & video solutions",[1,1,1]],
@@ -446,7 +453,7 @@ const COHORTS = {
   },
   "12-NEET": {
     label: "12th NEET",
-    tests: [["Batch Test",[1,1,1]],["AITS (+ 2 Maha NEET)",[1,1,1]],["RTS \u2014 Real Test Series (CBT mode)",[0,1,1]],["VP Mastery Test series",[0,0,1]]],
+    tests: [["Batch Test",[1,1,1]],["AITS (+ 2 Maha NEET)",[1,1,1]],["Rank Booster Test (1)",[0,0,1]],["RTS \u2014 Real Test Series (CBT mode)",[0,1,1]],["VP Mastery Test series",[0,0,1]]],
     support: [["Doubt support",[0,0,1]],["Last 45 Days Supervised Learning at VP",[0,0,1]]],
     online: [
       ["Detailed test analysis & video solutions",[1,1,1]],
@@ -478,7 +485,7 @@ const COHORTS = {
   },
   "dr-NEET": {
     label: "Dropper NEET",
-    tests: [["Batch Test",[1,1,1]],["AITS (+ 2 Maha NEET)",[1,1,1]],["RTS \u2014 Real Test Series (CBT mode)",[0,1,1]],["VP Mastery Test series",[0,0,1]]],
+    tests: [["Batch Test",[1,1,1]],["AITS (+ 2 Maha NEET)",[1,1,1]],["Rank Booster Test (4)",[0,0,1]],["Pre-AITS \u2014 100Q CBT on app (5)",[0,0,1]],["RTS \u2014 Real Test Series (CBT mode)",[0,1,1]],["VP Mastery Test series",[0,0,1]]],
     support: [["Doubt support",[0,0,1]],["Last 45 Days Supervised Learning at VP",[0,0,1]]],
     online: [
       ["Detailed test analysis & video solutions",[1,1,1]],
@@ -495,9 +502,9 @@ const COHORTS = {
 };
 
 /* =====================================================================
-   PLAN-WISE TEST BREAKDOWN \u2014 Sources: MIP test-count table (AY 26-27),
-   overridden where the live Dashboard tab (updated 22 Aug 2026) differs.
-   {total:N} = dashboard total; type-wise split awaited from the academic team.
+   PLAN-WISE TEST BREAKDOWN \u2014 counted test-by-test from the MIP Planner
+   workbook (all 21 tabs, 22 Aug 2026); VP Mastery counts from the Dashboard
+   tab. Every total verified against the Dashboard's cohort\u00d7plan table.
    PLAN_COUNTS[cohort][plan] = [ [testType, count], ... ]
    Reproduced exactly as supplied; "\u2014" columns are simply omitted.
    Totals are computed from these rows, so nothing can drift out of step.
@@ -519,27 +526,27 @@ const PLAN_COUNTS = {
     [["Batch",6],["AITS",15],["RTS",4],["Mastery",6]]
   ],
   "11-NEET": [
-    [["Batch",4],["Ranker",0],["AITS",6],["Mastery",0]],
-    [["Batch",4],["Ranker",0],["AITS",6],["Mastery",4]],
-    {total:17}
+    [["Batch",4],["AITS",6]],
+    [["Batch",8],["AITS",6]],
+    [["Batch",8],["Ranker",3],["AITS",6],["Mastery",0]]
   ],
   "12-NEET": [
-    {total:16},
-    [["Batch",4],["Ranker",0],["AITS",12],["Mastery",4]],
-    {total:27}
+    [["Batch",4],["AITS",12]],
+    [["Batch",4],["AITS",12],["RTS",4]],
+    [["Batch",4],["Ranker",1],["AITS",12],["RTS",4],["Mastery",6]]
   ],
   "dr-NEET": [
-    [["Batch",9],["Ranker",0],["AITS",11],["Mastery",0]],
-    [["Batch",9],["Ranker",0],["AITS",11],["Mastery",4]],
+    [["Batch",9],["AITS",11]],
+    [["Batch",9],["AITS",11],["RTS",4]],
     [["Batch",9],["Ranker",4],["PreAITS",5],["AITS",11],["RTS",4],["Mastery",6]]
   ]
 };
 
 /* Yakeen Hindi 2.0 (NEET Dropper Hindi) */
 const HINDI_COUNTS = [
-  [["Batch",10],["Ranker",0],["AITS",11],["Mastery",0]],
-  [["Batch",10],["Ranker",0],["AITS",11],["Mastery",4]],
-  [["Batch",10],["Ranker",3],["PreAITS",0],["AITS",11],["RTS",4],["Mastery",6]]
+  [["Batch",10],["AITS",11]],
+  [["Batch",10],["AITS",11],["RTS",4]],
+  [["Batch",10],["Ranker",3],["AITS",11],["RTS",4],["Mastery",6]]
 ];
 
 const TYPE_LABEL = {Batch:"Batch Test", AITS:"AITS", Ranker:"Rank Booster Test", RTS:"RTS \u2014 Real Test", PreAITS:"Pre-AITS", Mastery:"VP Mastery"};
@@ -582,7 +589,7 @@ function renderPlanCounts(key, ti, tableId, labelId, noteId, isPS){
   const hindi=(key==="dr-NEET")
     ? ' Yakeen Hindi 2.0 (NEET Dropper Hindi): '+HINDI_TOTALS.totals[ti]+' tests in this plan.' : '';
   document.getElementById(noteId).innerHTML=
-    'Showing only the tests included in <b>'+planName+'</b>. Click another plan card above to switch. Counts as per the MIP test-count table (AY 26-27).'+hindi;
+    'Showing only the tests included in <b>'+planName+'</b>. Click another plan card above to switch. Counts derived test-by-test from the MIP Planner workbook (22 Aug 2026); VP Mastery as per the live dashboard.'+hindi;
 }
 
 /* Test counts — exactly as printed in the deck */
@@ -971,7 +978,7 @@ function select(key){
       '<div class="head"><div class="tname">'+tname+'</div><div class="price">'+fmt(price)+' <span>incl. GST</span></div>'+
         (tt?'<div style="font-size:12px;margin-top:5px;opacity:.95">\uD83E\uDDEA '+tt.totals[ti]+' Tests in this plan</div>':'')+hero+'</div>'+
       '<div class="picktag">\u2B07 Test breakdown shown below</div>'+
-      '<div class="tag">'+TAGLINES[tk]+'</div>'+
+      '<div class="tag">'+tagline(key,tk)+'</div>'+
       '<ul>'+lis+'</ul>'+
       '<button class="copybtn" onclick="copyPitch(\''+key+'\',\''+tk+'\','+ti+')">\uD83D\uDCCB Copy Pitch (WhatsApp)</button>';
     tiersEl.appendChild(card);
@@ -1076,8 +1083,6 @@ const PS_CENTERS = [
 const PS_COHORTS = {
   "11-JEE": {
     label: "11th JEE (PS)",
-    totals: [15,17,17],
-    breakdown: ["Batch 6 \u00B7 AITS 9","Batch 6 \u00B7 AITS 9 \u00B7 Ranker 2","Batch 6 \u00B7 AITS 9 \u00B7 Ranker 2"],
     tests: [
       ["Batch Test", [1,1,1]],
       ["AITS", [1,1,1]],
@@ -1098,13 +1103,10 @@ const PS_COHORTS = {
   },
   "11-NEET": {
     label: "11th NEET (PS)",
-    totals: [13,17,17],
-    breakdown: ["Batch 4 \u00B7 AITS 6 \u00B7 Ranker 3","RTS 4 \u00B7 Batch 4 \u00B7 AITS 6 \u00B7 Ranker 3","RTS 4 \u00B7 Batch 4 \u00B7 AITS 6 \u00B7 Ranker 3"],
     tests: [
-      ["Batch Test", [1,1,1]],
+      ["Batch Test \u2014 4 in Basic \u00b7 8 in PRO & Pro Max", [1,1,1]],
       ["AITS", [1,1,1]],
-      ["Ranker Test", [1,1,1]],
-      ["RTS \u2014 Real Test Series (CBT mode)", [0,1,1]]
+      ["Rank Booster Test (3)", [0,0,1]]
     ],
     support: [["Doubt Support \u2014 8 Hrs weekly offline, personalised", [0,0,1]]],
     online: [
@@ -1120,12 +1122,9 @@ const PS_COHORTS = {
   },
   "12-JEE": {
     label: "12th JEE (PS)",
-    totals: [25,38,38],
-    breakdown: ["Batch 9 \u00B7 AITS 17","RTS 4 \u00B7 Batch 9 \u00B7 AITS 17 \u00B7 Maha JEE 2 \u00B7 Ranker 4","RTS 4 \u00B7 Batch 9 \u00B7 AITS 17 \u00B7 Maha JEE 2 \u00B7 Ranker 4 \u00B7 PS Mastery 6"],
     tests: [
       ["Batch Test", [1,1,1]],
-      ["AITS + 2 Maha JEE", [1,1,1]],
-      ["Ranker Test", [1,1,1]],
+      ["AITS (+ 2 Maha JEE)", [1,1,1]],
       ["RTS \u2014 Real Test Series (CBT mode)", [0,1,1]],
       ["Mastery Test Series (6 exclusive Pathshala tests, April)", [0,0,1]]
     ],
@@ -1144,8 +1143,6 @@ const PS_COHORTS = {
   },
   "12-NEET": {
     label: "12th NEET (PS)",
-    totals: [22,24,30],
-    breakdown: ["Batch 4 \u00B7 AITS 12 \u00B7 Maha NEET 2","RTS 4 \u00B7 Batch 4 \u00B7 AITS 12 \u00B7 Maha NEET 2 \u00B7 Ranker 2","RTS 4 \u00B7 Batch 4 \u00B7 AITS 12 \u00B7 Maha NEET 2 \u00B7 Ranker 2 \u00B7 Mastery 6"],
     tests: [
       ["Batch Test", [1,1,1]],
       ["AITS + 2 Maha NEET", [1,1,1]],
@@ -1168,11 +1165,9 @@ const PS_COHORTS = {
   },
   "dr-JEE": {
     label: "Dropper JEE (PS)",
-    totals: [22,32,38],
-    breakdown: ["Batch 7 \u00B7 AITS 15","RTS 4 \u00B7 Batch 7 \u00B7 AITS 15 \u00B7 Maha JEE 2 \u00B7 Ranker 4","RTS 4 \u00B7 Batch 7 \u00B7 AITS 15 \u00B7 Maha JEE 2 \u00B7 Ranker 4 \u00B7 Mastery 6"],
     tests: [
       ["Batch Test", [1,1,1]],
-      ["AITS + 2 Maha JEE", [1,1,1]],
+      ["AITS (+ 2 Maha JEE)", [1,1,1]],
       ["Ranker Test", [0,1,1]],
       ["RTS \u2014 Real Test Series (CBT mode)", [0,1,1]],
       ["Mastery Test Series (6 exclusive Pathshala tests, April)", [0,0,1]]
@@ -1192,12 +1187,10 @@ const PS_COHORTS = {
   },
   "dr-NEET": {
     label: "Dropper NEET (PS)",
-    totals: [22,30,38],
-    breakdown: ["Batch 9 \u00B7 AITS 11 \u00B7 Ranker 4","RTS 4 \u00B7 Batch 9 \u00B7 AITS 11 \u00B7 Ranker 4 \u00B7 Maha NEET 2","RTS 4 \u00B7 Batch 9 \u00B7 AITS 11 \u00B7 Ranker 4 \u00B7 Maha NEET 2 \u00B7 Mastery 6"],
     tests: [
       ["Batch Test", [1,1,1]],
       ["AITS + 2 Maha NEET", [1,1,1]],
-      ["Ranker Test", [1,1,1]],
+      ["Rank Booster Test", [0,0,1]],
       ["RTS \u2014 Real Test Series (CBT mode)", [0,1,1]],
       ["Mastery Test Series (6 exclusive Pathshala tests, April)", [0,0,1]]
     ],
@@ -2000,7 +1993,7 @@ function copyPitch(key,tk,ti){
 (VP_TIER_TOTALS[key]?"\uD83E\uDDEA Total Tests: "+VP_TIER_TOTALS[key].totals[ti]+" ("+VP_TIER_TOTALS[key].breakdown[ti]+")\n":"")+"\n"+
 "\u2705 *Included:*\n"+inc.map(f=>"\u2022 "+f).join("\n")+"\n\n"+
 "\uD83D\uDCF1 *Online Features ("+c.onlineCount[ti]+"):*\n"+online.map(f=>"\u2022 "+f).join("\n")+"\n\n"+
-"_"+TAGLINES[tk]+"_\n"+
+"_"+tagline(key,tk)+"_\n"+
 "Enrol now for AY 2026-27! \uD83C\uDFAF";
   navigator.clipboard.writeText(txt).then(()=>{
     const t=document.getElementById("toast");
