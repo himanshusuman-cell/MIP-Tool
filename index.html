@@ -383,13 +383,7 @@ const PRICING = {
   "dr": { basic: 5499, pro: 8499, promax: 13999 }
 };
 
-function tagline(key,tk){
-  if(key==="11-NEET"){
-    if(tk==="pro") return "MIP PRO \u2014 everything in Basic + 4 extra Batch Tests + more online support (no RTS for 11th NEET).";
-    if(tk==="promax") return "MIP Pro Max \u2014 everything in PRO + 3 Rank Booster Tests + doubt support features.";
-  }
-  return TAGLINES[tk];
-}
+function tagline(key,tk){ return TAGLINES[tk]; }
 const TAGLINES = {
   basic:  "MIP Basic \u2014 without RTS. Extra offline test exposure at the most affordable price.",
   pro:    "MIP PRO \u2014 with RTS. Everything in Basic + Real Test Series (CBT mode) + more online support.",
@@ -415,7 +409,7 @@ const COHORTS = {
   },
   "11-NEET": {
     label: "11th NEET",
-    tests: [["Batch Test \u2014 4 in Basic \u00b7 8 in PRO & Pro Max",[1,1,1]],["AITS",[1,1,1]],["Rank Booster Test (3)",[0,0,1]]],
+    tests: [["Batch Test",[1,1,1]],["AITS",[1,1,1]],["Rank Booster Test (3)",[0,0,1]],["RTS \u2014 Real Test Series (CBT mode)",[0,1,1]]],
     support: [["Doubt support",[0,0,1]],["Last 45 Days Supervised Learning at VP",[0,0,0]]],
     online: [
       ["Detailed test analysis & video solutions",[1,1,1]],
@@ -520,8 +514,8 @@ const PLAN_COUNTS = {
   ],
   "11-NEET": [
     [["Batch",4],["AITS",6]],
-    [["Batch",8],["AITS",6]],
-    [["Batch",8],["Ranker",3],["AITS",6],["Mastery",0]]
+    [["Batch",4],["AITS",6],["RTS",4]],
+    [["Batch",4],["Ranker",3],["AITS",6],["RTS",4],["Mastery",0]]
   ],
   "12-NEET": [
     [["Batch",4],["AITS",12]],
@@ -1100,9 +1094,10 @@ const PS_COHORTS = {
   "11-NEET": {
     label: "11th NEET (PS)",
     tests: [
-      ["Batch Test \u2014 4 in Basic \u00b7 8 in PRO & Pro Max", [1,1,1]],
+      ["Batch Test", [1,1,1]],
       ["AITS", [1,1,1]],
-      ["Rank Booster Test (3)", [0,0,1]]
+      ["Rank Booster Test (3)", [0,0,1]],
+      ["RTS \u2014 Real Test Series (CBT mode)", [0,1,1]]
     ],
     support: [["Doubt Support \u2014 8 Hrs weekly offline, personalised", [0,0,1]]],
     online: [
